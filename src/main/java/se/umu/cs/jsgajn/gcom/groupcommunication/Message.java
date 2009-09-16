@@ -1,6 +1,8 @@
 package se.umu.cs.jsgajn.gcom.groupcommunication;
 
-public interface Message<T> {
+import java.io.Serializable;
+
+public interface Message<T> extends Serializable {
 	
 	public T getMessage();
 }

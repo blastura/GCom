@@ -14,65 +14,61 @@ import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
 
 public class ChatMember implements GroupMember {
-	private static final Logger logger = Logger.getLogger(ChatMember.class);
-	private GroupMember chatfriend;
+    private static final Logger logger = Logger.getLogger(ChatMember.class);
+    private GroupMember chatfriend;
 
-	public ChatMember(String host, int port) {
+    public ChatMember(String host, int port) {
 
-		try {
-			GroupMember stub = (GroupMember) UnicastRemoteObject.exportObject(
-					this, 0);
+        try {
+            GroupMember stub = (GroupMember) UnicastRemoteObject.exportObject(
+                                                                              this, 0);
 
-			// Bind the remote object's stub in the registry
-			Registry registry = LocateRegistry.createRegistry(1099);
-			registry.bind("GroupMember", stub);
+            // Bind the remote object's stub in the registry
+            Registry registry = LocateRegistry.createRegistry(1099);
+            registry.bind("GroupMember", stub);
 
-			System.err.println("Server ready");
-			Scanner sc = new Scanner(System.in);
-			String msg = sc.nextLine();
-			if (msg.equals("conn")) {
-				connect(host, port);
-			}
-			msg = sc.nextLine();
-			chatfriend.receive(new ChatMessage(msg));
-			
-		} catch (RemoteException e) {
-			System.err.println("Server exception: " + e.toString());
-			e.printStackTrace();
-		} catch (AlreadyBoundException e) {
-			// TODO - fix error message
-			e.printStackTrace();
-		}
-	}
+            System.err.println("Server ready");
+            Scanner sc = new Scanner(System.in);
+            String msg = sc.nextLine();
+            if (msg.equals("conn")) {
+                connect(host, port);
+            }
+            msg = sc.nextLine();
+            chatfriend.receive(new ChatMessage(msg));
 
-	public boolean receive(Message<?> m) {
-		logger.debug(m.getMessage());
-		System.out.println(m.getMessage());
-		return true;
-	}
+        } catch (RemoteException e) {
+            System.err.println("Server exception: " + e.toString());
+            e.printStackTrace();
+        } catch (AlreadyBoundException e) {
+            // TODO - fix error message
+            e.printStackTrace();
+        }
+    }
 
-	public boolean connect(String host, int port) {
-		try {
+    public boolean receive(Message<?> m) {
+        logger.debug(m.getMessage());
+        System.out.println(m.getMessage());
+        return true;
+    }
 
-			// Bind the remote object's stub in the registry
-			Registry registry = LocateRegistry.getRegistry(host, port);
+    public boolean connect(String host, int port) {
+        try {
 
-			try {
-				chatfriend = (GroupMember) registry.lookup("GroupMember");
-			} catch (NotBoundException e) {
-				e.printStackTrace();
-			}
+            // Bind the remote object's stub in the registry
+            Registry registry = LocateRegistry.getRegistry(host, port);
 
-		} catch (RemoteException e) {
-			System.err.println("Server exception: " + e.toString());
-			e.printStackTrace();
-		}
-		return true;
-	}
+            chatfriend = (GroupMember) registry.lookup("GroupMember");
+            
+        } catch (RemoteException e) {
+            System.err.println("Server exception: " + e.toString());
+            e.printStackTrace();
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
 
-	public static void main(String[] args) {
-		new ChatMember(args[0], Integer.parseInt(args[1]));
-
-	}
-
+    public static void main(String[] args) {
+        new ChatMember(args[0], Integer.parseInt(args[1]));
+    }
 }
