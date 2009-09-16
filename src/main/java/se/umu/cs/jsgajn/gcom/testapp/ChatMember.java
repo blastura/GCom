@@ -21,7 +21,7 @@ public class ChatMember implements GroupMember {
 
         try {
             GroupMember stub = (GroupMember) UnicastRemoteObject.exportObject(
-                                                                              this, 0);
+                    this, 0);
 
             // Bind the remote object's stub in the registry
             Registry registry = LocateRegistry.createRegistry(1099);
@@ -33,9 +33,10 @@ public class ChatMember implements GroupMember {
             if (msg.equals("conn")) {
                 connect(host, port);
             }
-            msg = sc.nextLine();
-            chatfriend.receive(new ChatMessage(msg));
-
+            while(true) {
+                msg = sc.nextLine();
+                chatfriend.receive(new ChatMessage(msg));
+            }
         } catch (RemoteException e) {
             System.err.println("Server exception: " + e.toString());
             e.printStackTrace();
@@ -58,7 +59,7 @@ public class ChatMember implements GroupMember {
             Registry registry = LocateRegistry.getRegistry(host, port);
 
             chatfriend = (GroupMember) registry.lookup("GroupMember");
-            
+
         } catch (RemoteException e) {
             System.err.println("Server exception: " + e.toString());
             e.printStackTrace();
