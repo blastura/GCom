@@ -1,0 +1,180 @@
+#+TITLE:     NOTES.sv
+#+AUTHOR:    Anton Johansson
+#+EMAIL:     anton.johansson@gmail.com
+#+DATE:      2009-09-11 Fri
+#+OPTIONS:   creator:nil
+#+DESCRIPTION: 
+#+KEYWORDS: 
+#+LANGUAGE:  sv
+
+* Frågor
+** Går det att använda  en referens till en och samma stubs i flera olika processer?
+   Svar: Ja, se det som vanliga objektreferenser.
+   
+** Hur ska servrarna kunna prata med klienterna, RMI?
+   Ska klienterna använda sig av RMI för att prata med gruppen?
+   
+** Vad ska vi använda RMI till?
+   Svar: All kommunikation. Använd inga sockets varken TCP eller UDP.
+   - Ett kluster av servrar och RMI för att prata med klienter?
+   - Kan man använda RMI för multikast, alltså för kommunikation inom
+     gruppen eller är det bara till för klient-server kommunikation.
+   
+* Spec
+** RMI registry
+   Där sparar servern sin instans, klienten kan hämta upp
+   serverinstansen här och anropa metoder på den.
+
+   För att binda en ny serverinstans till ett RMI registry som inte
+   sitter på den lokala maskinen krävs säkerhetspolicys. Dvs kanske är
+   det bäst att enbart köra lokala register för varje serverinstans?
+* Moduler
+** Group management module
+   En eller flera grupper ska finnas, det ska gå att:
+   - Skapa nya grupper.
+   - Ta bort grupper.
+   - Lägga till medlemmar.
+   - Ta bort medlemmar.
+   
+   En grupp består av en samling av servrar, varje server bör ha en
+   lista över alla andra serverar som befinner sig i samma grupp.
+** Communication module
+** Message ordering module
+* Use case
+ - Start everything
+   
+ - How is a new group created?
+ - How do I join one that exists?
+ - What happens in case of a crash?
+ - How do I leave a group?
+ - What happens when the last process leaves the group?
+  
+* Stack
+  Program middleware stack:
+  
+  |-----------------------+-------------------------------------|
+  | Application           | Ex: chat, whiteboard                |
+  |-----------------------+-------------------------------------|
+  | GroupManagement       | DNS, addGroups, join etc.           |
+  |-----------------------+-------------------------------------|
+  | MessageOrderingModule | FIFO, Casual,                       |
+  |-----------------------+-------------------------------------|
+  | CommunicationsLayer   | Basic multicast, Reliable multicast |
+  |-----------------------+-------------------------------------|
+
+* Från google wave protocol
+  :PROPERTIES:
+  :url:      http://www.waveprotocol.org/draft-protocol-spec
+  :END:
+
+  An upstream wave provider's federation host connects to a downstream
+  wave provider's federation remote to push wavelet operations that
+  are hosted by the upstream wave provider.
+
+  The federation protocol has the following mechanisms to make
+  operation delivery from host to remote reliable. The federation host
+  maintains (in persistent storage) a queue of outgoing operations for
+  each remote domain. Operations are queued until their receipt is
+  acknowledged by the receiving federation remote. The federation host
+  will continually attempt to establish a connection and reconnect
+  after any connection failures (retrying with an exponential
+  backoff). When a connection is established, the federation host will
+  send queued operations. The receiving federation remote sends
+  acknowledgements back to the sending federation host and whenever an
+  acknowledgement is received, the sender dequeues the acknowledged
+  operations.
+
+
+* Persistance
+  - JPA
+  - Hibernate
+
+* Definitions that might be interesting
+  - DHT :: Distributed Hash Table
+    http://en.wikipedia.org/wiki/Distributed_hash_table
+  -  Transaction :: A set of operations performed as a whole. Begin
+    trans, do operations, commit/abort.
+* Replikering, föreläsning <2009-09-15 Tue>
+** Group communication
+*** Static vs Dynamic Groups
+*** Primary partitions vs partitionable group
+    Vad händer om en grupp blir delad av t ex nätverksfel, en kabel
+    går av i Atlanten.
+
+    I primary partition låter man bara en av delarna överleva,
+    exempelvis där gruppledaren finns.
+
+    En partitionerbar grupp kan delas. Båda delar kan leva för sig för
+    att sedan läkas ihop när de har möjlighet till det.
+*** Group management
+    - Interface for membership changes.
+    - Failure detection.
+    - Notification upon membership changes.
+    - Provide group address expansion.
+*** Group views
+    A view contain a set of members at a given point in time. All
+    events occur within a given view.
+
+    View-synchronous group communication, if a message is sent and
+    delivered within a view it means all group members of that view
+    got the message.
+    - Messages are delivered at most once.
+    - Correct processes always deliver messages they send, if
+      delivering to q fails, the next view excludes q.
+      
+** Fault-tolerant services, passive and active replication
+  - Many algorithms require a working server node, this one shouldn't
+   stop working.
+  - Performance (load balancing).
+  - Increased availability.
+  - Fault-tolerance. Correct servers in majority. If 3 of 4 give you
+    one value it's probably the correct one.
+    
+*** Replication transparency
+    - Clients unaware of replication.
+    - Problem with more than one clients:
+
+      Correctness of interleavings: p1 = A, B, C : p2 = d, e ,f
+      : True A B d e C f
+      - Always
+      - Sequential consistency property.
+        : A B d C e f
+      - Linearizability property, consistency with regards to real
+        time of events. Good for time critical events. For example a
+        system connected to something occurring in real world
+        stock-market, on-line betting.
+        : A B d e C f
+*** Passive replication
+    A primary replica manager manages execution of events and only
+    sends the result to the other replicas. If the primary RM fails
+    then a backup can take its place.
+
+    Optimizations: You could send read request to backups, but then
+    you loose linearizability.
+    
+*** Active replication
+    A client uses a front-end the frontend communicates with multiple
+    RM for every RM. The frontend interpret the response and sends the
+    result back to the client, for example go with the majority of the
+    response, which means it handles arbitrary failures.
+    
+    Optimizations: Send reads to single backup,  loose fault tolerance
+    (one of the major pros), but it gives better performance.
+    
+** Transactions, ACID
+   ACID:
+   - Atomicity :: "all or nothing".
+   - Consistency :: transactions take system from one consistent stat
+     to another
+   - Isolation :: transactions do not interfere with each other.
+   - Durability :: committed results of transactions are permanent.
+                   
+   Conflictiong operations:
+    - read-read: no conflict
+    - read-write: conclict
+    - write-write: conflict
+*** Nested transactions
+    - A transaction may commit/abort once all child transactions have
+      commited/aborted.
+    - When a parent aborts, so do its children.
+      

@@ -1,0 +1,453 @@
+* Introduction
+
+  A distributed system is a system composed of group(s) of processes
+  that coordinate their activities by exchanging messages over a
+  network. For such systems, pair-wise exchange of messages need not
+  be the most efficient or reliable way to communicate. Multicast is
+  an operation that sends a message from one process to a group of
+  processes. This is typically achieved without the sending process
+  having explicit knowledge of the group members. Common applications
+  include, but are not limited to:
+
+  * Replication-based fault-tolerance: A replicated service is
+    composed of multiple servers forming a group. Client requests are
+    treated by all servers, allowing some servers to crash without
+    affecting the availability of the service.
+ * Ad-hoc network service discovery: Multicast messages are used by
+   clients to discover, and register to, services.
+ * Replication for high-performance data access: Commonly used data
+   are replicated locally for performance improvements. Updates to
+   data replicas are propagated using multicast-messages.
+ * Propagation of event messages
+
+   A middleware is a software layer that abstracts and hides the
+   heterogeneity of underlying networks, operating systems and
+   programming languages. Examples include CORBA [DS:4,5,20] and
+   Java RMI [DS:4,5.5], although the latter merely supports a
+   single programming language. In addition to solving the
+   heterogeneity problem, a middleware provides a model for
+   distributed communication, e.g., remote method invocation and
+   remote event notification. CORBA and Java RMI implement the
+   former approach, i.e., a program can invoke a method in an
+   object located on another computer.
+
+   The goal of this project is to design and implement GCom, a
+   middleware for group communication. The middleware must
+   implement a given API that in turn can be used by programmers to
+   develop applications that make use of reliable messaging. GCom
+   must support various types of multicast, guarantee different
+   types of message ordering and handle group membership issues.
+
+   Group membership management is a complicated problem and has
+   been the focus of much research. For this project, we will
+   accept simplified solutions to the group membership problem and
+   instead focus on the multicast types and message ordering
+   algorithms.
+
+   The project must be solved "individually" by groups of two
+   students. Assignment rules
+
+   The following rules apply to all assignments and are very
+   important.
+
+ * All departmental rules concerning assignments apply (see
+   riktlinjer and regler).
+ * Deadline for handing in solutions are found in the course
+   schedule. Late submissions will not be graded and the assignment
+   (and therefore the practical part of the course) will be failed.
+
+* Purpose
+
+  The overall aim of this project is to increase your knowledge of
+  distributed systems and distributed programming. More specific goals
+  include:
+
+  * Understanding of different communication types, their
+    characteristics and scenario suitability.
+  * Understanding of different message ordering algorithms, their
+    characteristics and effects.
+  * Understanding of system architecture design impact, with special
+    focus on differences between centralized and distributed
+    solutions.
+  * Development of software engineering skills. Practice the ability
+    to make a loosely specified problem concrete, design a solution
+    and implement the design.
+  * Development of written communication skills.
+
+* Description
+
+  The GCom middleware consists of three (logical) modules, the group
+  management module, the communication module and the message ordering
+  module. These are, respectively, responsible for handling group
+  membership issues, communication message exchange semantics and
+  message (re)ordering issues. All of these modules need to function
+  properly in order for your system to be able to ensure correct
+  message delivery semantics. Group management module
+
+  In order to send messages to the processes in a group, GCom must
+  keep track of the members of a group. This can be done either
+  statically or dynamically.
+
+  In a static group, the structure of the group is predefined and only
+  group members can join the group. Until all members have joined, no
+  member can send data messages to the group. Once the group is
+  established and message sharing may begin, no new members can join
+  (or re-join) the group. The group management module must however be
+  able to handle that members may leave static groups at any time (due
+  to crashes).
+
+  In contrast, in dynamic groups, members may join and leave the group
+  at any time. Processes that re-join the group may be handled as any
+  other joining process.
+
+  The four main tasks of the group management module is:
+
+  * To provide an interface for group management: The group management
+    module provides operations to create and remove groups, as well as
+    add and remove members from a group.
+  * To detect errors: The module monitors a group and indicates when
+    a member of the group crashes (or for some other reason become
+    unreachable).
+  * To notify changes in group membership: The module notifies all
+    group members about changes in group composition.
+  * To resolve group names: When a process sends a message to the
+    group, the group management module resolves the group name into
+    a list of group members.
+
+    Consider the following issues when designing the group
+    management module:
+
+  * Scalability, e.g., is it suitable to keep a complete list of all
+    groups in each process?
+  * Limitations, e.g., can your group management module handle all
+    types of errors? What can the system not guarantee?
+  * Partitioning: What happens if the group is partitioned, e.g.,
+    due to a network segmentation?
+
+    Recommended reading: DS:12.4,15.2.2 Communication module
+
+    Processes in a group can communicate via various mechanisms. The
+    creator of a group specifies which communication mechanism to
+    use for all data messages in that group. GCom must support the
+    following mechanisms:
+
+  * Basic non-reliable multicast.
+  * Basic reliable multicast.
+  * Tree-based reliable multicast (bonus level).
+
+    For the tree-based multicast algorithm, read about multicast
+    routing, e.g., in [DK:4.7.2]. For reliability issues regarding
+    tree-based multicast see, e.g., IP-multicast described in
+    [DS:12.4.2]. The requirements for the reliable tree-based
+    multicast are simply as follows:
+
+  * It must be reliable (see formal definition in the book).
+  * Messages must be sent along a path in a tree structure such that
+    a node only sends to its children, and only receives messages
+    from its parent.
+  * If you attempt to solve this level, you must come by our office
+    and explain your approach. Bring your idea in writing (images
+    are very useful for this as well). This is to avoid
+    misunderstandings that end up costing your group important time
+    that would be better spent testing and maintaining your code.
+
+    Recommended reading: DS:12.4, DK:4.7.2 Message ordering module
+
+    Various types of delays in networks and computers may cause
+    reordering of messages in a process, e.g., the reply to a
+    certain request may, in some process, arrive before the request.
+    For some applications, this type of behavior is unacceptable.
+    The GCom middleware must be able to deliver messages according
+    to the following orderings:
+
+  * Non-ordered
+  * FIFO
+  * Causal
+  * Total
+  * Causal-Total (messages are first sorted according to causal
+    ordering, then according to total ordering)
+
+    Note that GCom must be able to use these orderings in
+    combination with any of the multicast mechanisms listed above.
+
+    The definition of total ordering is that messages may be
+    delivered in arbitrary order, as long as all processes in a
+    group deliver the messages in exactly the same order. Hybrid
+    message orderings such as FIFO-Total add extra ordering
+    requirements. Total ordering combined with reliable multicast is
+    also referred to as atomic multicast, and is often used for
+    replication and transactions.
+
+    Recommended reading: DS:12.4.3, 12.5.4
+** Testing and Demonstration
+
+   In order to ensure the correctness of the GCom middleware, you must
+   implement a test application (a chat or shared whiteboard
+   application is a good choice for this type of application, but if
+   you have more creative ideas, come by our office and discuss it
+   with us!). You must also implement a debug application, that allows
+   you to simulate dropped, rearranged, or delayed packages, as this
+   will allow you to test whether your message ordering modules and
+   reliable multicasting modules are working correctly.
+
+   Note that it is perfectly fine to let the test and debug
+   application be one and the same application, although it is nicer
+   from a software engineering point of view if you keep them
+   separated logically. You have to agree that regular users do not
+   want to get a full debugging view when they start a program, so if
+   you make a combined test and debug application, at least keep the
+   functionality separated so the debug view can be enabled upon
+   request, rather than always enabled.
+
+   Your test application will (together with your debug utility) be
+   used during your practical demonstration of this project. It is
+   hence paramount that you not only implement GCom, but also clearly
+   are able to demonstrate that your implementation is correct. This
+   should be obvious, as you probably want to convince yourselves that
+   your solution is correct before attempting to convince the
+   teachers.
+
+   The debug utility and test application (combined) must clearly
+   demonstrate at least:
+
+   * That messages are delivered according to the specified ordering
+   * How messages are propagated in the network: Show both the path a
+     message takes and how many times a certain process has received
+     a certain message.
+   * The content of hold-back queues and other buffers: Present all
+     messages waiting to be sent or delivered as well as values of
+     vector clocks and other counters.
+   * Current system performance: As a measure of the system
+     performance, count the number of messages (including control
+     messages) required to perform an operation (send one message
+     with certain ordering and certain multicast).
+   * Also, for clarity reasons, the test and debug application must
+     feature graphical user interfaces, as the amount of information
+     that needs to be presented exceeds what is reasonable for a
+     text-only user interface.
+
+** Tools
+
+   You are free to use any tools you want for this project, in fact,
+   selection of appropriate tools is considered part of the
+   assignment. You will however have to motivate your choice of tools
+   with respect to, and in terms of, what you expect to learn from
+   this course and project. If you find a tool (there exists quite a
+   few) that solves the assignment with little or no effort from your
+   side, you are naturally not allowed to use it. (One such tool is
+   for example JGroup) You are of course allowed to use documentation
+   and research papers from existing solutions when designing GCom. As
+   middleware-development is part of the course focus, you are not
+   allowed to implement GCom using TCP/IP sockets.
+
+   More specifically:
+
+   * You may implement GCom in any programming language and middleware
+     of your choice (as long as the rule about non-trivial solutions
+     is not broken), however, the teachers cannot provide help for
+     other systems than Java using Java RMI.
+   * Make use of any IDE and/or plugins you feel makes the job
+     easier. You will write a quite substantial amount of code (in
+     Java, approximately between 2000 to 7000 lines including the
+     GUI). Use tools that facilitate this.
+   * Since your test and debug application(s) must feature graphical
+     user interface(s), use a suitable tool for interface
+     construction. There are IDE plugins for this task, and you will
+     likely save at least half a day if not more by using these tools
+     correctly.
+
+** Advice
+
+   Some helpful hints:
+
+   * Design and implement GCom modularly to simplify the combination
+     of message orders and multicast types, this is useful, e.g., when
+     constructing hybrid message orders.
+   * Consider how debugging will work early on in the design process.
+     This is very important! Retrofitting debug functionality onto
+     your application may require a non-trivial effort.
+   * Integrate testing and implementation. Test modules separately as
+     they are implemented. Early unit testing makes it easier to
+     detect, and limit effects of, bugs. Also perform integration
+     testing to ensure correctness in inter-module communication.
+   * Read the algorithms in [DS] carefully and consider what data
+     structures are required to implement them. The algorithms in
+     [DS] are described using a high level of abstraction, and cannot
+     be implemented as is.
+   * The fact that a system cannot be formally proven to work does
+     not make it impossible to implement - consider for example the
+     Internet. Read pages 498 and 508 in [DS].
+   * Analyze (and reanalyze) your design before you start
+     implementing it! You will most likely not have enough time to
+     comfortably make major redesigns as the weeks have gone by.
+
+** Assignment Levels
+
+   This project is divided into three levels and each student group
+   chooses which level of functionality to implement themselves.
+   Solving a higher level may award bonus points to the exam. In order
+   to receive bonus points your project must be graded G. It is also
+   possible to get the points if you get a K or O, if all errors are
+   resolved on the subsequent hand-in. See Bonus points for more
+   information.
+*** Level 1
+
+    This level is mandatory for all project groups. The following must
+    be implemented and demonstrated:
+
+    * Group management for static groups
+    * Basic non-reliable multicast
+    * Basic reliable multicast
+    * All message ordering algorithms
+    * Test and debug applications that clearly demonstrates the
+      correctness of GCom
+
+      In addition, you must demonstrate your solution to the tutors
+      and hand in a complete report fulfilling the requirements below.
+*** Level 2
+
+    Everything on level 1 and:
+
+    * Management of dynamic groups
+
+      In order to pass level 2, everything on level 1 must work
+      correctly.
+*** Level 3
+
+    Everything on level 2 and:
+
+    * Tree-based reliable multicast
+
+      In order to pass level 3, everything on level 1 and 2 must work
+      correctly.
+
+      If you attempt to solve this level, you must come by our office
+      and explain your approach. Bring your idea in writing (images
+      preferred). This is to avoid misunderstandings that end up
+      costing your group important time that would be better spent
+      testing and maintaining your code on level 1 and 2.
+* Deliverables
+
+  As an aid in planning your work, this project is divided into two
+  deliverables. Read both the specification and the suggested
+  literature carefully before starting to work on deliverable 1.
+  Deliverable 1 - Analysis and Design
+
+  You must include at least the following sections:
+
+  * Decide what bonus level you are aiming for. You may adjust this as
+    the project progresses, but make sure that you and your partner
+    have the same ambitions and goals with this project. State which
+    level you are aiming for in your report, so the teachers can
+    consider your design choices accordingly.
+  * Analyze the problem. What should be done, and what problems need
+    to be solved? Formulate a requirements specification for GCom,
+    based on the problems you identify. What must be implemented,
+    and what may be implemented, time permitting? See [RFC 2119] for
+    suggestions on how to write such sections.
+  * Identify suitable tools. Are there any third party components
+    that could be used? Learn the benefits and drawbacks of possible
+    choices by implementing simple test applications before choosing
+    a tool that you will devote energy into using. The sooner you
+    learn the limitations of a technology you use, the better.
+  * Plan your project Write a project plan, complete with milestones
+    (dates when you will have completed parts of the project) and
+    division of work. You will be required to refer back to this in
+    your final report, and discuss how well your project followed
+    the project plan.
+  * Design a solution. Write a design (as detailed as possible) for
+    your solution. Try to walk through the conceptual parts of the
+    design to convince yourself that it will be feasible when you
+    implement it. Having a sound, modular design is important. Your
+    design should be detailed enough to not need any major additions
+    during implementation. Minor modifications are allowed of
+    course - even the most carefully designed system may require
+    changes due to unforseen properties of the tools used.
+
+    Deliverable 2 - Implementation and full report
+* Hand-ins
+
+  Deadline for handing in solutions are found in the course schedule.
+  Late submissions will automatically fail!
+
+  The project consists of three to four hand-ins:
+
+  1. Written hand-in of deliverable 1.
+  2. Written hand-in of deliverable 2 (complete report) and
+     implementation.
+  3. Demo of your system.
+  4. Any additional hand-ins of steps 1 - 3.
+
+* Demo
+
+  During your demo, you will need to convince the teachers that your
+  implementation works. Bring a test protocol, i.e., a series of tests
+  that clearly demonstrates that your GCom fulfills the requirements
+  and a test tool which can be used to apply it. The test protocol
+  should include, e.g., tests of all message orders and multicast
+  types. Bring a copy of the test protocol on paper, see page 491 in
+  [DS] for suggested notation. Your test protocol must clearly state
+  your names, user names, and which level you intend to demonstrate.
+* Report
+
+  A written presentation of your results is an important part of the
+  project. This is true not only for this project, but in virtually
+  any software development process. People lacking the skills required
+  to communicate the results of their work (verbally and in writing)
+  will find it difficult to work in the software industry. The purpose
+  of the report is hence not to make the teachers happy, but to
+  improve your communication skills.
+
+  Try to focus on the specific characteristics of this project when
+  you write the report. Do not follow some predefined outline from
+  some previous course for the report, just for the sake of it -- at
+  this point in your education, you are more than able to decide which
+  parts are important and which could be left out. As this project
+  emphasizes analysis and investigation of a loosely specified
+  problem, include any assumptions you made during the analysis phase
+  in your report. Also discuss problems encountered and alternative
+  solutions considered in the analysis. The report should also discuss
+  to what extent the requirement list is fulfilled, as well as to
+  which extent you could adhere to the the project plan.
+
+  Try to maintain a focus on readability while writing the report.
+  Make the description of your system as clear as possible, and
+  consider your report's level of detail. Your report is the first
+  impression users (and teachers) get of your system. Ensure that
+  figures and diagrams are easy to read. Proof-read your report
+  carefully and use spelling-checking tools (for the LaTeX crowd, use
+  "aspell --lang=en_US -c filename.tex" -- nice typesetting does not
+  make spelling mistakes less of a distraction).
+
+  To make it easier for us to test your implementation, state the
+  complete command line required to execute your solution on the front
+  page of the report. Bonus Points
+
+  The project for this course can give bonus points to the exam. The
+  points can be used to get a higher grade (4 or 5), but not to pass
+  (grade 3).
+
+  * An accepted solution to level 1 gives 0 bonus points.
+  * An accepted solution to level 2 gives 3 bonus points.
+  * An accepted solution to level 3 gives 6 bonus points.
+
+  * The limit for a passing grade (3) on the exam is 30 points (50%
+    of the 60 points).
+  * The limit for grade 4 is 39 points (65% of 60 points).
+  * The limit for grade 5 is 48 points (80% of 60 points).
+
+    To clarify: you need to get at least 30 points on the exam to
+    pass it. Any bonus points from the assignment can only be used
+    to get a higher grade once you pass.
+
+    Any bonus points obtained only count during the three exams
+    offered for the course during the next 12 months, not for later
+    offerings of the course.
+* References
+
+  * [DS] Coulouris G., Dollimore J. and Kindberg T.: Distributed
+    Systems - Concept and Design. Fourth edn. Addison Wesley (2005)
+  * [DK] Kurose J.F. and Ross K.W.: Computer Networking - A Top-Down
+    Approach Featuring the Internet. Third edn. Addison Wesley
+    (2005)
+
