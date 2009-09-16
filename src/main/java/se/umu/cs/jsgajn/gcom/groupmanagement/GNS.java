@@ -2,7 +2,7 @@ package se.umu.cs.jsgajn.gcom.groupmanagement;
 
 import java.rmi.Remote;
 
-import se.umu.cs.jsgajn.gcom.Server;
+import se.umu.cs.jsgajn.gcom.testapp.Server;
 
 public interface GNS {
 	//List<Group> groups;

@@ -1,5 +1,7 @@
 package se.umu.cs.jsgajn.gcom.groupmanagement;
 
-public interface GroupLeader {
+import java.rmi.Remote;
+
+public interface GroupLeader extends Remote {
 
 }

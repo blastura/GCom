@@ -1,6 +1,6 @@
 package se.umu.cs.jsgajn.gcom.groupmanagement;
 
-import se.umu.cs.jsgajn.gcom.Server;
+import se.umu.cs.jsgajn.gcom.testapp.Server;
 
 public interface Group {
 	// List<Server> servers;

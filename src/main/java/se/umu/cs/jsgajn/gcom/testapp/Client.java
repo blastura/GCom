@@ -1,4 +1,4 @@
-package se.umu.cs.jsgajn.gcom;
+package se.umu.cs.jsgajn.gcom.testapp;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
