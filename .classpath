@@ -2,9 +2,9 @@
 <classpath>
 	<classpathentry kind="src" output="java" path="java"/>
 	<classpathentry kind="var" path="JRE_LIB" rootpath="JRE_SRCROOT" sourcepath="JRE_SRC"/>
-	<classpathentry kind="con" path="/Users/anton/Documents/skola/dist/gcom/bin/main/java"/>
-	<classpathentry kind="con" path="/Users/anton/Documents/skola/dist/gcom/bin/test/java"/>
-	<classpathentry kind="lib" path="/Users/anton/Documents/skola/dist/gcom/lib/junit-4.5.jar"/>
-	<classpathentry kind="lib" path="/Users/anton/Documents/skola/dist/gcom/lib/log4j-1.2.15.jar"/>
+	<classpathentry kind="con" path="bin/main/java"/>
+	<classpathentry kind="con" path="bin/test/java"/>
+	<classpathentry kind="lib" path="lib/junit-4.5.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
