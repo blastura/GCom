@@ -72,4 +72,19 @@ public class ChatMember implements GroupMember {
     public static void main(String[] args) {
         new ChatMember(args[0], Integer.parseInt(args[1]));
     }
+
+    public GroupMember joinGroup(String name) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public boolean addToGroup(GroupMember member) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public boolean removeFromGroup(GroupMember member) {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }
