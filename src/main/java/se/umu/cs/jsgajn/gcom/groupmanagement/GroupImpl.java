@@ -3,8 +3,6 @@ package se.umu.cs.jsgajn.gcom.groupmanagement;
 import java.util.Collection;
 import java.util.Iterator;
 
-import se.umu.cs.jsgajn.gcom.testapp.Server;
-
 public class GroupImpl implements Group {
 
     private Collection<GroupMember> group;
