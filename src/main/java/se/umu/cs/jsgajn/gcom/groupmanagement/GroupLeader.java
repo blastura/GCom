@@ -11,7 +11,7 @@ public interface GroupLeader extends Remote {
 	 * @param member The new member.
 	 * @return A Group.
 	 */
-	public Group addToGroup(GroupMember member);
-
+	public Group joinGroup(GroupMember member);
+	
 	public boolean removeFromGroup(GroupMember member);
 }

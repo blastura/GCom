@@ -5,7 +5,15 @@ import java.rmi.RemoteException;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 
-public interface GroupMember extends GroupLeader,Remote {
-    public boolean receive(Message<?> m) throws RemoteException;
-    public GroupMember joinGroup(String name);
+public interface GroupMember extends GroupLeader, Remote {
+    public static final String STUB_NAME = "ballen";
+    
+    /**
+     * For receiving remote messages from other group members. This method is
+     * called remotely.
+     * 
+     * @param m The message to receive.
+     * @throws RemoteException
+     */
+    public void receive(Message<?> m) throws RemoteException;
 }
