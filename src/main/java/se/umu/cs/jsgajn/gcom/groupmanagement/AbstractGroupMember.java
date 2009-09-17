@@ -85,7 +85,7 @@ public abstract class AbstractGroupMember implements GroupMember {
     public Group joinGroup(GroupMember member) {
         if (this.group == null) {
             System.out.println("I am my on master?");
-            Group result =  new GroupImpl(this.groupName, stub)
+            Group result =  new GroupImpl(this.groupName, stub);
             result.add(stub);
             return result;
         }

@@ -1,5 +1,6 @@
 package se.umu.cs.jsgajn.gcom.groupmanagement;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -10,14 +11,16 @@ public class GroupImpl implements Group {
     private GroupMember groupLeader;
     
     public GroupImpl(String name, GroupMember groupLeader) {
+	this.group = new ArrayList<GroupMember>();
         this.name = name;
         this.groupLeader = groupLeader;
     }
-    public String getName(){
+
+    public String getName() {
         return name;
     }
 
-    public GroupMember getGroupLeader(){
+    public GroupMember getGroupLeader() {
         return groupLeader;
     }
     
