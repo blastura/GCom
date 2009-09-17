@@ -10,6 +10,7 @@ import java.rmi.server.UnicastRemoteObject;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 
 public abstract class AbstractGroupMember implements GroupMember {
+    private String groupName;
     private GroupMember stub;
     private GNS gns;
     private Group group;
@@ -25,12 +26,13 @@ public abstract class AbstractGroupMember implements GroupMember {
      */
     public AbstractGroupMember(String gnsHost, int gnsPort, String groupName)
             throws RemoteException, AlreadyBoundException, NotBoundException {
+        this.groupName = groupName;
         this.stub = (GroupMember) UnicastRemoteObject.exportObject(this, 0);
         Registry registry = LocateRegistry.createRegistry(1099); // TODO: change 1099
         registry.bind(GroupMember.STUB_NAME, stub);
         this.gns = connectToGns(gnsHost, gnsPort);
         this.groupLeader = gns.connect(stub, groupName);
-        this.group = groupLeader.joinGroup(this);
+        this.group = groupLeader.joinGroup(stub);
     }
 
     /**
@@ -81,7 +83,11 @@ public abstract class AbstractGroupMember implements GroupMember {
     }
 
     public Group joinGroup(GroupMember member) {
-        // TODO Auto-generated method stub
-        return null;
+        if (member == stub) {
+            System.out.println("I am my on master?");
+            return new GroupImpl(this.groupName, stub);
+        }
+        System.out.println("Group exists you got it");
+        return this.group;
     }
 }
