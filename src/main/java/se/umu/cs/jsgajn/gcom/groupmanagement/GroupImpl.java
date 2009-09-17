@@ -9,9 +9,18 @@ public class GroupImpl implements Group {
 
     private Collection<GroupMember> group;
     private String name;
+    private GroupMember groupLeader;
     
-    public GroupImpl(String name) {
+    public GroupImpl(String name, GroupMember groupLeader) {
         this.name = name;
+        this.groupLeader = groupLeader;
+    }
+    public String getName(){
+        return name;
+    }
+
+    public GroupMember getGroupLeader(){
+        return groupLeader;
     }
     
     public void closeGroup() {
