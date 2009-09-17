@@ -12,27 +12,23 @@ import org.apache.log4j.Logger;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupmanagement.AbstractGroupMember;
+import se.umu.cs.jsgajn.gcom.groupmanagement.Group;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
 
 public class ChatMember extends AbstractGroupMember {
     private static final Logger logger = Logger.getLogger(ChatMember.class);
     private GroupMember chatfriend;
 
-    public ChatMember(String gnsHost, int gnsPort, String groupName) throws RemoteException, AlreadyBoundException, NotBoundException {
-        super(gnsHost, gnsPort,groupName);
-        
+    public ChatMember(String gnsHost, int gnsPort, String groupName)
+            throws RemoteException, AlreadyBoundException, NotBoundException {
+        super(gnsHost, gnsPort, groupName);
+
         /*
-        System.err.println("Server ready");
-        Scanner sc = new Scanner(System.in);
-        String msg = sc.nextLine();
-        if (msg.equals("conn")) {
-            connect(host, port);
-        }
-        while(true) {
-            msg = sc.nextLine();
-            chatfriend.receive(new ChatMessage(msg));
-        }
-        */
+         * System.err.println("Server ready"); Scanner sc = new
+         * Scanner(System.in); String msg = sc.nextLine(); if
+         * (msg.equals("conn")) { connect(host, port); } while(true) { msg =
+         * sc.nextLine(); chatfriend.receive(new ChatMessage(msg)); }
+         */
     }
 
     public boolean receive(Message<?> m) {
@@ -54,7 +50,7 @@ public class ChatMember extends AbstractGroupMember {
             // t.ex. om man redan är bunden dit
             e.printStackTrace();
         } catch (NotBoundException e) {
-            // Ifall man försöker ansluta till GNSen men den inte 
+            // Ifall man försöker ansluta till GNSen men den inte
             // gick att binda tidigare
             e.printStackTrace();
         }
@@ -65,13 +61,14 @@ public class ChatMember extends AbstractGroupMember {
         return null;
     }
 
-    public boolean addToGroup(GroupMember member) {
-        // TODO Auto-generated method stub
-        return false;
-    }
 
     public boolean removeFromGroup(GroupMember member) {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    public Group addToGroup(GroupMember member) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
