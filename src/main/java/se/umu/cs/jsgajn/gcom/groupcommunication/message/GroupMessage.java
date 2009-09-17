@@ -1,21 +1,21 @@
-package se.umu.cs.jsgajn.gcom.testapp;
+package se.umu.cs.jsgajn.gcom.groupcommunication.message;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Header;
 import se.umu.cs.jsgajn.gcom.groupcommunication.HeaderImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageTypes;
+import se.umu.cs.jsgajn.gcom.groupmanagement.Group;
 
-public class ChatMessage implements Message<String> {
-    private static final long serialVersionUID = 1L;
-    private String msg;
+public class GroupMessage implements Message<Group> {
+    private Group msg;
     private Header header;
-
-    public ChatMessage(String msg) {
+    
+    public GroupMessage(Group msg) {
         this.msg = msg;
-        this.header = new HeaderImpl(MessageTypes.CLIENTMESSAGE);
+        this.header = new HeaderImpl(MessageTypes.GROUPCHANGE);
     }
-
-    public String getMessage() {
+    
+    public Group getMessage() {
         return this.msg;
     }
 
@@ -26,4 +26,5 @@ public class ChatMessage implements Message<String> {
     public void setHeader() {
         
     }
+
 }

@@ -8,6 +8,8 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
+import se.umu.cs.jsgajn.gcom.groupcommunication.MessageTypes;
+import se.umu.cs.jsgajn.gcom.groupcommunication.message.GroupMessage;
 
 public abstract class AbstractGroupMember implements GroupMember {
     private String groupName;
@@ -25,7 +27,7 @@ public abstract class AbstractGroupMember implements GroupMember {
      * @throws NotBoundException If GNS stub is not found in GNS register.
      */
     public AbstractGroupMember(String gnsHost, int gnsPort, String groupName)
-            throws RemoteException, AlreadyBoundException, NotBoundException {
+    throws RemoteException, AlreadyBoundException, NotBoundException {
         this.groupName = groupName;
         this.stub = (GroupMember) UnicastRemoteObject.exportObject(this, 0);
         Registry registry = LocateRegistry.createRegistry(1099); // TODO: change 1099
@@ -43,7 +45,7 @@ public abstract class AbstractGroupMember implements GroupMember {
      * @throws NotBoundException If GNS stub can't be found.
      */
     private GNS connectToGns(String host, int port) throws RemoteException,
-            NotBoundException {
+    NotBoundException {
         Registry gnsReg = LocateRegistry.getRegistry(host, port);
         return (GNS) gnsReg.lookup(GNS.STUB_NAME);
     }
@@ -65,7 +67,7 @@ public abstract class AbstractGroupMember implements GroupMember {
     }
 
     public abstract void received(Message<?> m);
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -73,7 +75,18 @@ public abstract class AbstractGroupMember implements GroupMember {
      */
     public void receive(Message<?> m) {
         // TODO: implement ordering and delivering and stuff.
-        System.out.println(m.getMessage());
+        MessageTypes type = m.getHeader().getMessageType();
+
+        switch (type) {
+        case GROUPCHANGE:
+            System.out.println("We have a new member!!");
+            break;
+        case CLIENTMESSAGE:
+            System.out.println(m.getMessage());
+            break;
+        default:
+            System.out.println("error i header");
+        }
     }
 
     /** GroupLeader ************/
@@ -87,10 +100,15 @@ public abstract class AbstractGroupMember implements GroupMember {
             System.out.println("I am my on master?");
             Group result =  new GroupImpl(this.groupName, stub);
             result.add(stub);
+            this.group = result;
+            // Multicastar ut listan på nya grupper
+            multicast(new GroupMessage(result));
             return result;
         }
         System.out.println("Group exists you got it");
         this.group.add(member);
+        // Multicastar ut nya grupplistan
+        multicast(new GroupMessage(this.group));
         return this.group;
     }
 }
