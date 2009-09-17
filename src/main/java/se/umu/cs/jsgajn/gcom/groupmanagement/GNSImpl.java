@@ -19,6 +19,8 @@ public class GNSImpl implements GNS {
         this.stub = (GNS) UnicastRemoteObject.exportObject(this, 0);
         Registry registry = LocateRegistry.createRegistry(1099); // TODO: change 1099
         registry.bind(GNS.STUB_NAME, stub);
+        
+        System.out.println("Server is running.");
     }
     
     public GroupMember connect(GroupMember gm, String groupName) {

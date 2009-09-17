@@ -1,6 +1,7 @@
 package se.umu.cs.jsgajn.gcom.groupmanagement;
 
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 
 public interface GroupLeader extends Remote {
 	/**
@@ -11,7 +12,7 @@ public interface GroupLeader extends Remote {
 	 * @param member The new member.
 	 * @return A Group.
 	 */
-	public Group joinGroup(GroupMember member);
+	public Group joinGroup(GroupMember member) throws RemoteException;
 	
-	public boolean removeFromGroup(GroupMember member);
+	public boolean removeFromGroup(GroupMember member) throws RemoteException;
 }
