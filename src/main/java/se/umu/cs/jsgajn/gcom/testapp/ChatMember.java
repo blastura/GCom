@@ -11,39 +11,28 @@ import java.util.Scanner;
 import org.apache.log4j.Logger;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
+import se.umu.cs.jsgajn.gcom.groupmanagement.AbstractGroupMember;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
 
-public class ChatMember implements GroupMember {
+public class ChatMember extends AbstractGroupMember {
     private static final Logger logger = Logger.getLogger(ChatMember.class);
     private GroupMember chatfriend;
 
-    public ChatMember(String host, int port) {
-
-        try {
-            GroupMember stub = (GroupMember) UnicastRemoteObject.exportObject(
-                    this, 0);
-
-            // Bind the remote object's stub in the registry
-            Registry registry = LocateRegistry.createRegistry(1099);
-            registry.bind("GroupMember", stub);
-
-            System.err.println("Server ready");
-            Scanner sc = new Scanner(System.in);
-            String msg = sc.nextLine();
-            if (msg.equals("conn")) {
-                connect(host, port);
-            }
-            while(true) {
-                msg = sc.nextLine();
-                chatfriend.receive(new ChatMessage(msg));
-            }
-        } catch (RemoteException e) {
-            System.err.println("Server exception: " + e.toString());
-            e.printStackTrace();
-        } catch (AlreadyBoundException e) {
-            // TODO - fix error message
-            e.printStackTrace();
+    public ChatMember(String gnsHost, int gnsPort, String groupName) throws RemoteException, AlreadyBoundException, NotBoundException {
+        super(gnsHost, gnsPort,groupName);
+        
+        /*
+        System.err.println("Server ready");
+        Scanner sc = new Scanner(System.in);
+        String msg = sc.nextLine();
+        if (msg.equals("conn")) {
+            connect(host, port);
         }
+        while(true) {
+            msg = sc.nextLine();
+            chatfriend.receive(new ChatMessage(msg));
+        }
+        */
     }
 
     public boolean receive(Message<?> m) {
@@ -52,25 +41,23 @@ public class ChatMember implements GroupMember {
         return true;
     }
 
-    public boolean connect(String host, int port) {
+    public static void main(String[] args) {
         try {
-
-            // Bind the remote object's stub in the registry
-            Registry registry = LocateRegistry.getRegistry(host, port);
-
-            chatfriend = (GroupMember) registry.lookup("GroupMember");
-
+            new ChatMember(args[0], Integer.parseInt(args[1]), args[2]);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
         } catch (RemoteException e) {
-            System.err.println("Server exception: " + e.toString());
+            // Om det är nåt fel hos GNSen
+            e.printStackTrace();
+        } catch (AlreadyBoundException e) {
+            // Om man inte kan binda sig själv till sitt register
+            // t.ex. om man redan är bunden dit
             e.printStackTrace();
         } catch (NotBoundException e) {
+            // Ifall man försöker ansluta till GNSen men den inte 
+            // gick att binda tidigare
             e.printStackTrace();
         }
-        return true;
-    }
-
-    public static void main(String[] args) {
-        new ChatMember(args[0], Integer.parseInt(args[1]));
     }
 
     public GroupMember joinGroup(String name) {
