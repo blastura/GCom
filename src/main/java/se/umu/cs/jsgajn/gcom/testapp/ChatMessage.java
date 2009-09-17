@@ -13,5 +13,4 @@ public class ChatMessage implements Message<String> {
 	public String getMessage() {
 		return this.msg;
 	}
-
 }
