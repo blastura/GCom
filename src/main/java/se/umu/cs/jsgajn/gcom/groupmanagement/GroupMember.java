@@ -16,5 +16,5 @@ public interface GroupMember extends GroupLeader, Remote, Serializable {
      * @param m The message to receive.
      * @throws RemoteException
      */
-    public void receive(Message<?> m) throws RemoteException;
+    public void receive(Message m) throws RemoteException;
 }

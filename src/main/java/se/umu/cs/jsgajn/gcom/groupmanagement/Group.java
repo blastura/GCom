@@ -4,10 +4,10 @@ import java.io.Serializable;
 import java.rmi.Remote;
 import java.util.Collection;
 
-public interface Group extends Collection<GroupMember>, Serializable {
+public interface Group extends Collection<Receiver>, Serializable {
     // List<Server> servers;
     // Server.host och Server.host bör finnas
     public void closeGroup();
     public String getName();
-    public GroupMember getGroupLeader();
+    public Receiver getGroupLeaderReceiver();
 }

@@ -8,15 +8,16 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
+import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageTypes;
-import se.umu.cs.jsgajn.gcom.groupcommunication.message.GroupMessage;
 
 public abstract class AbstractGroupMember implements GroupMember {
     private String groupName;
-    private GroupMember stub;
+    //private GroupMember stub;
     private GNS gns;
     private Group group;
-    private GroupLeader groupLeader;
+    private Receiver groupLeader;
+    private Receiver receiver;
 
     /**
      * @param gnsHost GNS host
@@ -29,12 +30,14 @@ public abstract class AbstractGroupMember implements GroupMember {
     public AbstractGroupMember(String gnsHost, int gnsPort, String groupName)
     throws RemoteException, AlreadyBoundException, NotBoundException {
         this.groupName = groupName;
-        this.stub = (GroupMember) UnicastRemoteObject.exportObject(this, 0);
-        Registry registry = LocateRegistry.createRegistry(1099); // TODO: change 1099
-        registry.bind(GroupMember.STUB_NAME, stub);
+        
+        receiver = new ReceiverImpl();
+        
         this.gns = connectToGns(gnsHost, gnsPort);
-        this.groupLeader = gns.connect(stub, groupName);
-        this.group = groupLeader.joinGroup(stub);
+        this.groupLeader = gns.connect(receiver, groupName);
+        
+        // TODO: joina via multicast ?
+        //this.group = groupLeader.joinGroup(receiver);
     }
 
     /**
@@ -55,8 +58,8 @@ public abstract class AbstractGroupMember implements GroupMember {
      * TODO: move method to interface or Ordering-layer.
      * @param m The message to send.
      */
-    public void multicast(Message<?> m) {
-        for (GroupMember member : this.group) {
+    public void multicast(Message m) {
+        for (Receiver member : this.group) {
             try {
                 member.receive(m);
             } catch (RemoteException e) {
@@ -66,14 +69,14 @@ public abstract class AbstractGroupMember implements GroupMember {
         }
     }
 
-    public abstract void received(Message<?> m);
+    public abstract void received(Message m);
 
     /*
      * (non-Javadoc)
      * 
      * @see se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember#receive(se.umu.cs.jsgajn.gcom.groupcommunication.Message)
      */
-    public void receive(Message<?> m) {
+    public void receive(Message m) {
         // TODO: implement ordering and delivering and stuff.
         MessageTypes type = m.getHeader().getMessageType();
 
@@ -95,20 +98,20 @@ public abstract class AbstractGroupMember implements GroupMember {
         return false;
     }
 
-    public Group joinGroup(GroupMember member) {
+    public Group joinGroup(Receiver member) {
         if (this.group == null) {
             System.out.println("I am my on master?");
-            Group result =  new GroupImpl(this.groupName, stub);
-            result.add(stub);
+            Group result =  new GroupImpl(this.groupName, receiver);
+            result.add(receiver);
             this.group = result;
             // Multicastar ut listan på nya grupper
-            multicast(new GroupMessage(result));
+            multicast(new MessageImpl(result, MessageTypes.GROUPCHANGE));
             return result;
         }
         System.out.println("Group exists you got it");
         this.group.add(member);
         // Multicastar ut nya grupplistan
-        multicast(new GroupMessage(this.group));
+        multicast(new MessageImpl(this.group, MessageTypes.GROUPCHANGE));
         return this.group;
     }
 }

@@ -7,7 +7,7 @@ public class BasicMulticast implements Multicast {
 		
 	}
 
-	public void send(Message<?> m) {
+	public void send(Message m) {
 		// TODO Auto-generated method stub
 		
 	}

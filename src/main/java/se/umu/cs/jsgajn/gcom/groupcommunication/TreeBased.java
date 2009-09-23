@@ -7,7 +7,7 @@ public class TreeBased implements Multicast {
 
 	}
 
-	public void send(Message<?> m) {
+	public void send(Message m) {
 		// TODO Auto-generated method stub
 
 	}

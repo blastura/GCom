@@ -12,7 +12,7 @@ public interface GroupLeader extends Remote {
 	 * @param member The new member.
 	 * @return A Group.
 	 */
-	public Group joinGroup(GroupMember member) throws RemoteException;
+	public Group joinGroup(Receiver member) throws RemoteException;
 	
-	public boolean removeFromGroup(GroupMember member) throws RemoteException;
+	public boolean removeFromGroup(Receiver member) throws RemoteException;
 }

@@ -6,12 +6,13 @@ import java.util.Iterator;
 
 public class GroupImpl implements Group {
 
-    private Collection<GroupMember> group;
+    private Collection<Receiver> group;
     private String name;
-    private GroupMember groupLeader;
+    private Receiver groupLeader;
+    private Collection<Receiver> members;
     
-    public GroupImpl(String name, GroupMember groupLeader) {
-	this.group = new ArrayList<GroupMember>();
+    public GroupImpl(String name, Receiver groupLeader) {
+	this.group = new ArrayList<Receiver>();
         this.name = name;
         this.groupLeader = groupLeader;
     }
@@ -20,18 +21,18 @@ public class GroupImpl implements Group {
         return name;
     }
 
-    public GroupMember getGroupLeader() {
+    public Receiver getGroupLeaderReceiver() {
         return groupLeader;
     }
     
     public void closeGroup() {
     }
 
-    public boolean add(GroupMember member) {
+    public boolean add(Receiver member) {
         return group.add(member);
     }
 
-    public boolean addAll(Collection<? extends GroupMember> members) {
+    public boolean addAll(Collection<? extends Receiver> members) {
         return group.addAll(members);
     }
 

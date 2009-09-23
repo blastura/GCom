@@ -23,15 +23,15 @@ public class GNSImpl implements GNS {
         System.out.println("Server is running.");
     }
     
-    public GroupMember connect(GroupMember gm, String groupName) {
+    public Receiver connect(Receiver gm, String groupName) {
         Group group = getGroup(groupName);
         
         if (group != null) {
-            return group.getGroupLeader();
+            return group.getGroupLeaderReceiver();
         } else {
             GroupImpl newGroup = new GroupImpl(groupName, gm);
             groups.add(newGroup);
-            return newGroup.getGroupLeader();            
+            return newGroup.getGroupLeaderReceiver();            
         }
     }
    
