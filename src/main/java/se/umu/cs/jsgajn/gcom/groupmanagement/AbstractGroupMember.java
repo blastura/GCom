@@ -10,14 +10,17 @@ import java.rmi.server.UnicastRemoteObject;
 import se.umu.cs.jsgajn.gcom.groupcommunication.HeaderImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
-import se.umu.cs.jsgajn.gcom.groupcommunication.MessageTypes;
+import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
+import se.umu.cs.jsgajn.gcom.messageordering.FIFO;
+import se.umu.cs.jsgajn.gcom.messageordering.Ordering;
 
 public abstract class AbstractGroupMember implements GroupMember {
     private String groupName;
     private GNS gns;
     private GroupView group;
-
+    private Ordering orderingModule;
     private Receiver receiverLeader;
+    private GroupLeader gl;
 
     private Receiver receiver;
     private Receiver receiverStub;
@@ -33,6 +36,8 @@ public abstract class AbstractGroupMember implements GroupMember {
     public AbstractGroupMember(String gnsHost, int gnsPort, String groupName)
     throws RemoteException, AlreadyBoundException, NotBoundException {
         this.groupName = groupName;
+        this.orderingModule = new FIFO();  // TODO: which model to use
+        this.gl = new GroupLeader();
 
         // TODO: change 1099
         Registry registry = LocateRegistry.createRegistry(1099); 
@@ -45,11 +50,33 @@ public abstract class AbstractGroupMember implements GroupMember {
         this.gns = connectToGns(gnsHost, gnsPort);
         this.receiverLeader = gns.connect(receiver, groupName);
 
-        // TODO: joina via multicast ?
+        // Start thread to handle messages
+        new Thread(new MessageReceiver()).run();
+        
         //this.group = groupLeader.joinGroup(receiver);
-        MessageImpl m = 
-            new MessageImpl(receiver, new HeaderImpl(MessageTypes.JOIN));
-        receiverLeader.receive(m);
+        MessageImpl joinMessage = 
+            new MessageImpl(receiver, new HeaderImpl(MessageType.JOIN));
+        receiverLeader.receive(joinMessage);
+        
+        while (true) {
+           Message m = orderingModule.takeDelivered();
+           MessageType type = m.getHeader().getMessageType();
+            switch (type) {
+            case GROUPCHANGE:
+                System.out.println("We have a new member!!");
+                //joinGroup((GroupView)m.getMessage());
+                break;
+            case CLIENTMESSAGE:
+                System.out.println(m.getMessage());
+                // Till klientjävlen
+                break;
+            case JOIN:
+                gl.joinGroup((Receiver)m.getMessage());
+                break;
+            default:
+                System.out.println("error i header");
+            }
+        }
     }
 
     /**
@@ -90,7 +117,7 @@ public abstract class AbstractGroupMember implements GroupMember {
      */
     public void receive(Message m) {
         // TODO: implement ordering and delivering and stuff.
-        MessageTypes type = m.getHeader().getMessageType();
+        MessageType type = m.getHeader().getMessageType();
 
         switch (type) {
         case GROUPCHANGE:
@@ -108,45 +135,63 @@ public abstract class AbstractGroupMember implements GroupMember {
     }
 
     /** GroupLeader ************/
-    public boolean removeFromGroup(GroupMember member) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public GroupView joinGroup(Receiver member) {
-        if (this.group == null) {
-            System.out.println("I am my on master?");
-            GroupView result =  new GroupViewImpl(this.groupName, receiver);
-            result.add(receiver);
-            this.group = result;
-            // Multicastar ut listan på nya grupper
-            multicast(new MessageImpl(result, new HeaderImpl(MessageTypes.GROUPCHANGE)));
-            return result;
+    private class GroupLeader {
+        public boolean removeFromGroup(GroupMember member) {
+            // TODO Auto-generated method stub
+            return false;
         }
-        System.out.println("Group exists you got it");
-        this.group.add(member);
-        // Multicastar ut nya grupplistan
-        multicast(new MessageImpl(this.group, new HeaderImpl(MessageTypes.GROUPCHANGE)));
-        return this.group;
+
+        public GroupView joinGroup(Receiver member) {
+            // TODO: fix this
+            return group;
+            /*if (this.group == null) {
+                System.out.println("I am my on master?");
+                GroupView result =  new GroupViewImpl(this.groupName, receiver);
+                result.add(receiver);
+                this.group = result;
+                // Multicastar ut listan på nya grupper
+                multicast(new MessageImpl(result, new HeaderImpl(MessageType.GROUPCHANGE)));
+                return result;
+            }
+            System.out.println("Group exists you got it");
+            this.group.add(member);
+            // Multicastar ut nya grupplistan
+            multicast(new MessageImpl(this.group, new HeaderImpl(MessageType.GROUPCHANGE)));
+            return this.group;
+            */
+        }
     }
     
-    class MessageReceiver implements Runnable {
+    private class MessageReceiver implements Runnable {
         public void run() {
             try {
-                while(true) { 
-                    consume(receiver.getMessage());
+                while (true) { 
+                    orderingModule.add(receiver.getMessage());
                 }
             } catch (InterruptedException e) { 
                 System.out.println(e);
            }
         }
-        
-        public void consume(Message m) {
-            System.out.println("heja");
-        }
     }
 }
 
+
+/*
+switch (type) {
+case GROUPCHANGE:
+    System.out.println("We have a new member!!");
+    //joinGroup((GroupView)m.getMessage());
+    break;
+case CLIENTMESSAGE:
+    System.out.println(m.getMessage());
+    break;
+case JOIN:
+    joinGroup((Receiver)m.getMessage());
+    break;
+default:
+    System.out.println("error i header");
+}
+*/
 
 /*
 if (this.group == null) {

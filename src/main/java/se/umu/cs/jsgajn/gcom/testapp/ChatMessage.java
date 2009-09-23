@@ -3,7 +3,7 @@ package se.umu.cs.jsgajn.gcom.testapp;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Header;
 import se.umu.cs.jsgajn.gcom.groupcommunication.HeaderImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
-import se.umu.cs.jsgajn.gcom.groupcommunication.MessageTypes;
+import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
 
 public class ChatMessage implements Message<String> {
     private static final long serialVersionUID = 1L;
@@ -12,7 +12,7 @@ public class ChatMessage implements Message<String> {
 
     public ChatMessage(String msg) {
         this.msg = msg;
-        this.header = new HeaderImpl(MessageTypes.CLIENTMESSAGE);
+        this.header = new HeaderImpl(MessageType.CLIENTMESSAGE);
     }
 
     public String getMessage() {

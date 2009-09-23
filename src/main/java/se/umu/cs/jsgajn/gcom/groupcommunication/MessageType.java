@@ -1,5 +1,5 @@
 package se.umu.cs.jsgajn.gcom.groupcommunication;
 
-public enum MessageTypes {
+public enum MessageType {
     CLIENTMESSAGE, GROUPCHANGE, JOIN
 }
