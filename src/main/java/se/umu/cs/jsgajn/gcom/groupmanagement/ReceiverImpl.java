@@ -20,17 +20,18 @@ public class ReceiverImpl implements Receiver {
     public ReceiverImpl() 
     throws RemoteException, AlreadyBoundException, NotBoundException{
         this.q = new LinkedBlockingQueue<Message>();
-
     }
     
     /**
      * Used to get message from message queue.
      * 
      * @return The oldest message in queue.
+     * @throws InterruptedException 
      */
-    public Message getMessage() {
-        return q.poll();
+    public Message getMessage() throws InterruptedException {
+        return q.take();
     }
+    
 
     public void receive(Message m) throws RemoteException {
         // Simply add message to blockingQueue, if queue is busy, it will block.

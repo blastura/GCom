@@ -16,10 +16,12 @@ public abstract class AbstractGroupMember implements GroupMember {
     private String groupName;
     private GNS gns;
     private GroupView group;
-    private Receiver groupLeader;
+
+    private Receiver receiverLeader;
+
     private Receiver receiver;
     private Receiver receiverStub;
-    
+
     /**
      * @param gnsHost GNS host
      * @param gnsPort GNS port
@@ -31,21 +33,23 @@ public abstract class AbstractGroupMember implements GroupMember {
     public AbstractGroupMember(String gnsHost, int gnsPort, String groupName)
     throws RemoteException, AlreadyBoundException, NotBoundException {
         this.groupName = groupName;
-        
-        Registry registry = LocateRegistry.createRegistry(1099); // TODO: change 1099
+
+        // TODO: change 1099
+        Registry registry = LocateRegistry.createRegistry(1099); 
 
         receiver = new ReceiverImpl();
-        this.receiverStub = (Receiver) UnicastRemoteObject.exportObject(receiver, 0);
+        this.receiverStub = 
+            (Receiver) UnicastRemoteObject.exportObject(receiver, 0);
         registry.bind(Receiver.STUB_NAME, receiverStub);
-        
-        
-        
-        
+
         this.gns = connectToGns(gnsHost, gnsPort);
-        this.groupLeader = gns.connect(receiver, groupName);
-        
+        this.receiverLeader = gns.connect(receiver, groupName);
+
         // TODO: joina via multicast ?
         //this.group = groupLeader.joinGroup(receiver);
+        MessageImpl m = 
+            new MessageImpl(receiver, new HeaderImpl(MessageTypes.JOIN));
+        receiverLeader.receive(m);
     }
 
     /**
@@ -125,4 +129,40 @@ public abstract class AbstractGroupMember implements GroupMember {
         multicast(new MessageImpl(this.group, new HeaderImpl(MessageTypes.GROUPCHANGE)));
         return this.group;
     }
+    
+    class MessageReceiver implements Runnable {
+        public void run() {
+            try {
+                while(true) { 
+                    consume(receiver.getMessage());
+                }
+            } catch (InterruptedException e) { 
+                System.out.println(e);
+           }
+        }
+        
+        public void consume(Message m) {
+            System.out.println("heja");
+        }
+    }
 }
+
+
+/*
+if (this.group == null) {
+    System.out.println("I am my on master?");
+    GroupView result =  new GroupViewImpl(this.groupName, receiver);
+    result.add(receiver);
+    this.group = result;
+    // Multicastar ut listan på nya grupper
+    multicast(new MessageImpl(result, new HeaderImpl(MessageTypes.GROUPCHANGE)));
+    return result;
+}
+System.out.println("Group exists you got it");
+this.group.add(member);
+// Multicastar ut nya grupplistan
+multicast(new MessageImpl(this.group, new HeaderImpl(MessageTypes.GROUPCHANGE)));
+return this.group;
+*/
+
+
