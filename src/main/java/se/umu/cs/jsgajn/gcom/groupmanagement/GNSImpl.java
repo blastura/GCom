@@ -11,10 +11,10 @@ import java.util.Collection;
 public class GNSImpl implements GNS {
     
     private transient GNS stub;
-    public transient Collection<Group> groups;
+    public transient Collection<GroupView> groups;
     
     public GNSImpl() throws RemoteException, AlreadyBoundException {
-        this.groups = new ArrayList<Group>();
+        this.groups = new ArrayList<GroupView>();
         
         this.stub = (GNS) UnicastRemoteObject.exportObject(this, 0);
         Registry registry = LocateRegistry.createRegistry(1099); // TODO: change 1099
@@ -24,19 +24,19 @@ public class GNSImpl implements GNS {
     }
     
     public Receiver connect(Receiver gm, String groupName) {
-        Group group = getGroup(groupName);
+        GroupView group = getGroup(groupName);
         
         if (group != null) {
             return group.getGroupLeaderReceiver();
         } else {
-            GroupImpl newGroup = new GroupImpl(groupName, gm);
+            GroupViewImpl newGroup = new GroupViewImpl(groupName, gm);
             groups.add(newGroup);
             return newGroup.getGroupLeaderReceiver();            
         }
     }
    
-    public Group getGroup(String name) {
-        for (Group group : groups) {
+    public GroupView getGroup(String name) {
+        for (GroupView group : groups) {
             if (group.getName().equals(name)) {
                 return group;
             }

@@ -1,9 +1,9 @@
 package se.umu.cs.jsgajn.gcom.groupcommunication;
 
-public class AbstractHeader implements Header {
+public class HeaderImpl implements Header {
     private MessageTypes messageType;
     
-    public AbstractHeader(MessageTypes messageType) {
+    public HeaderImpl(MessageTypes messageType) {
         this.messageType = messageType;
     }
     public MessageTypes getMessageType() {

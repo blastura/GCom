@@ -7,19 +7,19 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-import se.umu.cs.jsgajn.gcom.groupcommunication.AbstractHeader;
+import se.umu.cs.jsgajn.gcom.groupcommunication.HeaderImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageTypes;
 
 public abstract class AbstractGroupMember implements GroupMember {
     private String groupName;
-    //private GroupMember stub;
     private GNS gns;
-    private Group group;
+    private GroupView group;
     private Receiver groupLeader;
     private Receiver receiver;
-
+    private Receiver receiverStub;
+    
     /**
      * @param gnsHost GNS host
      * @param gnsPort GNS port
@@ -32,7 +32,14 @@ public abstract class AbstractGroupMember implements GroupMember {
     throws RemoteException, AlreadyBoundException, NotBoundException {
         this.groupName = groupName;
         
-        receiver = new ReceiverMember();
+        Registry registry = LocateRegistry.createRegistry(1099); // TODO: change 1099
+
+        receiver = new ReceiverImpl();
+        this.receiverStub = (Receiver) UnicastRemoteObject.exportObject(receiver, 0);
+        registry.bind(Receiver.STUB_NAME, receiverStub);
+        
+        
+        
         
         this.gns = connectToGns(gnsHost, gnsPort);
         this.groupLeader = gns.connect(receiver, groupName);
@@ -102,20 +109,20 @@ public abstract class AbstractGroupMember implements GroupMember {
         return false;
     }
 
-    public Group joinGroup(Receiver member) {
+    public GroupView joinGroup(Receiver member) {
         if (this.group == null) {
             System.out.println("I am my on master?");
-            Group result =  new GroupImpl(this.groupName, receiver);
+            GroupView result =  new GroupViewImpl(this.groupName, receiver);
             result.add(receiver);
             this.group = result;
             // Multicastar ut listan på nya grupper
-            multicast(new MessageImpl(result, new AbstractHeader(MessageTypes.GROUPCHANGE)));
+            multicast(new MessageImpl(result, new HeaderImpl(MessageTypes.GROUPCHANGE)));
             return result;
         }
         System.out.println("Group exists you got it");
         this.group.add(member);
         // Multicastar ut nya grupplistan
-        multicast(new MessageImpl(this.group, new AbstractHeader(MessageTypes.GROUPCHANGE)));
+        multicast(new MessageImpl(this.group, new HeaderImpl(MessageTypes.GROUPCHANGE)));
         return this.group;
     }
 }

@@ -6,7 +6,7 @@ import java.rmi.RemoteException;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 
-public interface GroupMember extends GroupLeader, Remote, Serializable {
+public interface GroupMember extends ReceiverLeader {
     public static final String STUB_NAME = "ballen";
     
     /**
@@ -16,5 +16,5 @@ public interface GroupMember extends GroupLeader, Remote, Serializable {
      * @param m The message to receive.
      * @throws RemoteException
      */
-    public void receive(Message m) throws RemoteException;
+    public void receive(Message m);
 }

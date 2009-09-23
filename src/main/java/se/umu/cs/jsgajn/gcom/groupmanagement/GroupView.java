@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.rmi.Remote;
 import java.util.Collection;
 
-public interface Group extends Collection<Receiver>, Serializable {
+public interface GroupView extends Collection<Receiver>, Serializable {
     // List<Server> servers;
     // Server.host och Server.host bör finnas
     public void closeGroup();

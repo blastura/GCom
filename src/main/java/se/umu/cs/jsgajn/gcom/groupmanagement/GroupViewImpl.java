@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-public class GroupImpl implements Group {
+public class GroupViewImpl implements GroupView {
 
     private Collection<Receiver> group;
     private String name;
     private Receiver groupLeader;
     private Collection<Receiver> members;
     
-    public GroupImpl(String name, Receiver groupLeader) {
+    public GroupViewImpl(String name, Receiver groupLeader) {
 	this.group = new ArrayList<Receiver>();
         this.name = name;
         this.groupLeader = groupLeader;

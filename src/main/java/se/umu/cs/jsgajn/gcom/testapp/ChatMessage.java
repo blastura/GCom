@@ -1,7 +1,7 @@
 package se.umu.cs.jsgajn.gcom.testapp;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Header;
-import se.umu.cs.jsgajn.gcom.groupcommunication.AbstractHeader;
+import se.umu.cs.jsgajn.gcom.groupcommunication.HeaderImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageTypes;
 
@@ -12,7 +12,7 @@ public class ChatMessage implements Message<String> {
 
     public ChatMessage(String msg) {
         this.msg = msg;
-        this.header = new AbstractHeader(MessageTypes.CLIENTMESSAGE);
+        this.header = new HeaderImpl(MessageTypes.CLIENTMESSAGE);
     }
 
     public String getMessage() {
