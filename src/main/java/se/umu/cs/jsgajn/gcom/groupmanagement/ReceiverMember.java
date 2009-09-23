@@ -12,12 +12,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 
-public class ReceiverImpl implements Receiver {
+public class ReceiverMember implements Receiver {
     // This will not be sent when object is serialized
     private transient BlockingQueue<Message> q;
     private Receiver stub;
 
-    public ReceiverImpl() 
+    public ReceiverMember() 
     throws RemoteException, AlreadyBoundException, NotBoundException{
         this.q = new LinkedBlockingQueue<Message>();
 

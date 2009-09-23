@@ -6,6 +6,6 @@ public interface Message extends Serializable {
 
     public Object getMessage();
     public Header getHeader();
-    public void setHeader();
+    public void setHeader(Header h);
 
 }

@@ -7,6 +7,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
+import se.umu.cs.jsgajn.gcom.groupcommunication.AbstractHeader;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageTypes;
@@ -31,7 +32,7 @@ public abstract class AbstractGroupMember implements GroupMember {
     throws RemoteException, AlreadyBoundException, NotBoundException {
         this.groupName = groupName;
         
-        receiver = new ReceiverImpl();
+        receiver = new ReceiverMember();
         
         this.gns = connectToGns(gnsHost, gnsPort);
         this.groupLeader = gns.connect(receiver, groupName);
@@ -85,6 +86,9 @@ public abstract class AbstractGroupMember implements GroupMember {
             System.out.println("We have a new member!!");
             break;
         case CLIENTMESSAGE:
+            joinGroup((Receiver)m.getMessage());
+            break;
+        case JOIN:
             System.out.println(m.getMessage());
             break;
         default:
@@ -105,13 +109,13 @@ public abstract class AbstractGroupMember implements GroupMember {
             result.add(receiver);
             this.group = result;
             // Multicastar ut listan på nya grupper
-            multicast(new MessageImpl(result, MessageTypes.GROUPCHANGE));
+            multicast(new MessageImpl(result, new AbstractHeader(MessageTypes.GROUPCHANGE)));
             return result;
         }
         System.out.println("Group exists you got it");
         this.group.add(member);
         // Multicastar ut nya grupplistan
-        multicast(new MessageImpl(this.group, MessageTypes.GROUPCHANGE));
+        multicast(new MessageImpl(this.group, new AbstractHeader(MessageTypes.GROUPCHANGE)));
         return this.group;
     }
 }

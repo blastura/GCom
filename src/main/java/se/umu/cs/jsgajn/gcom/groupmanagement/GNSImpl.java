@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class GNSImpl implements GNS {
-    private GNS stub;
-
-    public Collection<Group> groups;
+    
+    private transient GNS stub;
+    public transient Collection<Group> groups;
     
     public GNSImpl() throws RemoteException, AlreadyBoundException {
         this.groups = new ArrayList<Group>();
