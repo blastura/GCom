@@ -124,7 +124,7 @@ public abstract class AbstractGroupMember implements GroupMember {
             System.out.println("We have a new member!!");
             break;
         case CLIENTMESSAGE:
-            joinGroup((Receiver)m.getMessage());
+            //joinGroup((Receiver)m.getMessage());
             break;
         case JOIN:
             System.out.println(m.getMessage());

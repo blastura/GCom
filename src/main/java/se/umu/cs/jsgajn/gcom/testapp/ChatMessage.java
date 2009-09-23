@@ -5,7 +5,7 @@ import se.umu.cs.jsgajn.gcom.groupcommunication.HeaderImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
 
-public class ChatMessage implements Message<String> {
+public class ChatMessage implements Message {
     private static final long serialVersionUID = 1L;
     private String msg;
     private Header header;
@@ -13,6 +13,10 @@ public class ChatMessage implements Message<String> {
     public ChatMessage(String msg) {
         this.msg = msg;
         this.header = new HeaderImpl(MessageType.CLIENTMESSAGE);
+    }
+
+    public void setHeader(Header h) {
+        this.header = h;
     }
 
     public String getMessage() {

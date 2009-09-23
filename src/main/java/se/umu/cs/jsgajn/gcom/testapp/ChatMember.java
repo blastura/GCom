@@ -27,10 +27,9 @@ public class ChatMember extends AbstractGroupMember {
             multicast(new ChatMessage(msg));
         }
     }
-    
-    @Override
-    public void received(Message<?> m) {
-        System.out.println(m.getMessage());   
+
+    public void received(Message m) {
+        // TODO:?
     }
 
     public static void main(String[] args) {

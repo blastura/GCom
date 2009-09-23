@@ -1,23 +1,47 @@
 package se.umu.cs.jsgajn.gcom.messageordering;
 
-import java.rmi.server.UID;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class VectorClock implements Comparable<VectorClock> {
-    private Map<UID, Integer> map = new HashMap<UID, Integer>();
-
-    public VectorClock() {
+public class VectorClock<T extends Serializable> implements Comparable<VectorClock<T>> {
+    private Map<T, Integer> map = new HashMap<T, Integer>();
+    private T id;
+    
+    public VectorClock(T id) {
+        this.id = id;
     }
 
-    public int compareTo(VectorClock o) {
+    public void newProcess(T newId) {
+        if (newId.equals(this.id)) {
+            throw new AssertionError("Own process id added");
+        }
+        map.put(id, 0);
+    }
+
+    /**
+     * Increment own value by 1;
+     */
+    public void tick() {
+        map.put(id, map.get(id) + 1);
+    }
+
+    public int get() {
+        return map.get(this.id);
+    }
+
+    public int get(T id) {
+        return map.get(id);
+    }
+
+    public int compareTo(VectorClock<T> o) {
         if (!this.equals(o)) {
             // TODO: what now?
             throw new AssertionError("Vectorclocks doesn't match sizes");
         }
-        Map<UID, Integer> oMap = o.getMap();
+        Map<T, Integer> oMap = o.getMap();
         int result = 0;
-        for (UID id : map.keySet()) {
+        for (T id : map.keySet()) {
             result += map.get(id) - oMap.get(id);
         }
         return result;
@@ -27,7 +51,7 @@ public class VectorClock implements Comparable<VectorClock> {
         return map.size();
     }
 
-    protected Map<UID, Integer> getMap() {
+    protected Map<T, Integer> getMap() {
         return this.map;
     }
 
@@ -37,7 +61,8 @@ public class VectorClock implements Comparable<VectorClock> {
             return true;
         if (!(o instanceof VectorClock))
             return false;
-        VectorClock other = (VectorClock) o;
+        @SuppressWarnings("unchecked") // TODO: Unchecked cast?
+        VectorClock<T> other = (VectorClock) o;
         return map.equals(other.getMap());
     }
 
