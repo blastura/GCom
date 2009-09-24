@@ -7,6 +7,7 @@ import java.util.Map;
 public class VectorClock<T extends Serializable> implements Comparable<VectorClock<T>> {
     private Map<T, Integer> map = new HashMap<T, Integer>();
     private T id;
+    private enum diff {STRICTLY_LESS, STRICTLY_LESS_OR_EQUAL, EQUAL, LARGER}
     
     public VectorClock(T id) {
         this.id = id;
@@ -16,7 +17,7 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
         if (newId.equals(this.id)) {
             throw new AssertionError("Own process id added");
         }
-        map.put(id, 0);
+        map.put(newId, 0);
     }
 
     /**
@@ -34,17 +35,46 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
         return map.get(id);
     }
 
+    /**
+     * Compare this VectorClock to another VectorClock.
+     *
+     * @return negative numbers if clock is smaller than parameter, 0 if it's
+     *         smaller or equal, possitive numbers if it is greater than the
+     *         parameter clock.
+     */
     public int compareTo(VectorClock<T> o) {
-        if (!this.equals(o)) {
+        if (map.size() != o.getMap().size()
+            && map.keySet().equals(o.getMap().keySet())) {
             // TODO: what now?
-            throw new AssertionError("Vectorclocks doesn't match sizes");
+            throw new AssertionError("Vectorclocks doesn't match sizes, and keySets");
         }
+        // TODO: use this or somehting else
+        // =, <=, <
         Map<T, Integer> oMap = o.getMap();
-        int result = 0;
+        System.out.println("myMap: " + map.toString());
+        System.out.println("===========");
+        System.out.println("oMap: " + oMap.toString());
+        int nrEqual = 0;
+        int larger = 0;
+        int smaller = 0;
         for (T id : map.keySet()) {
-            result += map.get(id) - oMap.get(id);
+            int diff = map.get(id) - oMap.get(id);
+            if (diff < 0) {
+                smaller =+ diff;
+            } else if (diff > 0) {
+                larger =+ diff;
+            } else {
+                nrEqual++;
+            }
         }
-        return result;
+        
+        if (nrEqual > 0 && larger == 0) {
+            return 0;
+        } else if (nrEqual == 0 && larger == 0) {
+            return smaller;
+        } else {
+            return larger;
+        }
     }
 
     public int size() {
