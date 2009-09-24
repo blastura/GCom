@@ -8,6 +8,8 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
+
 public class GNSImpl implements GNS {
     
     private transient GNS stub;

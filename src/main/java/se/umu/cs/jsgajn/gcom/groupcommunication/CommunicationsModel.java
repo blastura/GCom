@@ -10,8 +10,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import se.umu.cs.jsgajn.gcom.groupmanagement.GNS;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
-import se.umu.cs.jsgajn.gcom.groupmanagement.Receiver;
-import se.umu.cs.jsgajn.gcom.groupmanagement.ReceiverImpl;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingModule;
 
 public class CommunicationsModel implements Multicast {
@@ -21,9 +19,11 @@ public class CommunicationsModel implements Multicast {
     private Receiver receiverStub;
     private Multicast mMethod;
     private OrderingModule orderingModule;
+    // TODO: think syncronized
+    private GroupView groupView;
 
-    public CommunicationsModel(Multicast mMethod, OrderingModule orderingModule) throws RemoteException,
-    AlreadyBoundException, NotBoundException {
+    public CommunicationsModel(Multicast mMethod, OrderingModule orderingModule)
+            throws RemoteException, AlreadyBoundException, NotBoundException {
         this.mMethod = mMethod;
         this.orderingModule = orderingModule;
         // TODO: change 1099
@@ -65,7 +65,7 @@ public class CommunicationsModel implements Multicast {
                     communicationModule.doStuff();
                      */
                     Message m = receiveQueue.take();
-                    if (mMethod.deliverCheck(m)) {
+                    if (mMethod.deliverCheck(m, groupView)) {
                         orderingModule.deliver(m);
                     }
                 }

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
+
 public class GroupViewImpl implements GroupView {
 
     private Collection<Receiver> group;

@@ -1,4 +1,4 @@
-package se.umu.cs.jsgajn.gcom.groupmanagement;
+package se.umu.cs.jsgajn.gcom.groupcommunication;
 
 import java.io.Serializable;
 import java.rmi.AlreadyBoundException;
@@ -10,7 +10,6 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 
 public class ReceiverImpl implements Receiver, Serializable {
     // This will not be sent when object is serialized

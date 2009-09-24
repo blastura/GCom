@@ -3,7 +3,6 @@ package se.umu.cs.jsgajn.gcom.groupcommunication;
 import java.rmi.RemoteException;
 
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
-import se.umu.cs.jsgajn.gcom.groupmanagement.Receiver;
 
 public class BasicMulticast implements Multicast {
 

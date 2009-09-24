@@ -1,9 +1,8 @@
-package se.umu.cs.jsgajn.gcom.groupmanagement;
+package se.umu.cs.jsgajn.gcom.groupcommunication;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 
 public interface Receiver extends Remote {
     public static final String STUB_NAME = "snoppen";

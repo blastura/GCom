@@ -18,6 +18,7 @@ import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Multicast;
+import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
 import se.umu.cs.jsgajn.gcom.messageordering.FIFO;
 import se.umu.cs.jsgajn.gcom.messageordering.Ordering;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingModule;
@@ -73,7 +74,7 @@ public class GroupMemberImpl implements GroupMember {
         new Thread(new MessageDeliverer()).start();
 
         MessageImpl joinMessage = 
-            new MessageImpl(receiver, new HeaderImpl(MessageType.JOIN));
+            new MessageImpl(receiver, MessageType.JOIN, ID);
         receiverLeader.receive(joinMessage);
     }
 
@@ -83,7 +84,7 @@ public class GroupMemberImpl implements GroupMember {
     public void send(Object clientMessage) {
         Message m = 
             new MessageImpl(clientMessage,
-                    new HeaderImpl(MessageType.CLIENTMESSAGE));
+                    MessageType.CLIENTMESSAGE, ID);
         communicationModule.multicast(m, this.group);
     }
 
