@@ -1,7 +1,9 @@
 package se.umu.cs.jsgajn.gcom.groupcommunication;
 
-public class MessageImpl implements Message {
+import java.rmi.server.UID;
 
+public class MessageImpl implements Message {
+    
     Object m;
     Header h;
     
@@ -15,7 +17,6 @@ public class MessageImpl implements Message {
     }
 
     public Object getMessage() {
-        // TODO Auto-generated method stub
         return m;
     }
 

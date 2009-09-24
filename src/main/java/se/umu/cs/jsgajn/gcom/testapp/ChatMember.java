@@ -7,15 +7,17 @@ import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 
-import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
-import se.umu.cs.jsgajn.gcom.groupmanagement.AbstractGroupMember;
+import se.umu.cs.jsgajn.gcom.Client;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMemberImpl;
 
-public class ChatMember extends AbstractGroupMember {
+public class ChatMember implements Client {
     private static final Logger logger = Logger.getLogger(ChatMember.class);
-
+    private GroupMember groupMember;
+    
     public ChatMember(String gnsHost, int gnsPort, String groupName)
             throws RemoteException, AlreadyBoundException, NotBoundException {
-        super(gnsHost, gnsPort, groupName);
+        this.groupMember = new GroupMemberImpl(this, gnsHost, gnsPort, groupName);
 
         System.err.println("Server ready");
         Scanner sc = new Scanner(System.in);
@@ -24,12 +26,12 @@ public class ChatMember extends AbstractGroupMember {
         while (true) {
             System.out.print("message: ");
             msg = sc.nextLine();
-            multicast(new ChatMessage(msg));
+            groupMember.send(msg);
         }
     }
 
-    public void received(Message m) {
-        // TODO:?
+    public void deliver(Object m) {
+        System.out.println((String)m);
     }
 
     public static void main(String[] args) {

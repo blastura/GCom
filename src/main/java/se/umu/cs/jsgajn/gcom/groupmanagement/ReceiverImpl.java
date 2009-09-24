@@ -12,30 +12,19 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 
-public class ReceiverImpl implements Receiver {
+public class ReceiverImpl implements Receiver, Serializable {
     // This will not be sent when object is serialized
     private transient BlockingQueue<Message> q;
-    private Receiver stub;
 
-    public ReceiverImpl() 
+    public ReceiverImpl(BlockingQueue<Message> q) 
     throws RemoteException, AlreadyBoundException, NotBoundException{
-        this.q = new LinkedBlockingQueue<Message>();
-    }
-    
-    /**
-     * Used to get message from message queue.
-     * 
-     * @return The oldest message in queue.
-     * @throws InterruptedException 
-     */
-    public Message getMessage() throws InterruptedException {
-        return q.take();
-    }
-    
+        this.q = q;
+    } 
 
     public void receive(Message m) throws RemoteException {
         // Simply add message to blockingQueue, if queue is busy, it will block.
         try {
+            System.out.println("receive: " + m.toString());
             q.put(m);
         } catch (InterruptedException e) {
             // If queue is interrupted while waiting for insertion into queue.

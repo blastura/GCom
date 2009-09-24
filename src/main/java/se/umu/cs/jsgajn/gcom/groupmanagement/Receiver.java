@@ -15,5 +15,4 @@ public interface Receiver extends Remote {
      * @throws RemoteException
      */
     public void receive(Message m) throws RemoteException;
-    public Message getMessage() throws InterruptedException;
 }

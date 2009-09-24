@@ -1,15 +1,25 @@
 package se.umu.cs.jsgajn.gcom.groupcommunication;
 
+import java.rmi.RemoteException;
+
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
+import se.umu.cs.jsgajn.gcom.groupmanagement.Receiver;
+
 public class BasicMulticast implements Multicast {
 
-	public void deliver() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void send(Message m) {
-		// TODO Auto-generated method stub
-		
-	}
-
+    /**
+     * Send message to all members of the group.
+     * TODO: move method to interface or Ordering-layer.
+     * @param m The message to send.
+     */
+    public void multicast(Message m, GroupView g) {
+        for (Receiver member : g) {
+            try {
+                member.receive(m);
+            } catch (RemoteException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
 }

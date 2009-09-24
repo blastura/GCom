@@ -24,8 +24,7 @@ public class FIFO implements Ordering {
     }
     
     private void handleMessage(Message take) {
-        // TODO Auto-generated method stub
-        
+        deliverQueue.add(take);        
     }
 
     public void add(Message m) {
