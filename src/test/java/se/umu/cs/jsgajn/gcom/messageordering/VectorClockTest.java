@@ -58,6 +58,11 @@ public class VectorClockTest {
         v1.tick();
         assertEquals(1, v1.compareTo(v2));
         assertEquals(0, v2.compareTo(v1));
+        
+        v2.tick();
+        assertEquals(1, v1.compareTo(v2));
+        assertEquals(1, v2.compareTo(v1));
+        // TODO: more tests
     }
 }
 

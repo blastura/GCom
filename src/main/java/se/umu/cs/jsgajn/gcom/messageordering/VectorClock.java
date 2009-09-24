@@ -11,6 +11,7 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
     
     public VectorClock(T id) {
         this.id = id;
+        map.put(id, 0);
     }
 
     public void newProcess(T newId) {
@@ -43,8 +44,8 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
      *         parameter clock.
      */
     public int compareTo(VectorClock<T> o) {
-        if (map.size() != o.getMap().size()
-            && map.keySet().equals(o.getMap().keySet())) {
+        if ((map.size() != o.getMap().size())
+            && !(map.keySet().equals(o.getMap().keySet()))) {
             // TODO: what now?
             throw new AssertionError("Vectorclocks doesn't match sizes, and keySets");
         }
@@ -52,8 +53,8 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
         // =, <=, <
         Map<T, Integer> oMap = o.getMap();
         System.out.println("myMap: " + map.toString());
-        System.out.println("===========");
         System.out.println("oMap: " + oMap.toString());
+        System.out.println("===========");
         int nrEqual = 0;
         int larger = 0;
         int smaller = 0;
