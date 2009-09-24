@@ -27,7 +27,7 @@ public class FIFO implements Ordering {
         deliverQueue.add(take);        
     }
 
-    public void add(Message m) {
+    public void deliver(Message m) {
         try {
             q.put(m);
         } catch (InterruptedException e) {

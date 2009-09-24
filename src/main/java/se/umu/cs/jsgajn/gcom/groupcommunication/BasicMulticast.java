@@ -22,4 +22,9 @@ public class BasicMulticast implements Multicast {
             }
         }
     }
+
+    public boolean deliverCheck(Message m, GroupView g) {
+        // TODO Auto-generated method stub
+        return true;
+    }
 }

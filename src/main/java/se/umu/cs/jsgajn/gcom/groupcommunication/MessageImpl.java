@@ -4,24 +4,25 @@ import java.rmi.server.UID;
 
 public class MessageImpl implements Message {
     
-    Object m;
-    Header h;
     
-    public MessageImpl(Object m, Header h){
+    private MessageType messageType;
+    private UID originID;    
+    private Object m;
+    
+    public MessageImpl(Object m, MessageType messageType, UID originID) {
         this.m = m;
-        this.h = h;
-    }
-    
-    public Header getHeader() {
-        return h;
+        this.messageType = messageType;
+        this.originID = originID;
     }
 
     public Object getMessage() {
         return m;
     }
 
-    public void setHeader(Header h) {
-        this.h = h;
+    public MessageType getMessageType() {
+        return this.messageType;
     }
-
+    public UID getOriginUID() {
+        return originID;
+    }
 }

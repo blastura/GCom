@@ -12,6 +12,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import se.umu.cs.jsgajn.gcom.Client;
 import se.umu.cs.jsgajn.gcom.groupcommunication.BasicMulticast;
+import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationsModel;
 import se.umu.cs.jsgajn.gcom.groupcommunication.HeaderImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
@@ -19,6 +20,7 @@ import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Multicast;
 import se.umu.cs.jsgajn.gcom.messageordering.FIFO;
 import se.umu.cs.jsgajn.gcom.messageordering.Ordering;
+import se.umu.cs.jsgajn.gcom.messageordering.OrderingModule;
 
 public class GroupMemberImpl implements GroupMember {
     private Client client;
@@ -26,8 +28,8 @@ public class GroupMemberImpl implements GroupMember {
     private String groupName;
     private GNS gns;
     private GroupView group;
-    private Ordering orderingModule;
-    private Multicast communicationModule;
+    private OrderingModule orderingModule;
+    private CommunicationsModel communicationModule;
     private Receiver receiverLeader;
     private BlockingQueue<Message> receiveQueue;
     private GroupLeader gl;
@@ -46,26 +48,28 @@ public class GroupMemberImpl implements GroupMember {
     throws RemoteException, AlreadyBoundException, NotBoundException {
         this.client = client;
         // TODO: dynamic loading of multicast module
-        this.communicationModule = new BasicMulticast();
+        this.orderingModule = new OrderingModule(new FIFO());
+        this.communicationModule = new CommunicationsModel(new BasicMulticast(),
+                this.orderingModule);
 
         this.groupName = groupName;
-        this.orderingModule = new FIFO();  // TODO: which model to use
+        // TODO: which model to use
         this.gl = new GroupLeader();
 
         // TODO: change 1099
-        Registry registry = LocateRegistry.createRegistry(1099); 
+        //Registry registry = LocateRegistry.createRegistry(1099); 
 
-        this.receiveQueue = new LinkedBlockingQueue<Message>();
-        receiver = new ReceiverImpl(this.receiveQueue);
-        this.receiverStub = 
-            (Receiver) UnicastRemoteObject.exportObject(receiver, 0);
-        registry.bind(Receiver.STUB_NAME, receiverStub);
+        //this.receiveQueue = new LinkedBlockingQueue<Message>();
+        //receiver = new ReceiverImpl(this.receiveQueue);
+        //        this.receiverStub = 
+        //            (Receiver) UnicastRemoteObject.exportObject(receiver, 0);
+        //        registry.bind(Receiver.STUB_NAME, receiverStub);
 
-        this.gns = connectToGns(gnsHost, gnsPort);
+
+        this.gns = communicationModule.connectToGns(gnsHost, gnsPort);
         this.receiverLeader = gns.connect(receiver, groupName);
 
-        // Start thread to handle messages
-        new Thread(new MessageReceiver()).start();
+
         new Thread(new MessageDeliverer()).start();
 
         MessageImpl joinMessage = 
@@ -74,18 +78,7 @@ public class GroupMemberImpl implements GroupMember {
     }
 
 
-    /**
-     * @param host Host to GNS
-     * @param port Port to GNS
-     * @return GNS stub
-     * @throws RemoteException If GNS throws exception
-     * @throws NotBoundException If GNS stub can't be found.
-     */
-    private GNS connectToGns(String host, int port) throws RemoteException,
-    NotBoundException {
-        Registry gnsReg = LocateRegistry.getRegistry(host, port);
-        return (GNS) gnsReg.lookup(GNS.STUB_NAME);
-    }
+
 
     public void send(Object clientMessage) {
         Message m = 
@@ -122,21 +115,7 @@ public class GroupMemberImpl implements GroupMember {
         }
     }
 
-    private class MessageReceiver implements Runnable {
-        public void run() {
-            try {
-                while (true) { 
-                    /*
-                    Message m = receiveQueue.take();
-                    communicationModule.doStuff();
-                    */
-                    orderingModule.add(receiveQueue.take());
-                }
-            } catch (InterruptedException e) { 
-                System.out.println(e);
-            }
-        }
-    }
+
 
     private class MessageDeliverer implements Runnable {
         public void run() {
