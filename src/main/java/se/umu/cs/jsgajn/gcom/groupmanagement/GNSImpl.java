@@ -5,18 +5,16 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.Collection;
-
-import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GNSImpl implements GNS {
     
     private transient GNS stub;
-    public transient Collection<GroupView> groups;
+    public transient Map<String, GroupSettings> groups;
     
     public GNSImpl() throws RemoteException, AlreadyBoundException {
-        this.groups = new ArrayList<GroupView>();
+        this.groups = new HashMap<String, GroupSettings>();
         
         this.stub = (GNS) UnicastRemoteObject.exportObject(this, 0);
         Registry registry = LocateRegistry.createRegistry(1099); // TODO: change 1099
@@ -25,9 +23,10 @@ public class GNSImpl implements GNS {
         System.out.println("Server is running.");
     }
     
-    public Receiver connect(Receiver gm, String groupName) {
-        GroupView group = getGroup(groupName);
+    public GroupSettings connect(GroupSettings gs) {
+        GroupSettings group = groups.get(gs.getName());
         
+        // TODO: implements
         if (group != null) {
             return group.getGroupLeaderReceiver();
         } else {
@@ -35,15 +34,6 @@ public class GNSImpl implements GNS {
             groups.add(newGroup);
             return newGroup.getGroupLeaderReceiver();            
         }
-    }
-   
-    public GroupView getGroup(String name) {
-        for (GroupView group : groups) {
-            if (group.getName().equals(name)) {
-                return group;
-            }
-        }
-        return null;
     }
     
     public static void main(String args[]) {

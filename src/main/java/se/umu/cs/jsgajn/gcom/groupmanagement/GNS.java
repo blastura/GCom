@@ -7,8 +7,6 @@ import java.rmi.RemoteException;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
 
 public interface GNS extends Remote, Serializable {
-    public static final String STUB_NAME = "GNS";
-    public Receiver connect(Receiver gm, String groupName) 
-        throws RemoteException;
-    public GroupView getGroup(String name) throws RemoteException;
+    public static final String STUB_NAME = "MURRAN";
+    public GroupSettings connect(GroupSettings gs) throws RemoteException;
 }
