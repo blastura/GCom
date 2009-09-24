@@ -46,27 +46,22 @@ public class GroupMemberImpl implements GroupMember {
 
         this.groupName = groupName;
         // TODO: which model to use
-        this.gl = new GroupLeader();
-
-        // TODO: change 1099
-        //Registry registry = LocateRegistry.createRegistry(1099);
-
-        //this.receiveQueue = new LinkedBlockingQueue<Message>();
-        //receiver = new ReceiverImpl(this.receiveQueue);
-        //        this.receiverStub =
-        //            (Receiver) UnicastRemoteObject.exportObject(receiver, 0);
-        //        registry.bind(Receiver.STUB_NAME, receiverStub);
-
 
         this.gns = communicationModule.connectToGns(gnsHost, gnsPort);
         GroupSettings gs = gns.connect(new GroupSettings(groupName, communicationModule.getReceiver(),
                                                          Multicast.type.BASIC_MULTICAST, Ordering.type.FIFO));
+        
+        if (gs.isEmpty()) { // Group is empty I am leader
+            this.gl = new GroupLeader();
+        } else {
+            MessageImpl joinMessage =
+                new MessageImpl(receiver, MessageType.JOIN, ID);
+            // Couldn't these just as well be multicasted to everyone, why need
+            // the leader to send groupchange? Howto create/get first group?
+            gs.getLeader().receive(joinMessage);
+        }
 
         new Thread(new MessageDeliverer()).start();
-
-        MessageImpl joinMessage =
-            new MessageImpl(receiver, MessageType.JOIN, ID);
-        receiverLeader.receive(joinMessage);
     }
 
 
@@ -125,7 +120,11 @@ public class GroupMemberImpl implements GroupMember {
                 client.deliver(m.getMessage());
                 break;
             case JOIN:
-                gl.joinGroup((Receiver)m.getMessage());
+                if (gl == null) {
+                    System.err.println("Got join message but I'm not leader");
+                } else {
+                    gl.joinGroup((Receiver)m.getMessage());
+                }
                 break;
             default:
                 System.out.println("error i header");
