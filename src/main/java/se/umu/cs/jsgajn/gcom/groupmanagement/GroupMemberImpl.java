@@ -3,17 +3,10 @@ package se.umu.cs.jsgajn.gcom.groupmanagement;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UID;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import se.umu.cs.jsgajn.gcom.Client;
 import se.umu.cs.jsgajn.gcom.groupcommunication.BasicMulticast;
 import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationsModel;
-import se.umu.cs.jsgajn.gcom.groupcommunication.HeaderImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
@@ -32,10 +25,8 @@ public class GroupMemberImpl implements GroupMember {
     private OrderingModule orderingModule;
     private CommunicationsModel communicationModule;
     private Receiver receiverLeader;
-    private BlockingQueue<Message> receiveQueue;
     private GroupLeader gl;
     private Receiver receiver;
-    private Receiver receiverStub;
 
     /**
      * @param gnsHost GNS host
@@ -46,34 +37,34 @@ public class GroupMemberImpl implements GroupMember {
      * @throws NotBoundException If GNS stub is not found in GNS register.
      */
     public GroupMemberImpl(Client client, String gnsHost, int gnsPort, String groupName)
-    throws RemoteException, AlreadyBoundException, NotBoundException {
+        throws RemoteException, AlreadyBoundException, NotBoundException {
         this.client = client;
         // TODO: dynamic loading of multicast module
         this.orderingModule = new OrderingModule(new FIFO());
         this.communicationModule = new CommunicationsModel(new BasicMulticast(),
-                this.orderingModule);
+                                                           this.orderingModule);
 
         this.groupName = groupName;
         // TODO: which model to use
         this.gl = new GroupLeader();
 
         // TODO: change 1099
-        //Registry registry = LocateRegistry.createRegistry(1099); 
+        //Registry registry = LocateRegistry.createRegistry(1099);
 
         //this.receiveQueue = new LinkedBlockingQueue<Message>();
         //receiver = new ReceiverImpl(this.receiveQueue);
-        //        this.receiverStub = 
+        //        this.receiverStub =
         //            (Receiver) UnicastRemoteObject.exportObject(receiver, 0);
         //        registry.bind(Receiver.STUB_NAME, receiverStub);
 
 
         this.gns = communicationModule.connectToGns(gnsHost, gnsPort);
-        this.receiverLeader = gns.connect(receiver, groupName);
-
+        GroupSettings gs = gns.connect(new GroupSettings(groupName, communicationModule.getReceiver(),
+                                                         Multicast.type.BASIC_MULTICAST, Ordering.type.FIFO));
 
         new Thread(new MessageDeliverer()).start();
 
-        MessageImpl joinMessage = 
+        MessageImpl joinMessage =
             new MessageImpl(receiver, MessageType.JOIN, ID);
         receiverLeader.receive(joinMessage);
     }
@@ -82,9 +73,8 @@ public class GroupMemberImpl implements GroupMember {
 
 
     public void send(Object clientMessage) {
-        Message m = 
-            new MessageImpl(clientMessage,
-                    MessageType.CLIENTMESSAGE, ID);
+        Message m = new MessageImpl(clientMessage,
+                MessageType.CLIENTMESSAGE, ID);
         communicationModule.multicast(m, this.group);
     }
 
@@ -102,21 +92,19 @@ public class GroupMemberImpl implements GroupMember {
                 group =  new GroupViewImpl(groupName, receiver);
                 group.add(receiver);
                 // Multicastar ut listan på nya grupper
-                communicationModule.multicast(new MessageImpl(group, new HeaderImpl(MessageType.GROUPCHANGE)),
-                        group);
+                communicationModule.multicast(new MessageImpl(group, MessageType.GROUPCHANGE, ID),
+                                              group);
                 return group;
             }
             System.out.println("Group exists you got it");
             group.add(member);
             // Multicastar ut nya grupplistan
-            communicationModule.multicast(new MessageImpl(group, new HeaderImpl(MessageType.GROUPCHANGE)),
-                    group);
+            communicationModule.multicast(new MessageImpl(group, MessageType.GROUPCHANGE, ID),
+                                          group);
             return group;
 
         }
     }
-
-
 
     private class MessageDeliverer implements Runnable {
         public void run() {
@@ -127,7 +115,7 @@ public class GroupMemberImpl implements GroupMember {
 
         public void handleDelivered(Message m) {
             System.out.println("Got message!");
-            MessageType type = m.getHeader().getMessageType();
+            MessageType type = m.getMessageType();
             switch (type) {
             case GROUPCHANGE:
                 System.out.println("We have a new member!!");
@@ -141,7 +129,7 @@ public class GroupMemberImpl implements GroupMember {
                 break;
             default:
                 System.out.println("error i header");
-            }       
+            }
         }
     }
 }

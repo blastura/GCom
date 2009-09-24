@@ -4,7 +4,6 @@ import java.rmi.server.UID;
 
 public class MessageImpl implements Message {
     
-    
     private MessageType messageType;
     private UID originID;    
     private Object m;

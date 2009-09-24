@@ -74,4 +74,13 @@ public class CommunicationsModel implements Multicast {
             }
         }
     }
+
+    public boolean deliverCheck(Message m, GroupView g) {
+        // TODO: remove
+        throw new AssertionError("Not implemented");
+    }
+
+    public Receiver getReceiver() {
+        return this.receiver;
+    }
 }

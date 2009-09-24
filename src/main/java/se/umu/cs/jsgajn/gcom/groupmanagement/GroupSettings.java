@@ -12,7 +12,7 @@ public class GroupSettings implements Serializable {
     private Receiver leader;
     private type multicastType;
     private Ordering.type orderingType;
-    private boolean empty = false;
+    private boolean empty = true;
     private String name;
 
     public GroupSettings(String name, Receiver leader, Multicast.type multicastType, Ordering.type orderingType) {
@@ -24,6 +24,10 @@ public class GroupSettings implements Serializable {
     
     public String getName() {
         return this.name;
+    }
+    
+    public void touch() {
+        this.empty = false;
     }
     
     public boolean isEmpty() {

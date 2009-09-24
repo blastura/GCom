@@ -26,13 +26,11 @@ public class GNSImpl implements GNS {
     public GroupSettings connect(GroupSettings gs) {
         GroupSettings group = groups.get(gs.getName());
         
-        // TODO: implements
         if (group != null) {
-            return group.getGroupLeaderReceiver();
+            gs.touch();
+            return gs;
         } else {
-            GroupViewImpl newGroup = new GroupViewImpl(groupName, gm);
-            groups.add(newGroup);
-            return newGroup.getGroupLeaderReceiver();            
+            return group;
         }
     }
     
