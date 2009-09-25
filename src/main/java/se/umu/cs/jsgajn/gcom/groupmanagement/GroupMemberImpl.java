@@ -21,12 +21,12 @@ public class GroupMemberImpl implements GroupMember {
 
     private String groupName;
     private GNS gns;
-    private GroupView group;
+    private GroupView groupView;
     private OrderingModule orderingModule;
     private CommunicationsModel communicationModule;
-    private Receiver receiverLeader;
+    //private Receiver receiverLeader;
     private GroupLeader gl;
-    private Receiver receiver;
+    //private Receiver receiver;
 
     /**
      * @param gnsHost GNS host
@@ -37,67 +37,57 @@ public class GroupMemberImpl implements GroupMember {
      * @throws NotBoundException If GNS stub is not found in GNS register.
      */
     public GroupMemberImpl(Client client, String gnsHost, int gnsPort, String groupName)
-        throws RemoteException, AlreadyBoundException, NotBoundException {
+    throws RemoteException, AlreadyBoundException, NotBoundException {
         this.client = client;
         // TODO: dynamic loading of multicast module
         this.orderingModule = new OrderingModule(new FIFO());
         this.communicationModule = new CommunicationsModel(new BasicMulticast(),
-                                                           this.orderingModule);
+                this.orderingModule);
 
         this.groupName = groupName;
         // TODO: which model to use
 
         this.gns = communicationModule.connectToGns(gnsHost, gnsPort);
         GroupSettings gs = gns.connect(new GroupSettings(groupName, communicationModule.getReceiver(),
-                                                         Multicast.type.BASIC_MULTICAST, Ordering.type.FIFO));
-        
-        if (gs.isEmpty()) { // Group is empty I am leader
-            this.gl = new GroupLeader();
+                Multicast.type.BASIC_MULTICAST, Ordering.type.FIFO));
+
+        if (gs.isNew()) { // Group is empty I am leader
+            System.out.println("Group created");
+            // TODO: Test if setIsNew(false) will affect GNSImpl
+            this.gl = new GroupLeaderImpl();
+            this.groupView =  new GroupViewImpl(groupName, communicationModule.getReceiver());
+
         } else {
+            System.out.println("Try join group");
             MessageImpl joinMessage =
-                new MessageImpl(receiver, MessageType.JOIN, ID);
-            // Couldn't these just as well be multicasted to everyone, why need
-            // the leader to send groupchange? Howto create/get first group?
+                new MessageImpl(communicationModule.getReceiver(), 
+                        MessageType.JOIN, ID);
+
             gs.getLeader().receive(joinMessage);
         }
 
         new Thread(new MessageDeliverer()).start();
     }
 
-
-
-
     public void send(Object clientMessage) {
         Message m = new MessageImpl(clientMessage,
                 MessageType.CLIENTMESSAGE, ID);
-        communicationModule.multicast(m, this.group);
+        communicationModule.multicast(m, this.groupView);
     }
 
     /** GroupLeader ************/
-    private class GroupLeader {
-        public boolean removeFromGroup(GroupMember member) {
+    private class GroupLeaderImpl implements GroupLeader {
+        public void removeFromGroup(Receiver member) {
             // TODO Auto-generated method stub
-            return false;
         }
 
-        public GroupView joinGroup(Receiver member) {
+        public void addMemberToGroup(Receiver member) {
             // TODO: fix this
-            if (group == null) {
-                System.out.println("I am my on master?");
-                group =  new GroupViewImpl(groupName, receiver);
-                group.add(receiver);
-                // Multicastar ut listan på nya grupper
-                communicationModule.multicast(new MessageImpl(group, MessageType.GROUPCHANGE, ID),
-                                              group);
-                return group;
-            }
-            System.out.println("Group exists you got it");
-            group.add(member);
-            // Multicastar ut nya grupplistan
-            communicationModule.multicast(new MessageImpl(group, MessageType.GROUPCHANGE, ID),
-                                          group);
-            return group;
+            groupView.add(member);
 
+            // Multicast new groupView
+            communicationModule.multicast(new MessageImpl(groupView, 
+                    MessageType.GROUPCHANGE, ID), groupView);
         }
     }
 
@@ -114,7 +104,7 @@ public class GroupMemberImpl implements GroupMember {
             switch (type) {
             case GROUPCHANGE:
                 System.out.println("We have a new member!!");
-                group = (GroupView)m.getMessage();
+                groupView = (GroupView)m.getMessage();
                 break;
             case CLIENTMESSAGE:
                 client.deliver(m.getMessage());
@@ -123,7 +113,7 @@ public class GroupMemberImpl implements GroupMember {
                 if (gl == null) {
                     System.err.println("Got join message but I'm not leader");
                 } else {
-                    gl.joinGroup((Receiver)m.getMessage());
+                    gl.addMemberToGroup((Receiver)m.getMessage());
                 }
                 break;
             default:
@@ -132,5 +122,4 @@ public class GroupMemberImpl implements GroupMember {
         }
     }
 }
-
 

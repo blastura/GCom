@@ -11,12 +11,12 @@ public class GroupViewImpl implements GroupView {
     private Collection<Receiver> group;
     private String name;
     private Receiver groupLeader;
-    private Collection<Receiver> members;
-    
+
     public GroupViewImpl(String name, Receiver groupLeader) {
-	this.group = new ArrayList<Receiver>();
+        this.group = new ArrayList<Receiver>();
         this.name = name;
         this.groupLeader = groupLeader;
+        add(groupLeader);
     }
 
     public String getName() {
@@ -26,7 +26,7 @@ public class GroupViewImpl implements GroupView {
     public Receiver getGroupLeaderReceiver() {
         return groupLeader;
     }
-    
+
     public void closeGroup() {
     }
 

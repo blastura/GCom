@@ -25,10 +25,12 @@ public class GNSImpl implements GNS {
     
     public GroupSettings connect(GroupSettings gs) {
         GroupSettings group = groups.get(gs.getName());  
-        if (group != null) {
-            gs.touch();
+        if (group == null) {
+            gs.setIsNew(true);
+            groups.put(gs.getName(), gs);
             return gs;
         } else {
+            gs.setIsNew(false);
             return group;
         }
     }
