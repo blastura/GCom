@@ -10,7 +10,6 @@ import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Multicast;
-import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
 import se.umu.cs.jsgajn.gcom.groupcommunication.ReliableMulticast;
 import se.umu.cs.jsgajn.gcom.messageordering.FIFO;
 import se.umu.cs.jsgajn.gcom.messageordering.Ordering;
@@ -28,6 +27,9 @@ public class GroupModuleImpl implements GroupModule {
     private GroupLeader gl;
     //private Receiver receiver;
 
+    // Own group member
+    private GroupMember groupMember;
+
     /**
      * @param gnsHost GNS host
      * @param gnsPort GNS port
@@ -44,12 +46,15 @@ public class GroupModuleImpl implements GroupModule {
         this.communicationModule = new CommunicationsModelImpl(new ReliableMulticast(),
                 this.orderingModule, this);
 
-        this.groupView =  new GroupViewImpl(groupName, new GroupMember(communicationModule.getReceiver()));
+        this.groupMember = new GroupMember(communicationModule.getReceiver());
+
+        this.groupView =  new GroupViewImpl(groupName, this.groupMember);
         this.groupName = groupName;
         // TODO: which model to use
 
+
         this.gns = communicationModule.connectToGns(gnsHost, gnsPort);
-        GroupSettings gs = gns.connect(new GroupSettings(groupName, communicationModule.getReceiver(),
+        GroupSettings gs = gns.connect(new GroupSettings(groupName, this.groupMember,
                 Multicast.type.RELIABLE_MULTICAST, Ordering.type.FIFO));
 
         if (gs.isNew()) { // Group is empty I am leader
@@ -60,10 +65,10 @@ public class GroupModuleImpl implements GroupModule {
         } else {
             System.out.println("Try join group");
             MessageImpl joinMessage =
-                new MessageImpl(communicationModule.getReceiver(), 
+                new MessageImpl(this.groupMember, 
                         MessageType.JOIN, PID, groupView.getID());
 
-            gs.getLeader().receive(joinMessage);
+            gs.getLeader().getReceiver().receive(joinMessage);
         }
 
         new Thread(new MessageDeliverer()).start();
@@ -81,11 +86,11 @@ public class GroupModuleImpl implements GroupModule {
 
     /** GroupLeader ************/
     private class GroupLeaderImpl implements GroupLeader {
-        public void removeFromGroup(Receiver member) {
-            // TODO Auto-generated method stub
+        public void removeFromGroup(GroupMember member) {
+            throw new Error("TODO: not implemented");          
         }
 
-        public void addMemberToGroup(Receiver member) {
+        public void addMemberToGroup(GroupMember member) {
             // TODO: fix this
             groupView.add(member);
 
@@ -120,7 +125,7 @@ public class GroupModuleImpl implements GroupModule {
                 if (gl == null) {
                     System.err.println("Got join message but I'm not leader");
                 } else {
-                    gl.addMemberToGroup((Receiver)m.getMessage());
+                    gl.addMemberToGroup((GroupMember) m.getMessage());
                 }
                 break;
             default:

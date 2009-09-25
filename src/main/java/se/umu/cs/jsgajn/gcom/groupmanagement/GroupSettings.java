@@ -3,19 +3,18 @@ package se.umu.cs.jsgajn.gcom.groupmanagement;
 import java.io.Serializable;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Multicast;
-import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Multicast.type;
 import se.umu.cs.jsgajn.gcom.messageordering.Ordering;
 
 public class GroupSettings implements Serializable {
-
-    private Receiver leader;
+    private static final long serialVersionUID = 1L;
+    private GroupMember leader;
     private type multicastType;
     private Ordering.type orderingType;
     private boolean isNew = true;
     private String name;
 
-    public GroupSettings(String name, Receiver leader, Multicast.type multicastType, Ordering.type orderingType) {
+    public GroupSettings(String name, GroupMember leader, Multicast.type multicastType, Ordering.type orderingType) {
         this.name = name;
         this.leader = leader;
         this.multicastType = multicastType;
@@ -34,7 +33,7 @@ public class GroupSettings implements Serializable {
         return isNew;
     }
 
-    public Receiver getLeader() {
+    public GroupMember getLeader() {
         return leader;
     }
 
