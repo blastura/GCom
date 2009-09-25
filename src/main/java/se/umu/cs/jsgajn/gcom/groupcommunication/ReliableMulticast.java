@@ -25,6 +25,7 @@ public class ReliableMulticast implements Multicast {
     }
 
     public boolean deliverCheck(Message m, GroupView g) {
+        //System.out.println(m.getUID() + " \n " + m.getOriginUID() + " \n " + m.toString() + "\n" +  m.getMessage().toString() +"\n\n");
         if (!received.contains(m)) {
             received.add(m);
             if (!m.getOriginUID().equals(GroupModule.PID)) {

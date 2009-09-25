@@ -5,7 +5,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import se.umu.cs.jsgajn.gcom.Client;
-import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationsModel;
+import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationsModelImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
@@ -23,7 +23,7 @@ public class GroupModuleImpl implements GroupModule {
     private GNS gns;
     private GroupView groupView;
     private OrderingModule orderingModule;
-    private CommunicationsModel communicationModule;
+    private CommunicationsModelImpl communicationModule;
     //private Receiver receiverLeader;
     private GroupLeader gl;
     //private Receiver receiver;
@@ -41,7 +41,7 @@ public class GroupModuleImpl implements GroupModule {
         this.client = client;
         // TODO: dynamic loading of multicast module
         this.orderingModule = new OrderingModule(new FIFO());
-        this.communicationModule = new CommunicationsModel(new ReliableMulticast(),
+        this.communicationModule = new CommunicationsModelImpl(new ReliableMulticast(),
                 this.orderingModule, this);
 
         this.groupView =  new GroupViewImpl(groupName, new GroupMember(communicationModule.getReceiver()));

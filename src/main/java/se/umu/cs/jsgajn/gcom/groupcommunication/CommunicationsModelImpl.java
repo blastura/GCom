@@ -13,7 +13,7 @@ import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingModule;
 
-public class CommunicationsModel implements Multicast {
+public class CommunicationsModelImpl implements CommunicationModule {
 
     private LinkedBlockingQueue<Message> receiveQueue;
     private Receiver receiver;
@@ -21,13 +21,13 @@ public class CommunicationsModel implements Multicast {
     private Multicast mMethod;
     private OrderingModule orderingModule;
     private GroupModule groupModule;
-
+    
     // TODO: think syncronized
     //private GroupView groupView;
 
-    public CommunicationsModel(Multicast mMethod, OrderingModule orderingModule,
+    public CommunicationsModelImpl(Multicast mMethod, OrderingModule orderingModule,
             GroupModule groupModule)
-    throws RemoteException, AlreadyBoundException, NotBoundException {
+            throws RemoteException, AlreadyBoundException, NotBoundException {
         this.mMethod = mMethod;
         this.orderingModule = orderingModule;
         this.groupModule = groupModule;
@@ -35,7 +35,7 @@ public class CommunicationsModel implements Multicast {
         Registry registry = LocateRegistry.createRegistry(1099); 
         this.receiveQueue = new LinkedBlockingQueue<Message>();
 
-        this.receiver = new ReceiverImpl(this.receiveQueue, GroupModule.PID);
+        this.receiver = new ReceiverImpl(this.receiveQueue);
         this.receiverStub = 
             (Receiver) UnicastRemoteObject.exportObject(receiver, 0);
         registry.bind(Receiver.STUB_NAME, receiverStub);
@@ -86,6 +86,6 @@ public class CommunicationsModel implements Multicast {
     }
 
     public Receiver getReceiver() {
-        return this.receiverStub;
+        return this.receiver;
     }
 }
