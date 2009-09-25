@@ -113,6 +113,9 @@ public class GroupModuleImpl implements GroupModule {
             case CLIENTMESSAGE:
                 client.deliver(m.getMessage());
                 break;
+            case MEMBERCRASH:
+                handelCrash((GroupMember)m);
+                break;
             case JOIN:
                 if (gl == null) {
                     System.err.println("Got join message but I'm not leader");
@@ -123,6 +126,10 @@ public class GroupModuleImpl implements GroupModule {
             default:
                 System.out.println("error i header");
             }
+        }
+
+        private void handelCrash(GroupMember m) {
+                        
         }
     }
 }

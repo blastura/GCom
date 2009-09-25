@@ -3,13 +3,15 @@ package se.umu.cs.jsgajn.gcom.groupcommunication;
 import java.rmi.RemoteException;
 import java.rmi.server.UID;
 import java.util.HashSet;
+import java.util.Set;
 
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 
 public class BasicMulticast implements Multicast {
 
-    private Set<GroupMember> crashed = new Set<GroupMember>();
+    private Set<GroupMember> crashed = new HashSet<GroupMember>();
 
     /**
      * Send message to all members of the group.
@@ -21,12 +23,12 @@ public class BasicMulticast implements Multicast {
         for (GroupMember member : g) {
             if(!crashed.contains(member)){
                 try {
-                    member.receive(m);
+                    member.getReceiver().receive(m);
                 } catch (RemoteException e) {
                     crashed.add(member);
 
                     Message crashMessage = new MessageImpl(member, 
-                            MessageType.MEMBERCRASH, GroupModule.ID, g.getID());
+                            MessageType.MEMBERCRASH, GroupModule.PID, g.getID());
                     multicast(crashMessage, g);
 
                     // TODO Auto-generated catch block
