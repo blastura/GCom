@@ -44,7 +44,7 @@ public class GroupModuleImpl implements GroupModule {
         this.orderingModule = new OrderingModule(new FIFO());
         this.communicationModule = new CommunicationsModel(new ReliableMulticast(),
                 this.orderingModule, this);
-        
+
         this.groupView =  new GroupViewImpl(groupName, communicationModule.getReceiver());
         this.groupName = groupName;
         // TODO: which model to use
@@ -62,7 +62,7 @@ public class GroupModuleImpl implements GroupModule {
             System.out.println("Try join group");
             MessageImpl joinMessage =
                 new MessageImpl(communicationModule.getReceiver(), 
-                        MessageType.JOIN, ID);
+                        MessageType.JOIN, ID, groupView.getID());
 
             gs.getLeader().receive(joinMessage);
         }
@@ -72,10 +72,10 @@ public class GroupModuleImpl implements GroupModule {
 
     public void send(Object clientMessage) {
         Message m = new MessageImpl(clientMessage,
-                MessageType.CLIENTMESSAGE, ID);
+                MessageType.CLIENTMESSAGE, ID, groupView.getID());
         communicationModule.multicast(m, this.groupView);
     }
-    
+
     public GroupView getGroupView(){
         return groupView;
     }
@@ -92,7 +92,7 @@ public class GroupModuleImpl implements GroupModule {
 
             // Multicast new groupView
             communicationModule.multicast(new MessageImpl(groupView, 
-                    MessageType.GROUPCHANGE, ID), groupView);
+                    MessageType.GROUPCHANGE, ID, groupView.getID()), groupView);
         }
     }
 
