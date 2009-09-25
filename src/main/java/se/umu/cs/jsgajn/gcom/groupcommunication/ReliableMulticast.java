@@ -21,6 +21,8 @@ public class ReliableMulticast implements Multicast {
      * @param m The message to send.
      */
     public void multicast(Message m, GroupView g) {
+        System.out.println("Mess: " + m);
+        System.out.println("Group: " + g);
         bMulticast.multicast(m, g);
     }
 

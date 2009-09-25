@@ -12,6 +12,7 @@ import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Multicast;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
+import se.umu.cs.jsgajn.gcom.groupcommunication.ReliableMulticast;
 import se.umu.cs.jsgajn.gcom.messageordering.FIFO;
 import se.umu.cs.jsgajn.gcom.messageordering.Ordering;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingModule;
@@ -41,7 +42,7 @@ public class GroupMemberImpl implements GroupMember {
         this.client = client;
         // TODO: dynamic loading of multicast module
         this.orderingModule = new OrderingModule(new FIFO());
-        this.communicationModule = new CommunicationsModel(new BasicMulticast(),
+        this.communicationModule = new CommunicationsModel(new ReliableMulticast(),
                 this.orderingModule);
 
         this.groupName = groupName;
@@ -49,7 +50,7 @@ public class GroupMemberImpl implements GroupMember {
 
         this.gns = communicationModule.connectToGns(gnsHost, gnsPort);
         GroupSettings gs = gns.connect(new GroupSettings(groupName, communicationModule.getReceiver(),
-                Multicast.type.BASIC_MULTICAST, Ordering.type.FIFO));
+                Multicast.type.RELIABLE_MULTICAST, Ordering.type.FIFO));
 
         if (gs.isNew()) { // Group is empty I am leader
             System.out.println("Group created");

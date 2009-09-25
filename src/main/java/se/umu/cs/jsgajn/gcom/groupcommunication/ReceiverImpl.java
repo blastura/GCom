@@ -23,7 +23,6 @@ public class ReceiverImpl implements Receiver, Serializable {
     public void receive(Message m) throws RemoteException {
         // Simply add message to blockingQueue, if queue is busy, it will block.
         try {
-            System.out.println("receive: " + m.toString());
             q.put(m);
         } catch (InterruptedException e) {
             // If queue is interrupted while waiting for insertion into queue.

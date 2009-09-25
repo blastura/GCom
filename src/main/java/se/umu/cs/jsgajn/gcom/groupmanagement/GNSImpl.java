@@ -30,7 +30,7 @@ public class GNSImpl implements GNS {
             groups.put(gs.getName(), gs);
             return gs;
         } else {
-            gs.setIsNew(false);
+            group.setIsNew(false);
             return group;
         }
     }
