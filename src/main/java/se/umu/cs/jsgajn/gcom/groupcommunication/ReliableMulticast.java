@@ -27,11 +27,11 @@ public class ReliableMulticast implements Multicast {
     public boolean deliverCheck(Message m, GroupView g) {
         if (!received.contains(m)) {
             received.add(m);
-            if (!m.getOriginUID().equals(GroupModule.ID)) {
+            if (!m.getOriginUID().equals(GroupModule.PID)) {
                 // TODO: which groupview to send this to?
                 multicast(m, g);
-                return true;
-            }
+            } 
+            return true;
         }
         return false;
     }

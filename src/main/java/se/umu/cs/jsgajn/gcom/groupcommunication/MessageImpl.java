@@ -36,4 +36,17 @@ public class MessageImpl implements Message {
     public UID getUID() {
         return ID;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Message))
+            return false;
+        Message oMsg = (Message) o;
+        return getUID().equals(oMsg.getUID());
+    }
+    
+    @Override
+    public int hashCode() {
+        return getUID().hashCode();
+    }
 }

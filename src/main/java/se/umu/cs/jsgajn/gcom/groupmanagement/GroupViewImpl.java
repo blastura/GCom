@@ -5,17 +5,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
-
 public class GroupViewImpl implements GroupView {
     private static final long serialVersionUID = 1L;
-    private List<Receiver> receivers;
+    private List<GroupMember> members;
     private String name;
-    private Receiver groupLeader;
+    private GroupMember groupLeader;
     private final UID ID;
 
-    public GroupViewImpl(String name, Receiver groupLeader) {
-        this.receivers = new ArrayList<Receiver>();
+    public GroupViewImpl(String name, GroupMember groupLeader) {
+        this.members = new ArrayList<GroupMember>();
         this.name = name;
         this.groupLeader = groupLeader;
         this.ID = new UID();
@@ -26,7 +24,7 @@ public class GroupViewImpl implements GroupView {
         return name;
     }
 
-    public Receiver getGroupLeaderReceiver() {
+    public GroupMember getGroupLeaderGroupMember() {
         return groupLeader;
     }
     
@@ -34,15 +32,20 @@ public class GroupViewImpl implements GroupView {
         return ID;
     }
     
-    public boolean add(Receiver r) {
-        return receivers.add(r);
+    public boolean add(GroupMember r) {
+        return members.add(r);
     }
 
-    public Iterator<Receiver> iterator() {
-        return receivers.iterator();
+    public Iterator<GroupMember> iterator() {
+        return members.iterator();
     }
 
     public int size() {
-        return receivers.size();
+        return members.size();
+    }
+
+    public boolean remove(GroupMember r) {
+        // TODO Auto-generated method stub
+        throw new Error("not implemented");
     }
 }

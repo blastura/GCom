@@ -4,16 +4,19 @@ import java.io.Serializable;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.server.UID;
 import java.util.concurrent.BlockingQueue;
 
 public class ReceiverImpl implements Receiver, Serializable {
     private static final long serialVersionUID = 1L;
     // This will not be sent when object is serialized
     private transient BlockingQueue<Message> q;
+    private final UID PID;
 
-    public ReceiverImpl(BlockingQueue<Message> q) 
-    throws RemoteException, AlreadyBoundException, NotBoundException{
+    public ReceiverImpl(BlockingQueue<Message> q, final UID processID) 
+    throws RemoteException, AlreadyBoundException, NotBoundException {
         this.q = q;
+        this.PID = processID;
     } 
 
     public void receive(Message m) throws RemoteException {
@@ -25,5 +28,9 @@ public class ReceiverImpl implements Receiver, Serializable {
             // TODO: How shall we handle this?
             e.printStackTrace();
         }
+    }
+
+    public UID getPID() throws RemoteException {
+        return this.PID;
     }
 }

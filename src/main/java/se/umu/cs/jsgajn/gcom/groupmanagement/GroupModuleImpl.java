@@ -3,9 +3,8 @@ package se.umu.cs.jsgajn.gcom.groupmanagement;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.concurrent.BlockingQueue;
+
 import se.umu.cs.jsgajn.gcom.Client;
-import se.umu.cs.jsgajn.gcom.groupcommunication.BasicMulticast;
 import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationsModel;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
@@ -45,7 +44,7 @@ public class GroupModuleImpl implements GroupModule {
         this.communicationModule = new CommunicationsModel(new ReliableMulticast(),
                 this.orderingModule, this);
 
-        this.groupView =  new GroupViewImpl(groupName, communicationModule.getReceiver());
+        this.groupView =  new GroupViewImpl(groupName, new GroupMember(communicationModule.getReceiver()));
         this.groupName = groupName;
         // TODO: which model to use
 
@@ -62,7 +61,7 @@ public class GroupModuleImpl implements GroupModule {
             System.out.println("Try join group");
             MessageImpl joinMessage =
                 new MessageImpl(communicationModule.getReceiver(), 
-                        MessageType.JOIN, ID, groupView.getID());
+                        MessageType.JOIN, PID, groupView.getID());
 
             gs.getLeader().receive(joinMessage);
         }
@@ -72,7 +71,7 @@ public class GroupModuleImpl implements GroupModule {
 
     public void send(Object clientMessage) {
         Message m = new MessageImpl(clientMessage,
-                MessageType.CLIENTMESSAGE, ID, groupView.getID());
+                MessageType.CLIENTMESSAGE, PID, groupView.getID());
         communicationModule.multicast(m, this.groupView);
     }
 
@@ -92,7 +91,7 @@ public class GroupModuleImpl implements GroupModule {
 
             // Multicast new groupView
             communicationModule.multicast(new MessageImpl(groupView, 
-                    MessageType.GROUPCHANGE, ID, groupView.getID()), groupView);
+                    MessageType.GROUPCHANGE, PID, groupView.getID()), groupView);
         }
     }
 
