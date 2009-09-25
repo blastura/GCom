@@ -3,7 +3,7 @@ package se.umu.cs.jsgajn.gcom.groupmanagement;
 import java.rmi.server.UID;
 
 
-public interface GroupMember {    
+public interface GroupModule {    
     public static final String STUB_NAME = "ballen";
 
     // TODO: Kommer detta fungera? där nere new UID static?
@@ -11,4 +11,6 @@ public interface GroupMember {
     public static final UID ID = new UID();
     
     public void send(Object m);
+
+    public GroupView getGroupView();
 }

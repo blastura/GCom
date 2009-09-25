@@ -3,7 +3,7 @@ package se.umu.cs.jsgajn.gcom.groupcommunication;
 import java.util.HashSet;
 import java.util.Set;
 
-import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 
 public class ReliableMulticast implements Multicast {
@@ -21,15 +21,13 @@ public class ReliableMulticast implements Multicast {
      * @param m The message to send.
      */
     public void multicast(Message m, GroupView g) {
-        System.out.println("Mess: " + m);
-        System.out.println("Group: " + g);
         bMulticast.multicast(m, g);
     }
 
     public boolean deliverCheck(Message m, GroupView g) {
         if (!received.contains(m)) {
             received.add(m);
-            if (m.getOriginUID() != GroupMember.ID) {
+            if (!m.getOriginUID().equals(GroupModule.ID)) {
                 // TODO: which groupview to send this to?
                 multicast(m, g);
                 return true;

@@ -9,6 +9,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import se.umu.cs.jsgajn.gcom.groupmanagement.GNS;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingModule;
 
@@ -19,13 +20,17 @@ public class CommunicationsModel implements Multicast {
     private Receiver receiverStub;
     private Multicast mMethod;
     private OrderingModule orderingModule;
+    private GroupModule groupModule;
+    
     // TODO: think syncronized
-    private GroupView groupView;
+    //private GroupView groupView;
 
-    public CommunicationsModel(Multicast mMethod, OrderingModule orderingModule)
+    public CommunicationsModel(Multicast mMethod, OrderingModule orderingModule,
+            GroupModule groupModule)
             throws RemoteException, AlreadyBoundException, NotBoundException {
         this.mMethod = mMethod;
         this.orderingModule = orderingModule;
+        this.groupModule = groupModule;
         // TODO: change 1099
         Registry registry = LocateRegistry.createRegistry(1099); 
         this.receiveQueue = new LinkedBlockingQueue<Message>();
@@ -65,7 +70,7 @@ public class CommunicationsModel implements Multicast {
                     communicationModule.doStuff();
                      */
                     Message m = receiveQueue.take();
-                    if (mMethod.deliverCheck(m, groupView)) {
+                    if (mMethod.deliverCheck(m, groupModule.getGroupView())) {
                         orderingModule.deliver(m);
                     }
                 }

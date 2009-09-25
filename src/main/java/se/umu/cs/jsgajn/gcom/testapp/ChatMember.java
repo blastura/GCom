@@ -8,16 +8,16 @@ import java.util.Scanner;
 import org.apache.log4j.Logger;
 
 import se.umu.cs.jsgajn.gcom.Client;
-import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
-import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMemberImpl;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModuleImpl;
 
 public class ChatMember implements Client {
     private static final Logger logger = Logger.getLogger(ChatMember.class);
-    private GroupMember groupMember;
+    private GroupModule groupMember;
     
     public ChatMember(String gnsHost, int gnsPort, String groupName)
             throws RemoteException, AlreadyBoundException, NotBoundException {
-        this.groupMember = new GroupMemberImpl(this, gnsHost, gnsPort, groupName);
+        this.groupMember = new GroupModuleImpl(this, gnsHost, gnsPort, groupName);
 
         System.err.println("Server ready");
         Scanner sc = new Scanner(System.in);

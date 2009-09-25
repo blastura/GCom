@@ -3,7 +3,8 @@ package se.umu.cs.jsgajn.gcom.groupcommunication;
 import java.rmi.server.UID;
 
 public class MessageImpl implements Message {
-    
+
+    private UID id;
     private MessageType messageType;
     private UID originID;    
     private Object m;
@@ -12,6 +13,7 @@ public class MessageImpl implements Message {
         this.m = m;
         this.messageType = messageType;
         this.originID = originID;
+        this.id = new UID();
     }
 
     public Object getMessage() {
@@ -23,5 +25,9 @@ public class MessageImpl implements Message {
     }
     public UID getOriginUID() {
         return originID;
+    }
+    
+    public UID getUID() {
+        return id;
     }
 }

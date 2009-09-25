@@ -17,7 +17,7 @@ import se.umu.cs.jsgajn.gcom.messageordering.FIFO;
 import se.umu.cs.jsgajn.gcom.messageordering.Ordering;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingModule;
 
-public class GroupMemberImpl implements GroupMember {
+public class GroupModuleImpl implements GroupModule {
     private Client client;
 
     private String groupName;
@@ -37,14 +37,15 @@ public class GroupMemberImpl implements GroupMember {
      * @throws AlreadyBoundException If it's not possible to bind this to own register.
      * @throws NotBoundException If GNS stub is not found in GNS register.
      */
-    public GroupMemberImpl(Client client, String gnsHost, int gnsPort, String groupName)
+    public GroupModuleImpl(Client client, String gnsHost, int gnsPort, String groupName)
     throws RemoteException, AlreadyBoundException, NotBoundException {
         this.client = client;
         // TODO: dynamic loading of multicast module
         this.orderingModule = new OrderingModule(new FIFO());
         this.communicationModule = new CommunicationsModel(new ReliableMulticast(),
-                this.orderingModule);
-
+                this.orderingModule, this);
+        
+        this.groupView =  new GroupViewImpl(groupName, communicationModule.getReceiver());
         this.groupName = groupName;
         // TODO: which model to use
 
@@ -56,7 +57,6 @@ public class GroupMemberImpl implements GroupMember {
             System.out.println("Group created");
             // TODO: Test if setIsNew(false) will affect GNSImpl
             this.gl = new GroupLeaderImpl();
-            this.groupView =  new GroupViewImpl(groupName, communicationModule.getReceiver());
 
         } else {
             System.out.println("Try join group");
@@ -74,6 +74,10 @@ public class GroupMemberImpl implements GroupMember {
         Message m = new MessageImpl(clientMessage,
                 MessageType.CLIENTMESSAGE, ID);
         communicationModule.multicast(m, this.groupView);
+    }
+    
+    public GroupView getGroupView(){
+        return groupView;
     }
 
     /** GroupLeader ************/
