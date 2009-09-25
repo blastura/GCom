@@ -26,13 +26,11 @@ public class BasicMulticast implements Multicast {
                     member.getReceiver().receive(m);
                 } catch (RemoteException e) {
                     crashed.add(member);
-
+                    
                     Message crashMessage = new MessageImpl(member, 
                             MessageType.MEMBERCRASH, GroupModule.PID, g.getID());
                     multicast(crashMessage, g);
-
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    System.out.println("Oh, no! This bitch crashed: " + member.getPID());
                 }
             }
         }

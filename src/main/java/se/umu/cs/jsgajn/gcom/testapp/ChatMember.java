@@ -24,7 +24,7 @@ public class ChatMember implements Client {
        
         String msg;
         while (true) {
-            System.out.print("message: ");
+            System.out.print(GroupModule.PID + " - message: ");
             msg = sc.nextLine();
             groupMember.send(msg);
         }

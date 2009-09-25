@@ -119,7 +119,7 @@ public class GroupModuleImpl implements GroupModule {
                 client.deliver(m.getMessage());
                 break;
             case MEMBERCRASH:
-                handelCrash((GroupMember)m);
+                handelCrash((GroupMember)(m.getMessage()));
                 break;
             case JOIN:
                 if (gl == null) {
@@ -134,7 +134,7 @@ public class GroupModuleImpl implements GroupModule {
         }
 
         private void handelCrash(GroupMember m) {
-                        
+            // TODO: Election om de e ledaren annars groupchange
         }
     }
 }

@@ -35,7 +35,7 @@ public class CommunicationsModelImpl implements CommunicationModule {
         Registry registry = LocateRegistry.createRegistry(1099); 
         this.receiveQueue = new LinkedBlockingQueue<Message>();
 
-        this.receiver = new ReceiverImpl(this.receiveQueue);
+        this.receiver = new ReceiverImpl(this.receiveQueue, GroupModule.PID);
         this.receiverStub = 
             (Receiver) UnicastRemoteObject.exportObject(receiver, 0);
         registry.bind(Receiver.STUB_NAME, receiverStub);
