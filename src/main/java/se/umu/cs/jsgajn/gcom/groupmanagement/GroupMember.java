@@ -31,4 +31,17 @@ public class GroupMember implements Serializable {
     public UID getPID() {
         return this.PID;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof GroupMember))
+            return false;
+        GroupMember oMem = (GroupMember) o;
+        return getPID().equals(oMem.getPID());
+    }
+
+    @Override
+    public int hashCode() {
+        return getPID().hashCode();
+    }
 }
