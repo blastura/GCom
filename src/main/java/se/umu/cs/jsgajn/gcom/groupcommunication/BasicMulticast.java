@@ -17,7 +17,7 @@ public class BasicMulticast implements Multicast {
                 member.receive(m);
             } catch (RemoteException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                System.err.println("Member " + member + " crashed?: " + e.getMessage());
             }
         }
     }
