@@ -6,6 +6,7 @@ import java.rmi.server.UID;
 public interface Message extends Serializable {
     public MessageType getMessageType();
     public UID getOriginUID();
+    public UID getGroupViewUID();
     public Object getMessage();
     public UID getUID();
 }

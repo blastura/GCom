@@ -1,21 +1,24 @@
 package se.umu.cs.jsgajn.gcom.groupmanagement;
 
+import java.rmi.server.UID;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
 
 public class GroupViewImpl implements GroupView {
-
-    private Collection<Receiver> group;
+    private static final long serialVersionUID = 1L;
+    private List<Receiver> receivers;
     private String name;
     private Receiver groupLeader;
+    private final UID ID;
 
     public GroupViewImpl(String name, Receiver groupLeader) {
-        this.group = new ArrayList<Receiver>();
+        this.receivers = new ArrayList<Receiver>();
         this.name = name;
         this.groupLeader = groupLeader;
+        this.ID = new UID();
         add(groupLeader);
     }
 
@@ -26,60 +29,20 @@ public class GroupViewImpl implements GroupView {
     public Receiver getGroupLeaderReceiver() {
         return groupLeader;
     }
-
-    public void closeGroup() {
+    
+    public UID getID() {
+        return ID;
+    }
+    
+    public boolean add(Receiver r) {
+        return receivers.add(r);
     }
 
-    public boolean add(Receiver member) {
-        return group.add(member);
-    }
-
-    public boolean addAll(Collection<? extends Receiver> members) {
-        return group.addAll(members);
-    }
-
-    public void clear() {
-        group.clear();
-    }
-
-    public boolean contains(Object member) {
-        return group.contains(member);
-    }
-
-    public boolean containsAll(Collection<?> members) {
-        return group.containsAll(members);
-    }
-
-    public boolean isEmpty() {
-        return group.isEmpty();
-    }
-
-    public Iterator iterator() {
-        return group.iterator();
-    }
-
-    public boolean remove(Object member) {
-        return group.remove(member);
-    }
-
-    public boolean removeAll(Collection<?> members) {
-        return group.removeAll(members);
-    }
-
-    public boolean retainAll(Collection<?> members) {
-        return group.retainAll(members);
+    public Iterator<Receiver> iterator() {
+        return receivers.iterator();
     }
 
     public int size() {
-        return group.size();
+        return receivers.size();
     }
-
-    public Object[] toArray() {
-        return group.toArray();
-    }
-
-    public Object[] toArray(Object[] arg0) {
-        return group.toArray(arg0);
-    }
-
 }
