@@ -16,7 +16,8 @@ public class ChatMember implements Client {
     private GroupModule groupMember;
     
     public ChatMember(String gnsHost, int gnsPort, String groupName)
-            throws RemoteException, AlreadyBoundException, NotBoundException {
+        throws RemoteException, AlreadyBoundException, NotBoundException {
+        logger.debug("start app ================");
         this.groupMember = new GroupModuleImpl(this, gnsHost, gnsPort, groupName);
 
         System.err.println("Server ready");

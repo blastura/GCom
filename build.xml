@@ -16,7 +16,7 @@
 
    <!-- Dir program resources -->
    <property name="src.main.resources.dir" location="${src.main.dir}/../resources"/>
-   <property name="build.main.resources.dir" location="${build.main.dir}/resources"/>
+   <property name="build.main.resources.dir" location="${build.main.dir}"/>
 
    <!-- Package name, dirs -->
    <property name="name" value="GCom" />
