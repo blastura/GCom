@@ -24,7 +24,7 @@ public class GNSImpl implements GNS {
     }
     
     public GroupSettings connect(GroupSettings gs) {
-        GroupSettings group = groups.get(gs.getName());  
+        GroupSettings group = groups.get(gs.getName()); 
         if (group == null) {
             gs.setIsNew(true);
             groups.put(gs.getName(), gs);
