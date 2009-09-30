@@ -20,7 +20,6 @@ public class ChatMember implements Client {
         logger.debug("start app ================");
         this.groupMember = new GroupModuleImpl(this, gnsHost, gnsPort, groupName);
 
-        System.err.println("Server ready");
         Scanner sc = new Scanner(System.in);
        
         String msg;

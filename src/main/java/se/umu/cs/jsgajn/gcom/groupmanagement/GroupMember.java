@@ -44,4 +44,9 @@ public class GroupMember implements Serializable {
     public int hashCode() {
         return getPID().hashCode();
     }
+    
+    @Override
+    public String toString() {
+        return getPID().toString();
+    }
 }

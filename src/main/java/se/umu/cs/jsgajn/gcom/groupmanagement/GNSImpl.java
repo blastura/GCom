@@ -16,8 +16,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import se.umu.cs.jsgajn.gcom.testapp.ChatMember;
-
 public class GNSImpl implements GNS {
     private static final long serialVersionUID = 1L;
 
@@ -40,9 +38,12 @@ public class GNSImpl implements GNS {
         if (group == null) {
             gs.setIsNew(true);
             groups.put(gs.getName(), gs);
+            save();
+            logger.info("New group created");
             return gs;
         } else {
             group.setIsNew(false);
+            logger.info("Existing group '" + group.getName() + "' served to:" + gs.getLeader());
             return group;
         }
     }
