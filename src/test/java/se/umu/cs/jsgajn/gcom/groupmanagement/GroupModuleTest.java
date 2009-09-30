@@ -6,7 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class GroupMemberTest {
+public class GroupModuleTest {
 
     @Before
     public void setUp() throws Exception {
@@ -18,6 +18,6 @@ public class GroupMemberTest {
     
     @Test
     public void testUID() {
-        assertEquals(GroupMember.ID, GroupMember.ID);
+        assertEquals(GroupModule.PID, GroupModule.PID);
     }
 }
