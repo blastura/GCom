@@ -95,19 +95,20 @@ public class GNSImpl implements GNS {
     }
     
     private static Map<String, GroupSettings> filterOutCrashedGroups(Map<String, GroupSettings> groups) {
-        Set<String> crachedGroups = new HashSet<String>();
+        //Set<String> crachedGroups = new HashSet<String>();
         for (GroupSettings gs : groups.values()) {
             try {
                 gs.getLeader().getReceiver().getPID();
             } catch (RemoteException e) {
                 logger.info("Group '" + gs.getName() + "' crasched");
-                crachedGroups.add(gs.getName());
+                //crachedGroups.add(gs.getName());
+                groups.remove(gs.getName());
             }
         }
         
-        for (String name : crachedGroups) {
-            groups.remove(name);
-        }
+//        for (String name : crachedGroups) {
+//            groups.remove(name);
+//        }
         return groups;
     }
 

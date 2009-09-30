@@ -47,8 +47,8 @@ public class GroupSettings implements Serializable {
     
     @Override
     public String toString() {
-        return this.getName() + ", " 
+        return "[" + this.getName() + ", " 
         + this.getMulticastType() + ", "
-        + this.getOrderingType();
+        + this.getOrderingType() + "]";
     }
 }
