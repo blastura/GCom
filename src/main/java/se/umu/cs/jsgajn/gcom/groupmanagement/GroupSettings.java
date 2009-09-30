@@ -44,4 +44,11 @@ public class GroupSettings implements Serializable {
     public Ordering.type getOrderingType() {
         return orderingType;
     }
+    
+    @Override
+    public String toString() {
+        return this.getName() + ", " 
+        + this.getMulticastType() + ", "
+        + this.getOrderingType();
+    }
 }

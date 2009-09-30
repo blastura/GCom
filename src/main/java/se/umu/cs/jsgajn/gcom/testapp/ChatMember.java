@@ -17,11 +17,9 @@ public class ChatMember implements Client {
     
     public ChatMember(String gnsHost, int gnsPort, String groupName)
         throws RemoteException, AlreadyBoundException, NotBoundException {
-        logger.debug("start app ================");
         this.groupMember = new GroupModuleImpl(this, gnsHost, gnsPort, groupName);
 
-        Scanner sc = new Scanner(System.in);
-       
+        Scanner sc = new Scanner(System.in);  
         String msg;
         while (true) {
             System.out.print(GroupModule.PID + " - message: ");
@@ -33,10 +31,22 @@ public class ChatMember implements Client {
     public void deliver(Object m) {
         System.out.println((String)m);
     }
+    
+    private static void usage() {
+        System.out.println("Usage: java ChatMember [host] [port] [groupname]");
+        System.out.println("Usage: java ChatMember [host] [groupname] // port 1099 will be used");
+
+    }
 
     public static void main(String[] args) {
         try {
-            new ChatMember(args[0], Integer.parseInt(args[1]), args[2]);
+            if (args.length == 3) {
+                new ChatMember(args[0], Integer.parseInt(args[1]), args[2]);
+            } else if (args.length == 2) {
+                new ChatMember(args[0], 1099, args[1]);
+            } else {
+                usage();
+            }
         } catch (NumberFormatException e) {
             e.printStackTrace();
         } catch (RemoteException e) {
