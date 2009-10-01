@@ -27,23 +27,25 @@ import java.beans.EventHandler;
 
 public class DebugView {
 
-    public static JFrame create(DebugController debugController) {
-        debugController.setClientsList(null);
+    public static JFrame create(DebugController debugController,DebugModel model) {
+        JList list0 = new JList();
 
         DefaultListModel defaultListModel0 = new DefaultListModel();
-        defaultListModel0.addElement("Sven");
-        defaultListModel0.addElement("Erik");
-        defaultListModel0.addElement("GÃ¶ran");
-        debugController.setListNew(defaultListModel0);
+        defaultListModel0.addElement("apples");
+        defaultListModel0.addElement("oranges");
+        defaultListModel0.addElement("pears");
+        list0.setModel(defaultListModel0);
+        debugController.setClientList(list0);
+        debugController.init();
 
         JFrame frame0 = new JFrame();
 
         JPanel panel0 = (JPanel) frame0.getContentPane();
 
         GridBagLayout gridBagLayout0 = new GridBagLayout();
-        gridBagLayout0.columnWidths = new int[]{6, 20, 6, 0, 9, 63, 12, 50, 6, 86, 46, 12, 1, 177, 1, 39, 0, 133};
-        gridBagLayout0.rowHeights = new int[]{5, 3, 26, 38, 6, 0, 6, 20, 14, 111, 6, 80, 1, 13};
-        gridBagLayout0.columnWeights = new double[]{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        gridBagLayout0.columnWidths = new int[]{6, 0, 6, 0, 9, 63, 12, 65, 6, 86, 46, 12, 1, 20, 1, 39, 0, 133};
+        gridBagLayout0.rowHeights = new int[]{6, 3, 26, 38, 6, 0, 6, 20, 14, 111, 6, 80, 1, 13};
+        gridBagLayout0.columnWeights = new double[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0};
         gridBagLayout0.rowWeights = new double[]{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0};
         panel0.setLayout(gridBagLayout0);
 
@@ -67,35 +69,25 @@ public class DebugView {
         JPanel panel1 = new JPanel();
 
         GridBagLayout gridBagLayout1 = new GridBagLayout();
-        gridBagLayout1.columnWidths = new int[]{18, 2, 20, 12};
+        gridBagLayout1.columnWidths = new int[]{18, 0, 12};
         gridBagLayout1.rowHeights = new int[]{12, 0, 12, 20, 58};
-        gridBagLayout1.columnWeights = new double[]{0, 0, 1, 0};
+        gridBagLayout1.columnWeights = new double[]{1, 0, 0};
         gridBagLayout1.rowWeights = new double[]{0, 0, 0, 1, 0};
         panel1.setLayout(gridBagLayout1);
 
-        JList list0 = new JList();
-
-        DefaultListModel defaultListModel1 = new DefaultListModel();
-        defaultListModel1.addElement("apples");
-        defaultListModel1.addElement("oranges");
-        defaultListModel1.addElement("pears");
-        list0.setModel(defaultListModel1);
-
         JScrollPane scrollPane1 = new JScrollPane(list0);
-        scrollPane1.setBounds(new Rectangle(20, 53, 156, 511));
         scrollPane1.setPreferredSize(new Dimension(23, 23));
-        panel1.add(scrollPane1, new GridBagConstraints(1, 3, 2, 1, 0.0, 0.0, 13, 1, new Insets(0, 0, 0, 0), 0, 0));
+        panel1.add(scrollPane1, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, 13, 1, new Insets(0, 0, 0, 0), 0, 0));
 
         JTextField textField0 = new JTextField();
-        textField0.setBounds(new Rectangle(22, 14, 154, 27));
         textField0.setBackground(new Color(254, 254, 254, 255));
         textField0.setColumns(8);
         textField0.setEditable(false);
         textField0.setFocusable(false);
         textField0.setText("Clients");
-        panel1.add(textField0, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, 13, 2, new Insets(0, 0, 0, 0), 0, 0));
+        panel1.add(textField0, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, 13, 2, new Insets(0, 0, 0, 0), 0, 0));
         panel1.setBorder(new EtchedBorder(1, null, null));
-        panel0.add(panel1, new GridBagConstraints(1, 2, 1, 10, 0.0, 0.0, 11, 1, new Insets(0, 0, 0, 0), 0, 0));
+        panel0.add(panel1, new GridBagConstraints(1, 2, 1, 10, 0.0, 0.0, 11, 3, new Insets(0, 0, 0, 0), 0, 0));
 
         JEditorPane editorPane1 = new JEditorPane();
         editorPane1.setContentType("text/html");
@@ -108,7 +100,7 @@ public class DebugView {
 
         JButton button2 = new JButton();
         button2.setText("Loose message");
-        panel0.add(button2, new GridBagConstraints(5, 5, 3, 1, 0.0, 0.0, 15, 2, new Insets(0, 0, 0, 0), 0, 0));
+        panel0.add(button2, new GridBagConstraints(5, 5, 3, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
 
         JButton button3 = new JButton();
         button3.setText("Hold message");
@@ -126,11 +118,11 @@ public class DebugView {
 
         JList list1 = new JList();
 
-        DefaultListModel defaultListModel2 = new DefaultListModel();
-        defaultListModel2.addElement("apples");
-        defaultListModel2.addElement("oranges");
-        defaultListModel2.addElement("pears");
-        list1.setModel(defaultListModel2);
+        DefaultListModel defaultListModel1 = new DefaultListModel();
+        defaultListModel1.addElement("apples");
+        defaultListModel1.addElement("oranges");
+        defaultListModel1.addElement("pears");
+        list1.setModel(defaultListModel1);
 
         JScrollPane scrollPane3 = new JScrollPane(list1);
         scrollPane3.setPreferredSize(new Dimension(23, 23));
@@ -158,11 +150,11 @@ public class DebugView {
 
         JList list2 = new JList();
 
-        DefaultListModel defaultListModel3 = new DefaultListModel();
-        defaultListModel3.addElement("apples");
-        defaultListModel3.addElement("oranges");
-        defaultListModel3.addElement("pears");
-        list2.setModel(defaultListModel3);
+        DefaultListModel defaultListModel2 = new DefaultListModel();
+        defaultListModel2.addElement("apples");
+        defaultListModel2.addElement("oranges");
+        defaultListModel2.addElement("pears");
+        list2.setModel(defaultListModel2);
 
         JScrollPane scrollPane4 = new JScrollPane(list2);
         scrollPane4.setPreferredSize(new Dimension(23, 23));
@@ -191,7 +183,7 @@ public class DebugView {
         DefaultTableModel defaultTableModel0 = (DefaultTableModel) table0.getModel();
         defaultTableModel0.setColumnCount(2);
         defaultTableModel0.setRowCount(15);
-        table0.getTableHeader().setSize(new Dimension(150, 25));
+        table0.getTableHeader().setSize(new Dimension(150, 16));
 
         JScrollPane scrollPane5 = new JScrollPane(table0);
         scrollPane5.setPreferredSize(new Dimension(23, 27));
@@ -217,11 +209,11 @@ public class DebugView {
 
         JList list3 = new JList();
 
-        DefaultListModel defaultListModel4 = new DefaultListModel();
-        defaultListModel4.addElement("apples");
-        defaultListModel4.addElement("oranges");
-        defaultListModel4.addElement("pears");
-        list3.setModel(defaultListModel4);
+        DefaultListModel defaultListModel3 = new DefaultListModel();
+        defaultListModel3.addElement("apples");
+        defaultListModel3.addElement("oranges");
+        defaultListModel3.addElement("pears");
+        list3.setModel(defaultListModel3);
 
         JScrollPane scrollPane6 = new JScrollPane(list3);
         scrollPane6.setPreferredSize(new Dimension(23, 23));
