@@ -3,8 +3,11 @@ package se.umu.cs.jsgajn.gcom.groupmanagement;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import se.umu.cs.jsgajn.gcom.Client;
+import se.umu.cs.jsgajn.gcom.Module;
+import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationModule;
 import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationsModelImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
@@ -15,20 +18,27 @@ import se.umu.cs.jsgajn.gcom.messageordering.FIFO;
 import se.umu.cs.jsgajn.gcom.messageordering.Ordering;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingModule;
 
+/**
+ * @author dit06ajn
+ *
+ */
 public class GroupModuleImpl implements GroupModule {
     private Client client;
 
     private String groupName;
     private GNS gns;
     private GroupView groupView;
-    private OrderingModule orderingModule;
-    private CommunicationsModelImpl communicationModule;
+    private Module orderingModule;
+    private CommunicationModule communicationModule;
     //private Receiver receiverLeader;
     private GroupLeader gl;
     //private Receiver receiver;
 
     // Own group member
     private GroupMember groupMember;
+
+    // Queue to contain newly delivered messages
+    private LinkedBlockingQueue<Message> receiveQueue;
 
     /**
      * @param gnsHost GNS host
@@ -41,21 +51,24 @@ public class GroupModuleImpl implements GroupModule {
     public GroupModuleImpl(Client client, String gnsHost, int gnsPort, String groupName)
     throws RemoteException, AlreadyBoundException, NotBoundException {
         this.client = client;
+        this.receiveQueue = new LinkedBlockingQueue<Message>();
+
         // TODO: dynamic loading of multicast module
-        this.orderingModule = new OrderingModule(new FIFO());
+        // TODO: fix order of modules, they refer to each other
+        this.orderingModule = new OrderingModule(this, this.communicationModule, new FIFO());
         this.communicationModule = new CommunicationsModelImpl(new ReliableMulticast(),
                 this.orderingModule, this);
-
+        
         this.groupMember = new GroupMember(communicationModule.getReceiver());
 
         this.groupView =  new GroupViewImpl(groupName, this.groupMember);
         this.groupName = groupName;
+        
         // TODO: which model to use
-
-
         this.gns = communicationModule.connectToGns(gnsHost, gnsPort);
         GroupSettings gs = gns.connect(new GroupSettings(groupName, this.groupMember,
                 Multicast.type.RELIABLE_MULTICAST, Ordering.type.FIFO));
+
 
         if (gs.isNew()) { // Group is empty I am leader
             System.out.println("Group created");
@@ -71,13 +84,19 @@ public class GroupModuleImpl implements GroupModule {
             gs.getLeader().getReceiver().receive(joinMessage);
         }
 
-        new Thread(new MessageDeliverer()).start();
+        new Thread(new MessageReceiver()).start();
     }
 
+    /** Used by clients */
     public void send(Object clientMessage) {
         Message m = new MessageImpl(clientMessage,
                 MessageType.CLIENTMESSAGE, PID, groupView.getID());
-        communicationModule.multicast(m, this.groupView);
+        orderingModule.send(m, this.groupView);
+        send(m, this.groupView);
+    }
+
+    public void send(Message m, GroupView g) {
+        orderingModule.send(m, this.groupView);   
     }
 
     public GroupView getGroupView(){
@@ -95,19 +114,24 @@ public class GroupModuleImpl implements GroupModule {
             groupView.add(member);
 
             // Multicast new groupView
-            communicationModule.multicast(new MessageImpl(groupView, 
+            orderingModule.send(new MessageImpl(groupView, 
                     MessageType.GROUPCHANGE, PID, groupView.getID()), groupView);
         }
     }
 
-    private class MessageDeliverer implements Runnable {
+    private class MessageReceiver implements Runnable {
         public void run() {
             while (true) {
-                handleDelivered(orderingModule.takeDelivered());
+                try {
+                    handleDelivered(receiveQueue.take());
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         }
 
-        public void handleDelivered(Message m) {
+        private void handleDelivered(Message m) {
             System.out.println("Got message!");
             MessageType type = m.getMessageType();
             switch (type) {
@@ -136,6 +160,23 @@ public class GroupModuleImpl implements GroupModule {
         private void handelCrash(GroupMember m) {
             // TODO: Election om de e ledaren annars groupchange
         }
+    }
+
+    public void deliver(Message m) {
+        try {
+            receiveQueue.put(m);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void setDeliverReceiver(Module m) {
+        throw new Error("TODO: not implemented");
+    }
+
+    public void setSendReceiver(Module m) {
+        this.orderingModule = m;
     }
 }
 

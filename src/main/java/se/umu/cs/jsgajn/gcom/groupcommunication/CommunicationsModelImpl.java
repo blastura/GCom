@@ -8,6 +8,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import se.umu.cs.jsgajn.gcom.Module;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GNS;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
@@ -19,13 +20,13 @@ public class CommunicationsModelImpl implements CommunicationModule {
     private Receiver receiver;
     private Receiver receiverStub;
     private Multicast mMethod;
-    private OrderingModule orderingModule;
+    private Module orderingModule;
     private GroupModule groupModule;
     
     // TODO: think syncronized
     //private GroupView groupView;
 
-    public CommunicationsModelImpl(Multicast mMethod, OrderingModule orderingModule,
+    public CommunicationsModelImpl(Multicast mMethod, Module orderingModule,
             GroupModule groupModule)
             throws RemoteException, AlreadyBoundException, NotBoundException {
         this.mMethod = mMethod;
@@ -57,7 +58,7 @@ public class CommunicationsModelImpl implements CommunicationModule {
         return (GNS) gnsReg.lookup(GNS.STUB_NAME);
     }
 
-    public void multicast(Message m, GroupView g) {
+    public void send(Message m, GroupView g) {
         mMethod.multicast(m, g);
     }
 
@@ -65,13 +66,9 @@ public class CommunicationsModelImpl implements CommunicationModule {
         public void run() {
             try {
                 while (true) { 
-                    /*
-                    Message m = receiveQueue.take();
-                    communicationModule.doStuff();
-                     */
                     Message m = receiveQueue.take();
                     if (mMethod.deliverCheck(m, groupModule.getGroupView())) {
-                        orderingModule.deliver(m);
+                        deliver(m);
                     }
                 }
             } catch (InterruptedException e) { 
@@ -80,12 +77,17 @@ public class CommunicationsModelImpl implements CommunicationModule {
         }
     }
 
-    public boolean deliverCheck(Message m, GroupView g) {
-        // TODO: remove
-        throw new AssertionError("Not implemented");
-    }
-
     public Receiver getReceiver() {
         return this.receiver;
+    }
+
+    public void deliver(Message m) {
+        orderingModule.deliver(m);
+    }
+
+    public void setDeliverReceiver(Module m) {
+        // TODO Auto-generated method stub
+        this.orderingModule = m;
+        
     }
 }

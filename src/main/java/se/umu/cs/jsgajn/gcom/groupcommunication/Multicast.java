@@ -1,8 +1,5 @@
 package se.umu.cs.jsgajn.gcom.groupcommunication;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 
 public interface Multicast {
