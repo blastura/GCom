@@ -39,7 +39,7 @@ public class FIFO implements Ordering {
 
     public Message prepareOutgoingMessage(Message m) {
         // TODO: set counters, vectorclocks and stuff.
-        logger.debug("Prepare outgoing message. TODO: implement");
+        logger.debug("Prepare outgoing message: " + m);
         return m;
     }
 
