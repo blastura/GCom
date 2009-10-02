@@ -56,11 +56,11 @@ public class GNSImpl implements GNS {
             gs.setIsNew(true);
             groups.put(gs.getName(), gs);
             save();
-            logger.info("New group created");
+            logger.info("New group created: " + gs);
             return gs;
         } else {
             group.setIsNew(false);
-            logger.info("Existing group '" + group.getName() + "' served to:" + gs.getLeader());
+            logger.info("Existing group '" + group + "' served to:" + gs.getLeader());
             return group;
         }
     }
@@ -100,7 +100,7 @@ public class GNSImpl implements GNS {
             try {
                 gs.getLeader().getReceiver().getPID();
             } catch (RemoteException e) {
-                logger.info("Group '" + gs.getName() + "' crasched");
+                logger.info("Group '" + gs + "' crasched");
                 //crachedGroups.add(gs.getName());
                 groups.remove(gs.getName());
             }

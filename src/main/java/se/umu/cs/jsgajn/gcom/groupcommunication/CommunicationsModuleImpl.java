@@ -8,11 +8,15 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.apache.log4j.Logger;
+
 import se.umu.cs.jsgajn.gcom.Module;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
+import se.umu.cs.jsgajn.gcom.messageordering.OrderingModuleImpl;
 
-public class CommunicationsModelImpl implements CommunicationModule {
+public class CommunicationsModuleImpl implements CommunicationModule {
+    private static final Logger logger = Logger.getLogger(CommunicationsModuleImpl.class);
     private LinkedBlockingQueue<Message> receiveQueue;
     private Receiver receiver;
     private Receiver receiverStub;
@@ -21,7 +25,7 @@ public class CommunicationsModelImpl implements CommunicationModule {
     private GroupModule groupModule;
     private Thread messageReceiverThread;
     
-    public CommunicationsModelImpl(GroupModule groupModule)
+    public CommunicationsModuleImpl(GroupModule groupModule)
             throws RemoteException, AlreadyBoundException, NotBoundException {
         this.groupModule = groupModule;
         
@@ -46,6 +50,7 @@ public class CommunicationsModelImpl implements CommunicationModule {
             throw new IllegalStateException("Ordering module is not set");
         }
         this.messageReceiverThread.start();
+        logger.debug("Started CommunicationsModule: " + mMethod);
     }
     
     public void setOrderingModule(Module m) {

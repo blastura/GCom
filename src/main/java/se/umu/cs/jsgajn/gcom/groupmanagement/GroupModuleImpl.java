@@ -10,7 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import se.umu.cs.jsgajn.gcom.Client;
 import se.umu.cs.jsgajn.gcom.Module;
 import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationModule;
-import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationsModelImpl;
+import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationsModuleImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
@@ -74,7 +74,7 @@ public class GroupModuleImpl implements GroupModule {
         this.receiveQueue = new LinkedBlockingQueue<Message>();
 
         this.orderingModule = new OrderingModuleImpl(this);
-        this.communicationModule = new CommunicationsModelImpl(this);
+        this.communicationModule = new CommunicationsModuleImpl(this);
         this.communicationModule.setOrderingModule(this.orderingModule);
         this.orderingModule.setCommunicationsModule(this.communicationModule);
 

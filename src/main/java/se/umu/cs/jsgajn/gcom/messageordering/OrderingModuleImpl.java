@@ -1,7 +1,10 @@
 package se.umu.cs.jsgajn.gcom.messageordering;
 
+import org.apache.log4j.Logger;
+
 import se.umu.cs.jsgajn.gcom.Module;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModuleImpl;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 
 /**
@@ -10,6 +13,7 @@ import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
  * @author dit06ajn, dit06jsg
  */
 public class OrderingModuleImpl implements OrderingModule {
+    private static final Logger logger = Logger.getLogger(OrderingModuleImpl.class);
     private Ordering ordering;
     private Module communicationsModule;
     private Module groupManagementModule;
@@ -28,6 +32,7 @@ public class OrderingModuleImpl implements OrderingModule {
             throw new IllegalStateException("GroupModule module is not set");
         }
         this.deliverHandlerThread.start();
+        logger.debug("Started OrderingModule: " + ordering);
     } 
 
     public void setCommunicationsModule(Module m) {
