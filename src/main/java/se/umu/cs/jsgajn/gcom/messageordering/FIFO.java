@@ -15,7 +15,7 @@ public class FIFO implements Ordering {
     public FIFO() {
         this.holdBackQueue = new LinkedBlockingQueue<Message>();
         this.deliverQueue = new LinkedBlockingQueue<Message>();
-        new Thread(new MessageHandler()).start();
+        new Thread(new MessageHandler(), "FIFO thread").start();
     }
 
     public Message take() {

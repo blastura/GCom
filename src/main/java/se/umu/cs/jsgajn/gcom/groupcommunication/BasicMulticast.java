@@ -5,12 +5,15 @@ import java.rmi.server.UID;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
+import se.umu.cs.jsgajn.gcom.messageordering.OrderingModuleImpl;
 
 public class BasicMulticast implements Multicast {
-
+    private static final Logger logger = Logger.getLogger(BasicMulticast.class);
     private Set<GroupMember> crashed = new HashSet<GroupMember>();
 
     /**
@@ -30,14 +33,13 @@ public class BasicMulticast implements Multicast {
                     Message crashMessage = new MessageImpl(member, 
                             MessageType.MEMBERCRASH, GroupModule.PID, g.getID());
                     multicast(crashMessage, g);
-                    System.out.println("Oh, no! This bitch crashed: " + member.getPID());
+                    logger.debug("Oh, no! This bitch crashed: " + member.getPID());
                 }
             }
         }
     }
 
     public boolean deliverCheck(Message m, GroupView g) {
-        // TODO Auto-generated method stub
         return true;
     }
 }

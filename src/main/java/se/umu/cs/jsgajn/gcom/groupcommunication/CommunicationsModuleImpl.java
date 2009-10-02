@@ -39,7 +39,8 @@ public class CommunicationsModuleImpl implements CommunicationModule {
         registry.bind(Receiver.STUB_NAME, receiverStub);
 
         // Create thread to handle messages
-        this.messageReceiverThread = new Thread(new MessageReceiver());
+        this.messageReceiverThread = new Thread(new MessageReceiver(),
+                "CommunicationsModule thread");
     }
     
     public void start() {
@@ -71,7 +72,7 @@ public class CommunicationsModuleImpl implements CommunicationModule {
                 while (true) { 
                     Message m = receiveQueue.take();
                     if (mMethod.deliverCheck(m, groupModule.getGroupView())) {
-                        deliver(m);
+                        orderingModule.deliver(m);
                     }
                 }
             } catch (InterruptedException e) { 
@@ -85,7 +86,6 @@ public class CommunicationsModuleImpl implements CommunicationModule {
     }
 
     public void deliver(Message m) {
-        orderingModule.deliver(m);
+        throw new UnsupportedOperationException();
     }
-
 }

@@ -108,7 +108,7 @@ public class GroupModuleImpl implements GroupModule {
             gs.getLeader().getReceiver().receive(joinMessage);
         }
 
-        this.messageReceiverThread = new Thread(new MessageReceiver());
+        this.messageReceiverThread = new Thread(new MessageReceiver(), "GroupModule Thread");
         start();
     }
     

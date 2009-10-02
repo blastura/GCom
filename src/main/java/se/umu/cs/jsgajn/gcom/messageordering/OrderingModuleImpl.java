@@ -21,7 +21,8 @@ public class OrderingModuleImpl implements OrderingModule {
 
     public OrderingModuleImpl(Module groupManagementModule) {
         this.groupManagementModule = groupManagementModule;
-        this.deliverHandlerThread = new Thread(new DeliverHandler());
+        this.deliverHandlerThread = new Thread(new DeliverHandler(),
+                "OrderingModule thread");
     }
     
     public void start() {
