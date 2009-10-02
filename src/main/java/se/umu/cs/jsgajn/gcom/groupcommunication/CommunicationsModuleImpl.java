@@ -86,6 +86,7 @@ public class CommunicationsModuleImpl implements CommunicationModule {
     }
 
     public void deliver(Message m) {
+        // Communicates directly  with receiver through queue
         throw new UnsupportedOperationException();
     }
 }
