@@ -49,4 +49,10 @@ public class MessageImpl implements Message {
     public int hashCode() {
         return getUID().hashCode();
     }
+    
+    @Override
+    public String toString() {
+        return "[origin: " + this.originID + ", object: " m.toString() + ", "
+        + "ID: " + this.ID + "]";
+    }
 }

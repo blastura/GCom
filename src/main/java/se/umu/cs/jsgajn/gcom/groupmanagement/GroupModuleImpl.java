@@ -162,7 +162,6 @@ public class GroupModuleImpl implements GroupModule {
     public void send(Object clientMessage) {
         Message m = new MessageImpl(clientMessage,
                 MessageType.CLIENTMESSAGE, PID, groupView.getID());
-        orderingModule.send(m, this.groupView);
         send(m, this.groupView);
     }
 
