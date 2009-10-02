@@ -9,7 +9,7 @@ import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
  *
  * @author dit06ajn, dit06jsg
  */
-public class OrderingModuleImpl implements Module {
+public class OrderingModuleImpl implements OrderingModule {
     private Ordering ordering;
     private Module communicationsModule;
     private Module groupManagementModule;

@@ -23,7 +23,4 @@ public interface Module {
      * @param m The Message to deliver.
      */
     public void deliver(Message m);
-    
-    public void setSendReceiver(Module m);
-    public void setDeliverReceiver(Module m);
 }

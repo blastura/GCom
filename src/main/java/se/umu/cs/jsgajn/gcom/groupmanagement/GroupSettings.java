@@ -2,33 +2,32 @@ package se.umu.cs.jsgajn.gcom.groupmanagement;
 
 import java.io.Serializable;
 
-import se.umu.cs.jsgajn.gcom.groupcommunication.Multicast;
-import se.umu.cs.jsgajn.gcom.groupcommunication.Multicast.type;
-import se.umu.cs.jsgajn.gcom.messageordering.Ordering;
+import se.umu.cs.jsgajn.gcom.groupcommunication.MulticastType;
+import se.umu.cs.jsgajn.gcom.messageordering.OrderingType;
 
 public class GroupSettings implements Serializable {
     private static final long serialVersionUID = 1L;
     private GroupMember leader;
-    private type multicastType;
-    private Ordering.type orderingType;
+    private MulticastType multicastType;
+    private OrderingType orderingType;
     private boolean isNew = true;
     private String name;
 
-    public GroupSettings(String name, GroupMember leader, Multicast.type multicastType, Ordering.type orderingType) {
+    public GroupSettings(String name, GroupMember leader, MulticastType multicastType, OrderingType orderingType) {
         this.name = name;
         this.leader = leader;
         this.multicastType = multicastType;
         this.orderingType = orderingType;
     }
-    
+
     public String getName() {
         return this.name;
     }
-    
+
     public void setIsNew(boolean isNew) {
         this.isNew = isNew;
     }
-    
+
     public boolean isNew() {
         return isNew;
     }
@@ -37,18 +36,18 @@ public class GroupSettings implements Serializable {
         return leader;
     }
 
-    public type getMulticastType() {
+    public MulticastType getMulticastType() {
         return multicastType;
     }
 
-    public Ordering.type getOrderingType() {
+    public OrderingType getOrderingType() {
         return orderingType;
     }
-    
+
     @Override
     public String toString() {
-        return "[" + this.getName() + ", " 
-        + this.getMulticastType() + ", "
-        + this.getOrderingType() + "]";
+        return "[" + this.getName() + ", "
+            + this.getMulticastType() + ", "
+            + this.getOrderingType() + "]";
     }
 }

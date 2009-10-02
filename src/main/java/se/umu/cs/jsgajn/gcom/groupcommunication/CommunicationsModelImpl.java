@@ -9,13 +9,10 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import se.umu.cs.jsgajn.gcom.Module;
-import se.umu.cs.jsgajn.gcom.groupmanagement.GNS;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
-import se.umu.cs.jsgajn.gcom.messageordering.OrderingModule;
 
 public class CommunicationsModelImpl implements CommunicationModule {
-
     private LinkedBlockingQueue<Message> receiveQueue;
     private Receiver receiver;
     private Receiver receiverStub;
@@ -23,15 +20,11 @@ public class CommunicationsModelImpl implements CommunicationModule {
     private Module orderingModule;
     private GroupModule groupModule;
     
-    // TODO: think syncronized
-    //private GroupView groupView;
-
-    public CommunicationsModelImpl(Multicast mMethod, Module orderingModule,
-            GroupModule groupModule)
+    public CommunicationsModelImpl(GroupModule groupModule, Multicast mMethod)
             throws RemoteException, AlreadyBoundException, NotBoundException {
         this.mMethod = mMethod;
-        this.orderingModule = orderingModule;
         this.groupModule = groupModule;
+        
         // TODO: change 1099
         Registry registry = LocateRegistry.createRegistry(1099); 
         this.receiveQueue = new LinkedBlockingQueue<Message>();
@@ -44,20 +37,11 @@ public class CommunicationsModelImpl implements CommunicationModule {
         // Start thread to handle messages
         new Thread(new MessageReceiver()).start();
     }
-
-    /**
-     * @param host Host to GNS
-     * @param port Port to GNS
-     * @return GNS stub
-     * @throws RemoteException If GNS throws exception
-     * @throws NotBoundException If GNS stub can't be found.
-     */
-    public GNS connectToGns(String host, int port) throws RemoteException,
-    NotBoundException {
-        Registry gnsReg = LocateRegistry.getRegistry(host, port);
-        return (GNS) gnsReg.lookup(GNS.STUB_NAME);
+    
+    public void setOrderingModule(Module m) {
+        this.orderingModule = m;
     }
-
+    
     public void send(Message m, GroupView g) {
         mMethod.multicast(m, g);
     }
@@ -83,11 +67,5 @@ public class CommunicationsModelImpl implements CommunicationModule {
 
     public void deliver(Message m) {
         orderingModule.deliver(m);
-    }
-
-    public void setDeliverReceiver(Module m) {
-        // TODO Auto-generated method stub
-        this.orderingModule = m;
-        
     }
 }
