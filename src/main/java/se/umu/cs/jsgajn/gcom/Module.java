@@ -23,4 +23,9 @@ public interface Module {
      * @param m The Message to deliver.
      */
     public void deliver(Message m);
+    
+    /**
+     * Starts message handling threads.
+     */
+    public void start();
 }

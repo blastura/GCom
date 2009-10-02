@@ -19,10 +19,10 @@ public class CommunicationsModelImpl implements CommunicationModule {
     private Multicast mMethod;
     private Module orderingModule;
     private GroupModule groupModule;
+    private Thread messageReceiverThread;
     
-    public CommunicationsModelImpl(GroupModule groupModule, Multicast mMethod)
+    public CommunicationsModelImpl(GroupModule groupModule)
             throws RemoteException, AlreadyBoundException, NotBoundException {
-        this.mMethod = mMethod;
         this.groupModule = groupModule;
         
         // TODO: change 1099
@@ -34,12 +34,26 @@ public class CommunicationsModelImpl implements CommunicationModule {
             (Receiver) UnicastRemoteObject.exportObject(receiver, 0);
         registry.bind(Receiver.STUB_NAME, receiverStub);
 
-        // Start thread to handle messages
-        new Thread(new MessageReceiver()).start();
+        // Create thread to handle messages
+        this.messageReceiverThread = new Thread(new MessageReceiver());
+    }
+    
+    public void start() {
+        if (this.mMethod == null) {
+            throw new IllegalStateException("Multicast method is not set");
+        }
+        if (this.orderingModule == null) {
+            throw new IllegalStateException("Ordering module is not set");
+        }
+        this.messageReceiverThread.start();
     }
     
     public void setOrderingModule(Module m) {
         this.orderingModule = m;
+    }
+
+    public void setMulticastMethod(Multicast m) {
+        this.mMethod = m;    
     }
     
     public void send(Message m, GroupView g) {
@@ -68,4 +82,5 @@ public class CommunicationsModelImpl implements CommunicationModule {
     public void deliver(Message m) {
         orderingModule.deliver(m);
     }
+
 }

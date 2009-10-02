@@ -13,17 +13,29 @@ public class OrderingModuleImpl implements OrderingModule {
     private Ordering ordering;
     private Module communicationsModule;
     private Module groupManagementModule;
+    private Thread deliverHandlerThread;
 
-    public OrderingModuleImpl(Module groupManagementModule,
-                              Ordering ordering) {
+    public OrderingModuleImpl(Module groupManagementModule) {
         this.groupManagementModule = groupManagementModule;
-        this.ordering = ordering;
-
-        new Thread(new DeliverHandler()).start();
+        this.deliverHandlerThread = new Thread(new DeliverHandler());
     }
+    
+    public void start() {
+        if (this.ordering == null) {
+            throw new IllegalStateException("Ordering is not set");
+        }
+        if (this.communicationsModule == null) {
+            throw new IllegalStateException("GroupModule module is not set");
+        }
+        this.deliverHandlerThread.start();
+    } 
 
     public void setCommunicationsModule(Module m) {
         this.communicationsModule = m;
+    }
+    
+    public void setOrdering(Ordering ordering) {
+        this.ordering = ordering; 
     }
 
     public void send(Message m, GroupView g) {
@@ -40,16 +52,5 @@ public class OrderingModuleImpl implements OrderingModule {
                 groupManagementModule.deliver(ordering.take());
             }
         }
-    }
-
-    public void setDeliverReceiver(Module m) {
-        // TODO Auto-generated method stub
-        throw new Error("TODO: fix");
-
-    }
-
-    public void setSendReceiver(Module m) {
-        // TODO Auto-generated method stub
-        this.communicationsModule = m;
     }
 }

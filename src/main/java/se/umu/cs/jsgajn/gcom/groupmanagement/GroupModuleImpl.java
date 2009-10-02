@@ -1,8 +1,10 @@
 package se.umu.cs.jsgajn.gcom.groupmanagement;
 
+import java.io.IOException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.Properties;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import se.umu.cs.jsgajn.gcom.Client;
@@ -12,20 +14,29 @@ import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationsModelImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
+import se.umu.cs.jsgajn.gcom.groupcommunication.Multicast;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MulticastType;
+import se.umu.cs.jsgajn.gcom.groupcommunication.Multicasts;
 import se.umu.cs.jsgajn.gcom.groupcommunication.ReliableMulticast;
 import se.umu.cs.jsgajn.gcom.messageordering.FIFO;
+import se.umu.cs.jsgajn.gcom.messageordering.Ordering;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingModuleImpl;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingType;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingModule;
+import se.umu.cs.jsgajn.gcom.messageordering.Orderings;
+
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
+
+import org.apache.log4j.Logger;
 
 /**
  * @author dit06ajn
  *
  */
 public class GroupModuleImpl implements GroupModule {
+    private static final Logger logger = Logger.getLogger(GroupModuleImpl.class);
+
     private Client client;
 
     private String groupName;
@@ -42,6 +53,8 @@ public class GroupModuleImpl implements GroupModule {
 
     // Queue to contain newly delivered messages
     private LinkedBlockingQueue<Message> receiveQueue;
+    
+    private Thread messageReceiverThread;
 
     /**
      * Implementations responsible for management of group, communication with
@@ -56,46 +69,88 @@ public class GroupModuleImpl implements GroupModule {
      * @throws NotBoundException If GNS stub is not found in GNS register.
      */
     public GroupModuleImpl(Client client, String gnsHost, int gnsPort, String groupName)
-        throws RemoteException, AlreadyBoundException, NotBoundException {
+    throws RemoteException, AlreadyBoundException, NotBoundException {
         this.client = client;
         this.receiveQueue = new LinkedBlockingQueue<Message>();
 
-        // TODO: dynamic loading of multicast module
-        // TODO: fix order of modules, they refer to each other
-        this.orderingModule = new OrderingModuleImpl(this, new FIFO());
-        this.communicationModule =
-            new CommunicationsModelImpl(this, new ReliableMulticast());
+        this.orderingModule = new OrderingModuleImpl(this);
+        this.communicationModule = new CommunicationsModelImpl(this);
         this.communicationModule.setOrderingModule(this.orderingModule);
         this.orderingModule.setCommunicationsModule(this.communicationModule);
 
         this.groupMember = new GroupMember(communicationModule.getReceiver());
-
         this.groupView =  new GroupViewImpl(groupName, this.groupMember);
         this.groupName = groupName;
+        GroupSettings gs = initGroupSettings(groupMember, groupName);
 
-        // TODO: which model to use
-        this.gns = connectToGns(gnsHost, gnsPort);
-        GroupSettings gs =
-            gns.connect(new GroupSettings(groupName, this.groupMember,
-                                          MulticastType.RELIABLE_MULTICAST, OrderingType.FIFO));
+        this.gns = getGNS(gnsHost, gnsPort);
+        // TODO: what happens if another client connects directly after this
+        //       client. Not all threads are started. 
+        gs = gns.connect(gs);
+        Ordering o = Orderings.newInstance(gs.getOrderingType());
+        this.orderingModule.setOrdering(o);
+        Multicast m = Multicasts.newInstance(gs.getMulticastType());
+        this.communicationModule.setMulticastMethod(m);
 
-
+        // Start modules
+        this.orderingModule.start();
+        this.communicationModule.start();
+        
         if (gs.isNew()) { // Group is empty I am leader
-            System.out.println("Group created");
-            // TODO: Test if setIsNew(false) will affect GNSImpl
+            logger.debug("Got new group from GNS, this member is leader");
             this.gl = new GroupLeaderImpl();
-
         } else {
-            System.out.println("Try join group");
+            logger.debug("Got existing group from DNS, sending join message");
             MessageImpl joinMessage =
                 new MessageImpl(this.groupMember,
-                                MessageType.JOIN, PID, groupView.getID());
+                        MessageType.JOIN, PID, groupView.getID());
 
             gs.getLeader().getReceiver().receive(joinMessage);
         }
 
-        new Thread(new MessageReceiver()).start();
+        this.messageReceiverThread = new Thread(new MessageReceiver());
+        start();
     }
+    
+    public void start() {
+        //Module is started in constructor
+        this.messageReceiverThread.start();
+    }
+
+    private GroupSettings initGroupSettings(GroupMember leader, String groupName) {
+        Properties prop = new Properties();
+        Properties sys = System.getProperties();
+        String ordering = "FIFO";
+        String multicastMethod = "BASIC_MULTICAST";
+        try {
+            prop.load(this.getClass().getResourceAsStream("/application.properties"));
+
+            // Get ordering
+            if (sys.containsKey("gcom.ordering")) {
+                ordering = sys.getProperty("gcom.ordering");
+            } else if (prop.containsKey("gcom.ordering")) {
+                ordering = prop.getProperty("gcom.ordering");
+            }
+
+            // Get multicastMethod
+            if (sys.containsKey("gcom.multicast")) {
+                multicastMethod = sys.getProperty("gcom.multicast");
+            } else if (prop.containsKey("gcom.multicast")) {
+                multicastMethod = prop.getProperty("gcom.multicast");
+            }
+        } catch (IOException e) {
+            logger.warn("application.properties not found");
+        }
+
+        OrderingType otype = OrderingType.valueOf(ordering);
+        MulticastType mtype = MulticastType.valueOf(multicastMethod);
+        if (otype == null || mtype == null) {
+            throw new Error("Coudn't initialize groupsettings");
+        }
+        logger.debug("Init groupsettings: " + mtype + ", " + otype);
+        return new GroupSettings(groupName, leader, mtype, otype);
+    }
+
 
 
     /**
@@ -106,11 +161,11 @@ public class GroupModuleImpl implements GroupModule {
      */
     public void send(Object clientMessage) {
         Message m = new MessageImpl(clientMessage,
-                                    MessageType.CLIENTMESSAGE, PID, groupView.getID());
+                MessageType.CLIENTMESSAGE, PID, groupView.getID());
         orderingModule.send(m, this.groupView);
         send(m, this.groupView);
     }
-    
+
     /**
      * Will send message to {@link OrderingModule} -> {@link CommunicationModule} ->
      * every member of the {@link GroupView}.
@@ -138,7 +193,7 @@ public class GroupModuleImpl implements GroupModule {
 
             // Multicast new groupView
             orderingModule.send(new MessageImpl(groupView,
-                                                MessageType.GROUPCHANGE, PID, groupView.getID()), groupView);
+                    MessageType.GROUPCHANGE, PID, groupView.getID()), groupView);
         }
     }
 
@@ -201,8 +256,8 @@ public class GroupModuleImpl implements GroupModule {
      * @throws RemoteException If GNS throws exception
      * @throws NotBoundException If GNS stub can't be found.
      */
-    private GNS connectToGns(String host, int port) throws RemoteException,
-                                                          NotBoundException {
+    private GNS getGNS(String host, int port) throws RemoteException,
+    NotBoundException {
         Registry gnsReg = LocateRegistry.getRegistry(host, port);
         return (GNS) gnsReg.lookup(GNS.STUB_NAME);
     }

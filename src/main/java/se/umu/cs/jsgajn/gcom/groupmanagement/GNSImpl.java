@@ -38,7 +38,7 @@ public class GNSImpl implements GNS {
         this.prop = new Properties();
         try {
             prop.load(this.getClass().getResourceAsStream("/application.properties"));
-            this.port = Integer.parseInt(prop.getProperty("registry-port"));
+            this.port = Integer.parseInt(prop.getProperty("gns-port"));
         } catch (IOException e) {
             logger.warn("application.properties not found");
         }
