@@ -18,7 +18,8 @@ public class OrderingModuleImpl implements OrderingModule {
     private Module communicationsModule;
     private Module groupManagementModule;
     private Thread deliverHandlerThread;
-
+    private boolean running;
+    
     public OrderingModuleImpl(Module groupManagementModule) {
         this.groupManagementModule = groupManagementModule;
         this.deliverHandlerThread = new Thread(new DeliverHandler(),
@@ -32,9 +33,14 @@ public class OrderingModuleImpl implements OrderingModule {
         if (this.communicationsModule == null) {
             throw new IllegalStateException("GroupModule module is not set");
         }
+        this.running = true;
         this.deliverHandlerThread.start();
         logger.debug("Started OrderingModule: " + ordering);
-    } 
+    }
+
+    public void stop() {
+        this.running = false;        
+    }
 
     public void setCommunicationsModule(Module m) {
         this.communicationsModule = m;
@@ -54,7 +60,7 @@ public class OrderingModuleImpl implements OrderingModule {
 
     private class DeliverHandler implements Runnable {
         public void run() {
-            while (true) {
+            while (running) {
                 groupManagementModule.deliver(ordering.take());
             }
         }

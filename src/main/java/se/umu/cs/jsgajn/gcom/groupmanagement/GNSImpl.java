@@ -24,28 +24,49 @@ public class GNSImpl implements GNS {
 
     private static final Logger logger = Logger.getLogger(GNSImpl.class); 
     private transient GNS stub;
-    private Properties prop;
-    private int port = 1099;
     public transient Map<String, GroupSettings> groups;
 
     public GNSImpl() throws AlreadyBoundException, RemoteException {
-        this(new HashMap<String, GroupSettings>());
+        this(new HashMap<String, GroupSettings>(), -1);
     }
 
     public GNSImpl(Map<String, GroupSettings> groups) throws AlreadyBoundException, RemoteException {
-        this.prop = new Properties();
-        try {
-            prop.load(this.getClass().getResourceAsStream("/application.properties"));
-            this.port = Integer.parseInt(prop.getProperty("gns-port"));
-        } catch (IOException e) {
-            logger.warn("application.properties not found");
+        this(groups, -1); 
+    }
+
+    public GNSImpl(int port) throws AlreadyBoundException, RemoteException {
+        this(new HashMap<String, GroupSettings>(), port);
+    }
+
+    public GNSImpl(Map<String, GroupSettings> groups, int port) throws AlreadyBoundException, RemoteException {
+        if (port < 1) {
+            String portString = System.getProperty("gcom.gns.port");
+            if (portString == null) { // Try application properties
+                try {
+                    Properties prop = new Properties();
+                    prop.load(this.getClass().getResourceAsStream("/application.properties"));
+                    portString = prop.getProperty("gcom.gns.port");
+                } catch (IOException e) {
+                    logger.warn("application.properties not found");
+                }
+            }
+            if (portString == null) {
+                port = Registry.REGISTRY_PORT;
+            } else {
+                try {
+                    port = Integer.parseInt(portString);
+                } catch (NumberFormatException e) {
+                    logger.warn("GNS port number not a number: " + e.getMessage());
+                    port = Registry.REGISTRY_PORT;
+                }
+            }
         }
 
         this.groups = groups;
         this.stub = (GNS) UnicastRemoteObject.exportObject(this, 0);
-        Registry registry = LocateRegistry.createRegistry(this.port);
+        Registry registry = LocateRegistry.createRegistry(port);
         registry.bind(GNS.STUB_NAME, stub);
-        System.out.println("Server is running at port " + this.port);
+        System.out.println("Server is running at port " + port);
     }
 
     public GroupSettings connect(GroupSettings gs) {
@@ -91,7 +112,8 @@ public class GNSImpl implements GNS {
             logger.warn("Cannot save groupsettings.");
         }
     }
-    
+
+    // TODO: should this be done?
     private static Map<String, GroupSettings> filterOutCrashedGroups(Map<String, GroupSettings> groups) {
         //Set<String> crachedGroups = new HashSet<String>();
         for (GroupSettings gs : groups.values()) {
@@ -103,10 +125,10 @@ public class GNSImpl implements GNS {
                 groups.remove(gs.getName());
             }
         }
-        
-//        for (String name : crachedGroups) {
-//            groups.remove(name);
-//        }
+
+        //      for (String name : crachedGroups) {
+        //            groups.remove(name);
+        //        }
         return groups;
     }
 
@@ -117,7 +139,7 @@ public class GNSImpl implements GNS {
                 Map<String, GroupSettings> restoredGroups = restore(args[0]);
                 if (restoredGroups != null) {
                     logger.info("Restored groups: " + restoredGroups);
-                    restoredGroups = filterOutCrashedGroups(restoredGroups);
+                    //restoredGroups = filterOutCrashedGroups(restoredGroups);
                     new GNSImpl(restoredGroups);
                 }
             } else {

@@ -16,6 +16,7 @@
 
    <!-- Dir program resources -->
    <property name="src.main.resources.dir" location="${src.main.dir}/../resources"/>
+   <property name="src.test.resources.dir" location="${src.test.dir}/../resources"/>
    <property name="build.main.resources.dir" location="${build.main.dir}"/>
 
    <!-- Package name, dirs -->
@@ -51,7 +52,7 @@
    <!-- Compile program -->
    <target name="compile" depends="prepare">
       <!-- Copy resource dirs -->
-      <copy todir="${build.main.resources.dir}">
+      <copy todir="${build.main.resources.dir}" overwrite="true">
          <fileset dir="${src.main.resources.dir}"/>
       </copy>
       
@@ -64,11 +65,11 @@
 
    <!-- Compile tests -->
    <target name="compile-tests" depends="compile">
-      <!-- Copy dirs -->
-      <!--     <copy todir="${build.test.dir}/resources"> -->
-      <!--       <fileset dir="${src.resources.dir}"/> -->
-      <!--     </copy> -->
-      <!-- Compile -->
+      <!-- Copy resource dirs to standard resource dir, overwrite
+           existing resources -->
+      <copy todir="${build.main.resources.dir}" overwrite="true">
+         <fileset dir="${src.test.resources.dir}"/>
+      </copy>
       <javac srcdir="${src.test.dir}" destdir="${build.test.dir}">
          <classpath refid="project.classpath" />
       </javac>

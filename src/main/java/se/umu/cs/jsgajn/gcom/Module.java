@@ -25,7 +25,12 @@ public interface Module {
     public void deliver(Message m);
     
     /**
-     * Starts message handling threads.
+     * Starts moudle. Ex: start message handling threads.
      */
     public void start();
+    
+    /**
+     * Shutdown moudle. Ex: kill threads, unregister created registries.
+     */
+    public void stop();
 }

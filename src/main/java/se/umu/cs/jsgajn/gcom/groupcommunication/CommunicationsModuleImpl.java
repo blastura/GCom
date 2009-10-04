@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import se.umu.cs.jsgajn.gcom.Module;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
+import java.rmi.NoSuchObjectException;
 
 public class CommunicationsModuleImpl implements CommunicationModule {
     private static final Logger logger = Logger.getLogger(CommunicationsModuleImpl.class);
@@ -23,13 +24,15 @@ public class CommunicationsModuleImpl implements CommunicationModule {
     private Module orderingModule;
     private GroupModule groupModule;
     private Thread messageReceiverThread;
-
+    private Registry registry;
+    private boolean running;
+    
     public CommunicationsModuleImpl(GroupModule groupModule)
         throws RemoteException, AlreadyBoundException, NotBoundException {
         this.groupModule = groupModule;
 
-        // TODO: change 1099
-        Registry registry = LocateRegistry.createRegistry(1099);
+        // TODO: make port optional
+        this.registry = LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
         this.receiveQueue = new LinkedBlockingQueue<Message>();
 
         this.receiver = new ReceiverImpl(this.receiveQueue, GroupModule.PID);
@@ -50,8 +53,18 @@ public class CommunicationsModuleImpl implements CommunicationModule {
             throw new IllegalStateException("Ordering module is not set");
         }
         
+        this.running = true;
         this.messageReceiverThread.start();
         logger.debug("Started CommunicationsModule: " + mMethod);
+    }
+
+    public void stop() {
+        this.running = false;
+        try {
+            UnicastRemoteObject.unexportObject(this.registry, true);
+        } catch (NoSuchObjectException e) {
+            logger.warn("Couldn't unregister registry: " + e.getMessage());
+        }
     }
 
     public void setOrderingModule(Module m) {
@@ -69,7 +82,7 @@ public class CommunicationsModuleImpl implements CommunicationModule {
     private class MessageReceiver implements Runnable {
         public void run() {
             try {
-                while (true) {
+                while (running) {
                     Message m = receiveQueue.take();
                     if (mMethod.deliverCheck(m, groupModule.getGroupView())) {
                         orderingModule.deliver(m);

@@ -52,7 +52,8 @@ public class GroupModuleImpl implements GroupModule {
     private LinkedBlockingQueue<Message> receiveQueue;
 
     private Thread messageReceiverThread;
-
+    private boolean running;
+    
     /**
      * Implementations responsible for management of group, communication with
      * group and ordering of messages. Clients should use this class to send
@@ -111,7 +112,14 @@ public class GroupModuleImpl implements GroupModule {
 
     public void start() {
         //Module is started in constructor
+        this.running = true;
         this.messageReceiverThread.start();
+    }
+
+    public void stop() {
+        this.running = false;
+        this.communicationModule.stop();
+        this.orderingModule.stop();
     }
 
     private GroupSettings initGroupSettings(GroupMember leader, String groupName) {
@@ -195,7 +203,7 @@ public class GroupModuleImpl implements GroupModule {
 
     private class MessageReceiver implements Runnable {
         public void run() {
-            while (true) {
+            while (running) {
                 try {
                     handleDelivered(receiveQueue.take());
                 } catch (InterruptedException e) {
@@ -258,4 +266,3 @@ public class GroupModuleImpl implements GroupModule {
         return (GNS) gnsReg.lookup(GNS.STUB_NAME);
     }
 }
-
