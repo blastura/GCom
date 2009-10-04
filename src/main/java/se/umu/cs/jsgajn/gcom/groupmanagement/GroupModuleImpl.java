@@ -8,7 +8,6 @@ import java.util.Properties;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import se.umu.cs.jsgajn.gcom.Client;
-import se.umu.cs.jsgajn.gcom.Module;
 import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationModule;
 import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationsModuleImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
@@ -17,8 +16,6 @@ import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Multicast;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MulticastType;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Multicasts;
-import se.umu.cs.jsgajn.gcom.groupcommunication.ReliableMulticast;
-import se.umu.cs.jsgajn.gcom.messageordering.FIFO;
 import se.umu.cs.jsgajn.gcom.messageordering.Ordering;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingModuleImpl;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingType;
@@ -53,7 +50,7 @@ public class GroupModuleImpl implements GroupModule {
 
     // Queue to contain newly delivered messages
     private LinkedBlockingQueue<Message> receiveQueue;
-    
+
     private Thread messageReceiverThread;
 
     /**
@@ -69,7 +66,7 @@ public class GroupModuleImpl implements GroupModule {
      * @throws NotBoundException If GNS stub is not found in GNS register.
      */
     public GroupModuleImpl(Client client, String gnsHost, int gnsPort, String groupName)
-    throws RemoteException, AlreadyBoundException, NotBoundException {
+        throws RemoteException, AlreadyBoundException, NotBoundException {
         this.client = client;
         this.receiveQueue = new LinkedBlockingQueue<Message>();
 
@@ -85,7 +82,7 @@ public class GroupModuleImpl implements GroupModule {
 
         this.gns = getGNS(gnsHost, gnsPort);
         // TODO: what happens if another client connects directly after this
-        //       client. Not all threads are started. 
+        //       client. Not all threads are started.
         gs = gns.connect(gs);
         Ordering o = Orderings.newInstance(gs.getOrderingType());
         this.orderingModule.setOrdering(o);
@@ -95,7 +92,7 @@ public class GroupModuleImpl implements GroupModule {
         // Start modules
         this.orderingModule.start();
         this.communicationModule.start();
-        
+
         if (gs.isNew()) { // Group is empty I am leader
             logger.debug("Got new group from GNS, this member is leader");
             this.gl = new GroupLeaderImpl();
@@ -103,7 +100,7 @@ public class GroupModuleImpl implements GroupModule {
             logger.debug("Got existing group from DNS, sending join message");
             MessageImpl joinMessage =
                 new MessageImpl(this.groupMember,
-                        MessageType.JOIN, PID, groupView.getID());
+                                MessageType.JOIN, PID, groupView.getID());
 
             gs.getLeader().getReceiver().receive(joinMessage);
         }
@@ -111,7 +108,7 @@ public class GroupModuleImpl implements GroupModule {
         this.messageReceiverThread = new Thread(new MessageReceiver(), "GroupModule Thread");
         start();
     }
-    
+
     public void start() {
         //Module is started in constructor
         this.messageReceiverThread.start();
@@ -161,7 +158,7 @@ public class GroupModuleImpl implements GroupModule {
      */
     public void send(Object clientMessage) {
         Message m = new MessageImpl(clientMessage,
-                MessageType.CLIENTMESSAGE, PID, groupView.getID());
+                                    MessageType.CLIENTMESSAGE, PID, groupView.getID());
         send(m, this.groupView);
     }
 
@@ -192,7 +189,7 @@ public class GroupModuleImpl implements GroupModule {
 
             // Multicast new groupView
             orderingModule.send(new MessageImpl(groupView,
-                    MessageType.GROUPCHANGE, PID, groupView.getID()), groupView);
+                                                MessageType.GROUPCHANGE, PID, groupView.getID()), groupView);
         }
     }
 
@@ -256,7 +253,7 @@ public class GroupModuleImpl implements GroupModule {
      * @throws NotBoundException If GNS stub can't be found.
      */
     private GNS getGNS(String host, int port) throws RemoteException,
-    NotBoundException {
+                                                     NotBoundException {
         Registry gnsReg = LocateRegistry.getRegistry(host, port);
         return (GNS) gnsReg.lookup(GNS.STUB_NAME);
     }

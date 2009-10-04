@@ -13,7 +13,9 @@ public class GroupSettings implements Serializable {
     private boolean isNew = true;
     private String name;
 
-    public GroupSettings(String name, GroupMember leader, MulticastType multicastType, OrderingType orderingType) {
+    public GroupSettings(String name, GroupMember leader,
+                         MulticastType multicastType,
+                         OrderingType orderingType) {
         this.name = name;
         this.leader = leader;
         this.multicastType = multicastType;

@@ -32,8 +32,8 @@ public class GroupViewImpl implements GroupView {
         return ID;
     }
     
-    public boolean add(GroupMember r) {
-        return members.add(r);
+    public boolean add(GroupMember m) {
+        return members.add(m);
     }
 
     public Iterator<GroupMember> iterator() {

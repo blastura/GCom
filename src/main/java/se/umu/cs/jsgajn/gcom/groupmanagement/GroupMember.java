@@ -27,7 +27,7 @@ public class GroupMember implements Serializable {
     public Receiver getReceiver() {
         return this.receiver;
     }
-
+    
     public UID getPID() {
         return this.PID;
     }

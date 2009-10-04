@@ -1,7 +1,6 @@
 package se.umu.cs.jsgajn.gcom.groupcommunication;
 
 import java.rmi.RemoteException;
-import java.rmi.server.UID;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,7 +9,6 @@ import org.apache.log4j.Logger;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
-import se.umu.cs.jsgajn.gcom.messageordering.OrderingModuleImpl;
 
 public class BasicMulticast implements Multicast {
     private static final Logger logger = Logger.getLogger(BasicMulticast.class);
