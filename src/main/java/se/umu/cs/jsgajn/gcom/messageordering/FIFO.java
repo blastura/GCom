@@ -3,12 +3,13 @@ package se.umu.cs.jsgajn.gcom.messageordering;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 
 public class FIFO implements Ordering {
-    private static final Logger logger = Logger.getLogger(FIFO.class);
+    private static final Logger logger = LoggerFactory.getLogger(FIFO.class);
     private BlockingQueue<Message> holdBackQueue;
     private BlockingQueue<Message> deliverQueue;
 

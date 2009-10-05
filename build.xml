@@ -52,7 +52,7 @@
    <!-- Compile program -->
    <target name="compile" depends="prepare">
       <!-- Copy resource dirs -->
-      <copy todir="${build.main.resources.dir}" overwrite="true">
+      <copy todir="${build.main.resources.dir}" overwrite="false">
          <fileset dir="${src.main.resources.dir}"/>
       </copy>
       
@@ -67,9 +67,9 @@
    <target name="compile-tests" depends="compile">
       <!-- Copy resource dirs to standard resource dir, overwrite
            existing resources -->
-      <copy todir="${build.main.resources.dir}" overwrite="true">
-         <fileset dir="${src.test.resources.dir}"/>
-      </copy>
+      <!--       <copy todir="${build.main.resources.dir}" overwrite="false"> -->
+      <!--          <fileset dir="${src.test.resources.dir}"/> -->
+      <!--       </copy> -->
       <javac srcdir="${src.test.dir}" destdir="${build.test.dir}">
          <classpath refid="project.classpath" />
       </javac>

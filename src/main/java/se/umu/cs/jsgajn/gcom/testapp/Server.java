@@ -5,14 +5,14 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Properties;
 import java.io.IOException;
 import java.rmi.AlreadyBoundException;
 
 public class Server implements Hello {
-    private static final Logger logger = Logger.getLogger(Server.class);
+    private static final Logger logger = LoggerFactory.getLogger(Server.class);
     private Properties properties;
     private String registryHost;
     private int registryPort;
@@ -54,7 +54,6 @@ public class Server implements Hello {
     }
 
     public static void main(String args[]) {
-        BasicConfigurator.configure();
         new Server();
     }
 }

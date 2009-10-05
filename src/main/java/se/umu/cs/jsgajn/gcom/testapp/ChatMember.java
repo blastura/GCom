@@ -5,14 +5,15 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.Scanner;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.umu.cs.jsgajn.gcom.Client;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModuleImpl;
 
 public class ChatMember implements Client {
-    private static final Logger logger = Logger.getLogger(ChatMember.class);
+    private static final Logger logger = LoggerFactory.getLogger(ChatMember.class);
     private GroupModule groupMember;
     
     public ChatMember(String gnsHost, int gnsPort, String groupName)

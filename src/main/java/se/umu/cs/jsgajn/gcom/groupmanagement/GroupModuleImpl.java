@@ -25,14 +25,16 @@ import se.umu.cs.jsgajn.gcom.messageordering.Orderings;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger//
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author dit06ajn
  *
  */
 public class GroupModuleImpl implements GroupModule {
-    private static final Logger logger = Logger.getLogger(GroupModuleImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(GroupModuleImpl.class);
 
     private Client client;
 
@@ -111,12 +113,14 @@ public class GroupModuleImpl implements GroupModule {
     }
 
     public void start() {
+        logger.debug("Starting GroupModuleImpl");
         //Module is started in constructor
         this.running = true;
         this.messageReceiverThread.start();
     }
 
     public void stop() {
+        logger.debug("Stopping GroupModuleImpl");
         this.running = false;
         this.communicationModule.stop();
         this.orderingModule.stop();

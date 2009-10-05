@@ -8,7 +8,8 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.umu.cs.jsgajn.gcom.Module;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
@@ -16,7 +17,7 @@ import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 import java.rmi.NoSuchObjectException;
 
 public class CommunicationsModuleImpl implements CommunicationModule {
-    private static final Logger logger = Logger.getLogger(CommunicationsModuleImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(CommunicationsModuleImpl.class);
     private LinkedBlockingQueue<Message> receiveQueue;
     private Receiver receiver;
     private Receiver receiverStub;
@@ -59,6 +60,7 @@ public class CommunicationsModuleImpl implements CommunicationModule {
     }
 
     public void stop() {
+        logger.debug("Stopping CommunicationsModule");
         this.running = false;
         try {
             UnicastRemoteObject.unexportObject(this.registry, true);

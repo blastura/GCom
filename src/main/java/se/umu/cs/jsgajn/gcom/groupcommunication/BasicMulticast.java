@@ -4,14 +4,15 @@ import java.rmi.RemoteException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 
 public class BasicMulticast implements Multicast {
-    private static final Logger logger = Logger.getLogger(BasicMulticast.class);
+    private static final Logger logger = LoggerFactory.getLogger(BasicMulticast.class);
     private Set<GroupMember> crashed = new HashSet<GroupMember>();
 
     /**

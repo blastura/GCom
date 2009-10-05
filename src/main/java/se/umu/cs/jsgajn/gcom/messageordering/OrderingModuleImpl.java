@@ -1,6 +1,7 @@
 package se.umu.cs.jsgajn.gcom.messageordering;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import se.umu.cs.jsgajn.gcom.Module;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
@@ -13,7 +14,7 @@ import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
  * @author dit06ajn, dit06jsg
  */
 public class OrderingModuleImpl implements OrderingModule {
-    private static final Logger logger = Logger.getLogger(OrderingModuleImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(OrderingModuleImpl.class);
     private Ordering ordering;
     private Module communicationsModule;
     private Module groupManagementModule;
@@ -39,6 +40,7 @@ public class OrderingModuleImpl implements OrderingModule {
     }
 
     public void stop() {
+        logger.debug("Stopping OrderingModuleImpl");
         this.running = false;        
     }
 

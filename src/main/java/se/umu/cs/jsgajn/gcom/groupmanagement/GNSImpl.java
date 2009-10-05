@@ -17,12 +17,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GNSImpl implements GNS {
     private static final long serialVersionUID = 1L;
 
-    private static final Logger logger = Logger.getLogger(GNSImpl.class); 
+    private static final Logger logger = LoggerFactory.getLogger(GNSImpl.class); 
     private transient GNS stub;
     public transient Map<String, GroupSettings> groups;
 
