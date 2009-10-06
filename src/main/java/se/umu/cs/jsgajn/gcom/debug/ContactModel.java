@@ -5,8 +5,11 @@ import java.rmi.server.UID;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
@@ -15,6 +18,7 @@ import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
 
 public class ContactModel {
 	
+	private JTabbedPane tabs;
 	private UID pid;
 	private DefaultTableModel receivedTable;
 	private DefaultTableModel deliveredTable;
@@ -36,6 +40,8 @@ public class ContactModel {
 		clearContent();
 		setupTables();
 		messageInfo = "Meddelandeinfo";
+		tabs.setTitleAt(0, "Overview");
+		tabs.setTitleAt(1, "Ordering");
 	}
 	
 	public void clearContent() {
@@ -50,8 +56,15 @@ public class ContactModel {
 		
 		vectorclock.setNumRows(0);
 		vectorclock.setColumnCount(0);
-		
-		clientInfoPanel.setName("snopp");
+
+		TitledBorder title;
+		title = BorderFactory.createTitledBorder("Client Name");
+		clientInfoPanel.setBorder(title);
+
+		TitledBorder groupViewPanel;
+		groupViewPanel = BorderFactory.createTitledBorder("Group View Name");
+		clientInfoPanel.setBorder(groupViewPanel);
+
 	}
 	
 	public void setupTables() {
@@ -139,6 +152,14 @@ public class ContactModel {
 
 	public void setGroupViewPanel(JPanel groupViewPanel) {
 		this.groupViewPanel = groupViewPanel;
+	}
+
+	public JTabbedPane getTabs() {
+		return tabs;
+	}
+
+	public void setTabs(JTabbedPane tabs) {
+		this.tabs = tabs;
 	}
 	
 }
