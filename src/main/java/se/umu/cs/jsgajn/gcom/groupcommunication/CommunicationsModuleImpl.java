@@ -114,6 +114,7 @@ public class CommunicationsModuleImpl implements CommunicationModule {
     }
 
     public void addDebugger(Debugger d) {
+        logger.debug("Added debugger: " + d);
         this.debugger = d;
     }
 }

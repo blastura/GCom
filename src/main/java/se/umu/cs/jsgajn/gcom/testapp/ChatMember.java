@@ -22,13 +22,15 @@ public class ChatMember implements Client, Debuggable {
         throws RemoteException, AlreadyBoundException, NotBoundException {
         this.groupMember = new GroupModuleImpl(this, gnsHost, gnsPort, groupName);
 
-        Scanner sc = new Scanner(System.in);  
-        String msg;
-        while (true) {
-            System.out.print(GroupModule.PID + " - message: ");
-            msg = sc.nextLine();
-            groupMember.send(msg);
-        }
+        new Thread (new Runnable() {
+                public void run() {
+                    while (true) {
+                        System.out.print(GroupModule.PID + " - message: ");
+                        Scanner sc = new Scanner(System.in);  
+                        String msg;
+                        msg = sc.nextLine();
+                        groupMember.send(msg);
+                    }}}).start();
     }
 
     public void deliver(Object m) {
