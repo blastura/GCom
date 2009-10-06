@@ -90,7 +90,9 @@ public class CommunicationsModuleImpl implements CommunicationModule {
                 while (running) {
                     Message m = receiveQueue.take();
                     // TODO: clone copy message?
-                    debugger.messageReceived(m);
+                    if (debugger != null) {
+                        debugger.messageReceived(m);
+                    }
                     if (mMethod.deliverCheck(m, groupModule.getGroupView())) {
                         orderingModule.deliver(m);
                     }
