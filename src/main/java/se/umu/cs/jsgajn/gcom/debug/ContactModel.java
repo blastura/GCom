@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JPanel;
 import javax.swing.table.DefaultTableModel;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
@@ -18,9 +19,12 @@ public class ContactModel {
 	private DefaultTableModel receivedTable;
 	private DefaultTableModel deliveredTable;
 	private DefaultTableModel crashedTable;
-	private String clientInfo;
+	private DefaultTableModel clientInfo;
 	private String messageInfo;
 
+	private JPanel clientInfoPanel;
+	private JPanel groupViewPanel;
+	
 	private DefaultTableModel vectorclock;
 	
 	private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
@@ -31,19 +35,23 @@ public class ContactModel {
 	public void init() {
 		clearContent();
 		setupTables();
-		clientInfo = "Klientinformation";
 		messageInfo = "Meddelandeinfo";
 	}
 	
 	public void clearContent() {
 		receivedTable.setNumRows(0);
 		receivedTable.setColumnCount(0);
+		
 		deliveredTable.setNumRows(0);
 		deliveredTable.setColumnCount(0);
+		
 		crashedTable.setNumRows(0);
 		crashedTable.setColumnCount(0);
+		
 		vectorclock.setNumRows(0);
 		vectorclock.setColumnCount(0);
+		
+		clientInfoPanel.setName("snopp");
 	}
 	
 	public void setupTables() {
@@ -85,14 +93,6 @@ public class ContactModel {
 		propertyChangeSupport.firePropertyChange("vectorclock", oldvectorclock, vectorclock);
 	}
 
-	public String getClientInfo() {
-		return clientInfo;
-	}
-
-	public void setClientInfo(String clientInfo) {
-		this.clientInfo = clientInfo;
-	}
-
 	public String getMessageInfo() {
 		return messageInfo;
 	}
@@ -123,6 +123,22 @@ public class ContactModel {
 
 	public void setCrashedTable(DefaultTableModel crashedTable) {
 		this.crashedTable = crashedTable;
+	}
+
+	public JPanel getClientInfoPanel() {
+		return clientInfoPanel;
+	}
+
+	public void setClientInfoPanel(JPanel clientInfoPanel) {
+		this.clientInfoPanel = clientInfoPanel;
+	}
+
+	public JPanel getGroupViewPanel() {
+		return groupViewPanel;
+	}
+
+	public void setGroupViewPanel(JPanel groupViewPanel) {
+		this.groupViewPanel = groupViewPanel;
 	}
 	
 }
