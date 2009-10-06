@@ -6,19 +6,22 @@ import org.slf4j.LoggerFactory;
 import se.umu.cs.jsgajn.gcom.Module;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
+import se.umu.cs.jsgajn.gcom.debug.Debugger;
 
 /**
  * Module to handle different orderings of messages.
  *
  * @author dit06ajn, dit06jsg
  */
-public class OrderingModuleImpl implements OrderingModule {
+public class OrderingModuleImpl implements OrderingModule {    
     private static final Logger logger = LoggerFactory.getLogger(OrderingModuleImpl.class);
     private Ordering ordering;
     private Module communicationsModule;
     private Module groupManagementModule;
     private Thread deliverHandlerThread;
     private boolean running;
+
+    private Debugger debugger;
     
     public OrderingModuleImpl(Module groupManagementModule) {
         this.groupManagementModule = groupManagementModule;
@@ -65,5 +68,9 @@ public class OrderingModuleImpl implements OrderingModule {
                 groupManagementModule.deliver(ordering.take());
             }
         }
+    }
+    
+    public void addDebugger(Debugger d) {
+        this.debugger = d;
     }
 }

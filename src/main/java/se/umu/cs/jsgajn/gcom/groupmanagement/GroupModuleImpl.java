@@ -23,8 +23,6 @@ import se.umu.cs.jsgajn.gcom.messageordering.OrderingModule;
 import se.umu.cs.jsgajn.gcom.messageordering.Orderings;
 import se.umu.cs.jsgajn.gcom.debug.Debugger;
 
-
-
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 
@@ -252,6 +250,9 @@ public class GroupModuleImpl implements GroupModule {
 
     public void deliver(Message m) {
         try {
+            if (debugger != null) {
+                debugger.messageDelivered(m);
+            }
             receiveQueue.put(m);
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
@@ -275,5 +276,6 @@ public class GroupModuleImpl implements GroupModule {
     public void addDebugger(Debugger d) {
         this.debugger = d;
         this.communicationModule.addDebugger(d);
+        this.orderingModule.addDebugger(d);
     }    
 }
