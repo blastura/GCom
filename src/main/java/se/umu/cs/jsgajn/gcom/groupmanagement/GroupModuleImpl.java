@@ -8,6 +8,7 @@ import java.util.Properties;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import se.umu.cs.jsgajn.gcom.Client;
+import se.umu.cs.jsgajn.gcom.debug.Debugger;
 import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationModule;
 import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationsModuleImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
@@ -17,14 +18,13 @@ import se.umu.cs.jsgajn.gcom.groupcommunication.Multicast;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MulticastType;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Multicasts;
 import se.umu.cs.jsgajn.gcom.messageordering.Ordering;
+import se.umu.cs.jsgajn.gcom.messageordering.OrderingModule;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingModuleImpl;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingType;
-import se.umu.cs.jsgajn.gcom.messageordering.OrderingModule;
 import se.umu.cs.jsgajn.gcom.messageordering.Orderings;
-import se.umu.cs.jsgajn.gcom.debug.Debugger;
 
-import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +55,11 @@ public class GroupModuleImpl implements GroupModule {
     private Thread messageReceiverThread;
     private boolean running;
     
+    public GroupModuleImpl(Client client, String gnsHost, int gnsPort, String groupName)
+        throws RemoteException, AlreadyBoundException, NotBoundException {
+        this(client, gnsHost, gnsPort, groupName, Registry.REGISTRY_PORT);
+    }
+    
     /**
      * Implementations responsible for management of group, communication with
      * group and ordering of messages. Clients should use this class to send
@@ -67,13 +72,14 @@ public class GroupModuleImpl implements GroupModule {
      * @throws AlreadyBoundException If it's not possible to bind this to own register.
      * @throws NotBoundException If GNS stub is not found in GNS register.
      */
-    public GroupModuleImpl(Client client, String gnsHost, int gnsPort, String groupName)
+    public GroupModuleImpl(Client client, String gnsHost, int gnsPort,
+                           String groupName, int clientPort)
         throws RemoteException, AlreadyBoundException, NotBoundException {
         this.client = client;
         this.receiveQueue = new LinkedBlockingQueue<Message>();
 
         this.orderingModule = new OrderingModuleImpl(this);
-        this.communicationModule = new CommunicationsModuleImpl(this);
+        this.communicationModule = new CommunicationsModuleImpl(this, clientPort);
         this.communicationModule.setOrderingModule(this.orderingModule);
         this.orderingModule.setCommunicationsModule(this.communicationModule);
 
@@ -103,7 +109,6 @@ public class GroupModuleImpl implements GroupModule {
             MessageImpl joinMessage =
                 new MessageImpl(this.groupMember,
                                 MessageType.JOIN, PID, groupView.getID());
-
             gs.getLeader().getReceiver().receive(joinMessage);
         }
 

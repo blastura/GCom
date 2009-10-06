@@ -66,10 +66,13 @@ public class DebugController implements DebugHandler {
     
     public void block() {
         // TODO: implement
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        boolean blocking = true;
+        while (blocking) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
     

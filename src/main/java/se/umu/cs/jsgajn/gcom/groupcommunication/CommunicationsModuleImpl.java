@@ -30,13 +30,27 @@ public class CommunicationsModuleImpl implements CommunicationModule {
     private Thread messageReceiverThread;
     private Registry registry;
     private boolean running;
-        
+
+    /**
+     * Creates a new <code>CommunicationsModuleImpl</code> instance with a
+     * register on port defined by {@link java.rmi.Register#REGISTRY_PORT}.
+     *
+     * @param groupModule TODO: only to get GroupViews
+     * @exception RemoteException if an error occurs
+     * @exception AlreadyBoundException if an error occurs
+     * @exception NotBoundException if an error occurs
+     */
     public CommunicationsModuleImpl(GroupModule groupModule)
+        throws RemoteException, AlreadyBoundException, NotBoundException {
+        this(groupModule, Registry.REGISTRY_PORT);
+    }    
+        
+    public CommunicationsModuleImpl(GroupModule groupModule, final int port)
         throws RemoteException, AlreadyBoundException, NotBoundException {
         this.groupModule = groupModule;
 
         // TODO: make port optional
-        this.registry = LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
+        this.registry = LocateRegistry.createRegistry(port);
         this.receiveQueue = new LinkedBlockingQueue<Message>();
 
         this.receiver = new ReceiverImpl(this.receiveQueue, GroupModule.PID);
@@ -47,6 +61,7 @@ public class CommunicationsModuleImpl implements CommunicationModule {
         // Create thread to handle messages
         this.messageReceiverThread = new Thread(new MessageReceiver(),
                                                 "CommunicationsModule thread");
+        logger.debug("CommunicationsModuleImpl receiveing messages at port: " + port);
     }
 
     public void start() {

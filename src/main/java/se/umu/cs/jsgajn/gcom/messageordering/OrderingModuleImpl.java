@@ -13,7 +13,7 @@ import se.umu.cs.jsgajn.gcom.debug.Debugger;
  *
  * @author dit06ajn, dit06jsg
  */
-public class OrderingModuleImpl implements OrderingModule {    
+public class OrderingModuleImpl implements OrderingModule {
     private static final Logger logger = LoggerFactory.getLogger(OrderingModuleImpl.class);
     private Ordering ordering;
     private Module communicationsModule;
@@ -23,8 +23,9 @@ public class OrderingModuleImpl implements OrderingModule {
     
     public OrderingModuleImpl(Module groupManagementModule) {
         this.groupManagementModule = groupManagementModule;
-        this.deliverHandlerThread = new Thread(new DeliverHandler(),
-                "OrderingModule thread");
+        this.deliverHandlerThread =
+            new Thread(new DeliverHandler(),
+                       "OrderingModule thread");
     }
     
     public void start() {

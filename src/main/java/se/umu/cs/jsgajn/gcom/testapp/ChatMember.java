@@ -15,16 +15,25 @@ import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModuleImpl;
 public class ChatMember implements Client {
     private static final Logger logger = LoggerFactory.getLogger(ChatMember.class);
     private GroupModule groupMember;
-    
+
     public ChatMember(String gnsHost, int gnsPort, String groupName)
         throws RemoteException, AlreadyBoundException, NotBoundException {
-        this.groupMember = new GroupModuleImpl(this, gnsHost, gnsPort, groupName);
+        this(gnsHost, gnsPort, groupName, -1); // TODO: FIx init clientPort
+    }
+
+    public ChatMember(String gnsHost, int gnsPort, String groupName, int clientPort)
+        throws RemoteException, AlreadyBoundException, NotBoundException {
+        if (clientPort < 1) {
+            this.groupMember = new GroupModuleImpl(this, gnsHost, gnsPort, groupName);
+        } else {
+            this.groupMember = new GroupModuleImpl(this, gnsHost, gnsPort, groupName, clientPort);
+        }
 
         new Thread (new Runnable() {
                 public void run() {
                     while (true) {
                         System.out.print(GroupModule.PID + " - message: ");
-                        Scanner sc = new Scanner(System.in);  
+                        Scanner sc = new Scanner(System.in);
                         String msg;
                         msg = sc.nextLine();
                         groupMember.send(msg);
@@ -32,18 +41,19 @@ public class ChatMember implements Client {
     }
 
     public void deliver(Object m) {
-        System.out.println((String)m);
+        System.out.println((String) m);
     }
-    
+
     private static void usage() {
         System.out.println("Usage: java ChatMember [host] [port] [groupname]");
         System.out.println("Usage: java ChatMember [host] [groupname] // port 1099 will be used");
-
     }
 
     public static void main(String[] args) {
         try {
-            if (args.length == 3) {
+            if (args.length == 4) {
+                new ChatMember(args[0], Integer.parseInt(args[1]), args[2], Integer.parseInt(args[3]));
+            } else if (args.length == 3) {
                 new ChatMember(args[0], Integer.parseInt(args[1]), args[2]);
             } else if (args.length == 2) {
                 new ChatMember(args[0], 1099, args[1]);

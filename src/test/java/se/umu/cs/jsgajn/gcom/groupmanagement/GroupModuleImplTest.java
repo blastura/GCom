@@ -42,10 +42,30 @@ public class GroupModuleImplTest {
         try {
             Client c = new ClientTest();
             new GNSImpl(); // Should use system prop 6554 as port
-             GroupModule m = new GroupModuleImpl(c, "localhost", 6554, "testgroup");
-             m.stop();
+            GroupModule m = new GroupModuleImpl(c, "localhost", 6554, "testgroup");
+            m.stop();
         } catch (Exception e) {
             System.err.println(e.getMessage());
+            fail();
+        }
+    }
+
+    @Test
+    public void multipleClients() {
+        try {
+            int gnsPort = 6522;
+            new GNSImpl(gnsPort);
+            Client c1 = new ClientTest();
+            Client c2 = new ClientTest();
+            Client c3 = new ClientTest();
+            GroupModule m1 = new GroupModuleImpl(c1, "localhost", gnsPort, "testgroup", 1099);
+            GroupModule m2 = new GroupModuleImpl(c2, "localhost", gnsPort, "testgroup", 1100);
+            GroupModule m3 = new GroupModuleImpl(c3, "localhost", gnsPort, "testgroup", 1101);
+            m1.stop();
+            m2.stop();
+            m3.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
             fail();
         }
     }
