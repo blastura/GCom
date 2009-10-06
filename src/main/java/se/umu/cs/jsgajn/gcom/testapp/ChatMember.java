@@ -42,6 +42,7 @@ public class ChatMember implements Client, Debuggable {
     }
 
     public void addDebugger(Debugger d) {
+    	logger.debug(d.toString());
         this.groupMember.addDebugger(d);
     }
 

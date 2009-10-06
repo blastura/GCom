@@ -85,6 +85,7 @@ public class DebugController implements Debugger{
 		
 	}
 	public void messageReceived(Message m) {
+		System.out.println("kuuk");
 		currentContact.addDelivered(new Object[]{m.getUID(), m.getMessage(), m.getOriginUID()});
 		
 	}
