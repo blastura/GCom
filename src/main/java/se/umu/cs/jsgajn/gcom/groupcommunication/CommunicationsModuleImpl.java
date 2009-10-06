@@ -19,6 +19,8 @@ import java.rmi.NoSuchObjectException;
 
 public class CommunicationsModuleImpl implements CommunicationModule {
     private static final Logger logger = LoggerFactory.getLogger(CommunicationsModuleImpl.class);
+    private static final Debugger debugger = Debugger.getDebugger();
+    
     private LinkedBlockingQueue<Message> receiveQueue;
     private Receiver receiver;
     private Receiver receiverStub;
@@ -28,8 +30,6 @@ public class CommunicationsModuleImpl implements CommunicationModule {
     private Thread messageReceiverThread;
     private Registry registry;
     private boolean running;
-    
-    private Debugger debugger;
         
     public CommunicationsModuleImpl(GroupModule groupModule)
         throws RemoteException, AlreadyBoundException, NotBoundException {
@@ -90,10 +90,7 @@ public class CommunicationsModuleImpl implements CommunicationModule {
                 while (running) {
                     Message m = receiveQueue.take();
                     // TODO: clone copy message?
-                    if (debugger != null) {
-                        logger.debug("Send message to debugger");
-                        debugger.messageReceived(m);
-                    }
+                    debugger.messageReceived(m);
                     if (mMethod.deliverCheck(m, groupModule.getGroupView())) {
                         orderingModule.deliver(m);
                     }
@@ -111,10 +108,5 @@ public class CommunicationsModuleImpl implements CommunicationModule {
     public void deliver(Message m) {
         // Communicates directly  with receiver through queue
         throw new UnsupportedOperationException();
-    }
-
-    public void addDebugger(Debugger d) {
-        logger.debug("Added debugger: " + d);
-        this.debugger = d;
     }
 }

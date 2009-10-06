@@ -10,9 +10,12 @@ import org.slf4j.LoggerFactory;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
+import se.umu.cs.jsgajn.gcom.debug.Debugger;
 
 public class BasicMulticast implements Multicast {
     private static final Logger logger = LoggerFactory.getLogger(BasicMulticast.class);
+    private static final Debugger debugger = Debugger.getDebugger();
+    
     private Set<GroupMember> crashed = new HashSet<GroupMember>();
 
     /**
@@ -23,10 +26,15 @@ public class BasicMulticast implements Multicast {
     public void multicast(Message m, GroupView g) {
         // Add this PID to the current path the message has traveled
         m.addToPath(GroupModule.PID);
+        int i = 0;
+        int size = g.size();
         for (GroupMember member : g) {
             if(!crashed.contains(member)){
                 try {
                     member.getReceiver().receive(m);
+                    // TODO: fix fix fix test
+                    debugger.messageReceived(m);
+                    //debugger.possibleCrash(i, size);
                 } catch (RemoteException e) {
                     crashed.add(member);
                     
@@ -36,6 +44,7 @@ public class BasicMulticast implements Multicast {
                     logger.debug("Oh, no! This bitch crashed: " + member.getPID());
                 }
             }
+            i++;
         }
     }
 

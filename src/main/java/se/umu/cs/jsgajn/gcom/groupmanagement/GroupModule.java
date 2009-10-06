@@ -3,9 +3,8 @@ package se.umu.cs.jsgajn.gcom.groupmanagement;
 import java.rmi.server.UID;
 
 import se.umu.cs.jsgajn.gcom.Module;
-import se.umu.cs.jsgajn.gcom.debug.Debuggable;
 
-public interface GroupModule extends Module, Debuggable {
+public interface GroupModule extends Module {
     /** The stubname to bind in registry */
     public static final String STUB_NAME = "ballen";
 

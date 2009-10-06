@@ -3,6 +3,7 @@ package se.umu.cs.jsgajn.gcom.debug;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import se.umu.cs.jsgajn.gcom.debug.Debugger;
 
 import javax.swing.*;
 
@@ -14,6 +15,7 @@ public class DebugMain {
 
     public DebugMain(final String[] args) {
         final DebugController controller = new DebugController();
+        Debugger.setDebugHandler(controller);
 
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -26,31 +28,21 @@ public class DebugMain {
                 }
             });
 
-        new Thread (new Runnable() {
-                public void run() {
-                    try {
-                        DebugMain.this.chatmember = new ChatMember(args[0],
-                                                                   Integer.parseInt(args[1]),
-                                                                   args[2]);
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    } catch (AlreadyBoundException e) {
-                        e.printStackTrace();
-                    } catch (NotBoundException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-        System.out.println("heeeeej");
         try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
+            DebugMain.this.chatmember = new ChatMember(args[0],
+                                                       Integer.parseInt(args[1]),
+                                                       args[2]);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (AlreadyBoundException e) {
+            e.printStackTrace();
+        } catch (NotBoundException e) {
             e.printStackTrace();
         }
+        System.out.println("Started client");
         System.out.println("cm: " + chatmember + ", controller: " + controller);
-        chatmember.addDebugger(controller);
     }
 
     public static void main(final String[] args) {

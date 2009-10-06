@@ -13,7 +13,7 @@ import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
 
 import com.sun.corba.se.impl.orbutil.concurrent.DebugMutex;
 
-public class DebugController implements Debugger{
+public class DebugController implements DebugHandler {
 
     private DebugModel debugModel;
     private JList clientList;

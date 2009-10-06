@@ -56,6 +56,8 @@ public class MessageImpl implements Message {
 
     @Override
     public boolean equals(Object o) {
+        if (o == this.m)
+            return true;
         if (!(o instanceof Message))
             return false;
         Message oMsg = (Message) o;

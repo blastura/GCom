@@ -1,9 +1,9 @@
 import org.junit.*;
 
-import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
 import java.rmi.server.UID;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
+import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
 
 import static org.junit.Assert.*;
 

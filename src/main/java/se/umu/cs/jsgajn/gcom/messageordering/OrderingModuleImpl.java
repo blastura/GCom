@@ -20,8 +20,6 @@ public class OrderingModuleImpl implements OrderingModule {
     private Module groupManagementModule;
     private Thread deliverHandlerThread;
     private boolean running;
-
-    private Debugger debugger;
     
     public OrderingModuleImpl(Module groupManagementModule) {
         this.groupManagementModule = groupManagementModule;
@@ -68,9 +66,5 @@ public class OrderingModuleImpl implements OrderingModule {
                 groupManagementModule.deliver(ordering.take());
             }
         }
-    }
-    
-    public void addDebugger(Debugger d) {
-        this.debugger = d;
     }
 }
