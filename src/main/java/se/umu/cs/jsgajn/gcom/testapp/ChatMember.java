@@ -11,8 +11,10 @@ import org.slf4j.LoggerFactory;
 import se.umu.cs.jsgajn.gcom.Client;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModuleImpl;
+import se.umu.cs.jsgajn.gcom.debug.Debugger;
+import se.umu.cs.jsgajn.gcom.debug.Debuggable;
 
-public class ChatMember implements Client {
+public class ChatMember implements Client, Debuggable {
     private static final Logger logger = LoggerFactory.getLogger(ChatMember.class);
     private GroupModule groupMember;
     
@@ -37,6 +39,10 @@ public class ChatMember implements Client {
         System.out.println("Usage: java ChatMember [host] [port] [groupname]");
         System.out.println("Usage: java ChatMember [host] [groupname] // port 1099 will be used");
 
+    }
+
+    public void addDebugger(Debugger d) {
+        this.groupMember.addDebugger(d);
     }
 
     public static void main(String[] args) {

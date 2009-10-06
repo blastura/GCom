@@ -21,7 +21,6 @@ import se.umu.cs.jsgajn.gcom.messageordering.OrderingModuleImpl;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingType;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingModule;
 import se.umu.cs.jsgajn.gcom.messageordering.Orderings;
-import se.umu.cs.jsgajn.gcom.debug.Debuggable;
 import se.umu.cs.jsgajn.gcom.debug.Debugger;
 
 
@@ -35,7 +34,7 @@ import org.slf4j.LoggerFactory;
 /**
  * author dit06ajn, dit06jsg
  */
-public class GroupModuleImpl implements GroupModule, Debuggable {
+public class GroupModuleImpl implements GroupModule {
     private static final Logger logger = LoggerFactory.getLogger(GroupModuleImpl.class);
 
     private Client client;
