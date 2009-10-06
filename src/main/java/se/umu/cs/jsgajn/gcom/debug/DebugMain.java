@@ -5,9 +5,9 @@ import javax.swing.*;
 public class DebugMain {
 
     public static void main(String[] args) {
-    	DebugModel model = new DebugModel();
-    	DebugController controller = new DebugController(model);
-        JFrame frame = DebugView.create(controller, model);
+    	DebugController controller = new DebugController();
+        JFrame frame = DebugView.create(controller, 
+        		controller.getDebugModel(), controller.getCurrentContact());
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);

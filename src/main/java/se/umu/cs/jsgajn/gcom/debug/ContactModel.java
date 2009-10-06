@@ -1,8 +1,12 @@
 package se.umu.cs.jsgajn.gcom.debug;
 
+import java.beans.PropertyChangeSupport;
 import java.rmi.server.UID;
 import java.util.ArrayList;
 import java.util.HashSet;
+
+import javax.swing.DefaultListModel;
+import javax.swing.table.DefaultTableModel;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
@@ -11,14 +15,114 @@ import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
 public class ContactModel {
 	
 	private UID pid;
-	private ArrayList<Message> received;
-	private ArrayList<Message> delivered;
-	private VectorClock vectorclock;
-	private HashSet<Receiver> crashed;
+	private DefaultTableModel receivedTable;
+	private DefaultTableModel deliveredTable;
+	private DefaultTableModel crashedTable;
+	private String clientInfo;
+	private String messageInfo;
+
+	private DefaultTableModel vectorclock;
+	
+	private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 	
 	public ContactModel() {
-		
 	}
 	
+	public void init() {
+		clearContent();
+		setupTables();
+		clientInfo = "Klientinformation";
+		messageInfo = "Meddelandeinfo";
+	}
+	
+	public void clearContent() {
+		receivedTable.setNumRows(0);
+		receivedTable.setColumnCount(0);
+		deliveredTable.setNumRows(0);
+		deliveredTable.setColumnCount(0);
+		crashedTable.setNumRows(0);
+		crashedTable.setColumnCount(0);
+		vectorclock.setNumRows(0);
+		vectorclock.setColumnCount(0);
+	}
+	
+	public void setupTables() {
+		receivedTable.addColumn("UID");
+		receivedTable.addColumn("Message");
+		receivedTable.addColumn("Origin");	
 
+		deliveredTable.addColumn("UID");
+		deliveredTable.addColumn("Message");
+		deliveredTable.addColumn("Origin");
+
+		crashedTable.addColumn("UID");
+		
+		vectorclock.addColumn("UID");
+		vectorclock.addColumn("Ticks");
+	}
+	
+	public void addReceived(Object[] obj) {
+		receivedTable.insertRow(0, obj);
+	}
+	public void addDelivered(Object[] obj) {
+		deliveredTable.insertRow(0, obj);
+	}
+	public void addCrashed(Object[] obj) {
+		crashedTable.insertRow(0,obj);
+	}
+	public void addToClock(String[] rowData) {
+		vectorclock.insertRow(0, rowData);
+	}
+
+
+	public DefaultTableModel getVectorclock() {
+		return vectorclock;
+	}
+
+	public void setVectorclock(DefaultTableModel vectorclock) {
+		DefaultTableModel oldvectorclock = this.vectorclock; 
+		this.vectorclock = vectorclock;
+		propertyChangeSupport.firePropertyChange("vectorclock", oldvectorclock, vectorclock);
+	}
+
+	public String getClientInfo() {
+		return clientInfo;
+	}
+
+	public void setClientInfo(String clientInfo) {
+		this.clientInfo = clientInfo;
+	}
+
+	public String getMessageInfo() {
+		return messageInfo;
+	}
+
+	public void setMessageInfo(String messageInfo) {
+		this.messageInfo = messageInfo;
+	}
+
+	public DefaultTableModel getReceivedTable() {
+		return receivedTable;
+	}
+
+	public void setReceivedTable(DefaultTableModel receivedTable) {
+		this.receivedTable = receivedTable;
+	}
+
+	public DefaultTableModel getDeliveredTable() {
+		return deliveredTable;
+	}
+
+	public void setDeliveredTable(DefaultTableModel deliveredTable) {
+		this.deliveredTable = deliveredTable;
+	}
+
+	public DefaultTableModel getCrashedTable() {
+		return crashedTable;
+	}
+
+	public void setCrashedTable(DefaultTableModel crashedTable) {
+		this.crashedTable = crashedTable;
+	}
+	
 }

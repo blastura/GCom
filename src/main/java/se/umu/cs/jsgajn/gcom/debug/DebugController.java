@@ -6,26 +6,44 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
+import javax.swing.table.DefaultTableModel;
 
-public class DebugController {
+import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
+import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
 
-    private DebugModel model;
+import com.sun.corba.se.impl.orbutil.concurrent.DebugMutex;
+
+public class DebugController implements Debugger{
+
+    private DebugModel debugModel;
     private JList clientList;
+    
+    private ContactModel currentContact = new ContactModel();
     
 
 
 	public DebugController() {
     }
     public DebugController(DebugModel model) {
-        this.model = model;
+        this.debugModel = model;
+        currentContact = new ContactModel();
     }
     
     public void init() {
-    	JOptionPane.showMessageDialog(null, clientList);
-    	DefaultListModel defaultListModel = new DefaultListModel();
-    	defaultListModel.addElement("Hej");
-    	clientList.setModel(defaultListModel);
-    	JOptionPane.showMessageDialog(null, clientList);
+    	clientList.setModel(new DefaultListModel());
+    }
+    
+    
+    public DebugModel getDebugModel() {
+    	return debugModel;
+    }
+    public void setDebugModel(DebugModel debugModel) {
+    	this.debugModel = debugModel;
+    }
+    
+    
+    public ContactModel getCurrentContact() {
+    	return currentContact;
     }
     
 	public JList getClientList() {
@@ -33,10 +51,41 @@ public class DebugController {
 	}
 	public void setClientList(JList clientList) {
 		this.clientList = clientList;
+	} 
+	
+	public void receiveMessage() {
+		currentContact.addReceived(new String[]{"hej", "heja1"});
+	}
+	public void deliverMessage() {
+		currentContact.addDelivered(new String[]{"hej", "heja2"});
+	}
+	public void crashMessage() {
+		currentContact.addCrashed(new String[]{"hej", "heja3"});
 	}
 	
-	public void updateClientList() {
+	public void updateVectorClock() {
+		/*
+		DefaultTableModel vectorclock = new DefaultTableModel();
+		for(int i = 0; i < 10; i++) {
+			String[] columns = new String[2];
+			columns[0] = Integer.toString(i);
+			columns[1] = Integer.toString(2);
+			vectorclock.addRow(columns);
+		}
+		currentContact.updateVectorclock(vectorclock);
+		*/
+		String[] columns = new String[2];
+		columns[0] = Integer.toString(1);
+		columns[1] = Integer.toString(2);
+		currentContact.addToClock(columns);
 		
+	}
+	public void messageDelivered(Message m) {
+		currentContact.addReceived(new Object[]{m.getUID(), m.getMessage(), m.getOriginUID()});
+		
+	}
+	public void messageReceived(Message m) {
+		currentContact.addDelivered(new Object[]{m.getUID(), m.getMessage(), m.getOriginUID()});
 		
 	}
     
