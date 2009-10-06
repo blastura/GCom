@@ -40,7 +40,6 @@ public class DebugView {
         list0.setModel(defaultListModel0);
         debugController.setClientList(list0);
         debugController.init();
-        currentContact.setClientInfo("<html>\n  <head>\n    \n  </head>\n  <body>\n    Client Info\n  </body>\n</html>\n");
 
         DefaultTableModel defaultTableModel0 = new DefaultTableModel();
         defaultTableModel0.setColumnCount(3);
@@ -153,10 +152,7 @@ public class DebugView {
         panel5.setLayout(gridBagLayout5);
 
         JTable table1 = new JTable();
-
-        DefaultTableModel defaultTableModel5 = (DefaultTableModel) table1.getModel();
-        defaultTableModel5.setColumnCount(2);
-        defaultTableModel5.setRowCount(15);
+        table1.setModel(defaultTableModel3);
         table1.getTableHeader().setSize(new Dimension(150, 16));
 
         JScrollPane scrollPane2 = new JScrollPane(table1);
@@ -176,10 +172,7 @@ public class DebugView {
         panel6.setLayout(gridBagLayout6);
 
         JTable table2 = new JTable();
-
-        DefaultTableModel defaultTableModel6 = (DefaultTableModel) table2.getModel();
-        defaultTableModel6.setColumnCount(3);
-        defaultTableModel6.setRowCount(5);
+        table2.setModel(defaultTableModel0);
         table2.getTableHeader().setSize(new Dimension(225, 16));
 
         JScrollPane scrollPane3 = new JScrollPane(table2);
@@ -199,10 +192,7 @@ public class DebugView {
         panel7.setLayout(gridBagLayout7);
 
         JTable table3 = new JTable();
-
-        DefaultTableModel defaultTableModel7 = (DefaultTableModel) table3.getModel();
-        defaultTableModel7.setColumnCount(3);
-        defaultTableModel7.setRowCount(5);
+        table3.setModel(defaultTableModel1);
         table3.getTableHeader().setSize(new Dimension(595, 16));
 
         JScrollPane scrollPane4 = new JScrollPane(table3);
@@ -222,10 +212,7 @@ public class DebugView {
         panel8.setLayout(gridBagLayout8);
 
         JTable table4 = new JTable();
-
-        DefaultTableModel defaultTableModel8 = (DefaultTableModel) table4.getModel();
-        defaultTableModel8.setColumnCount(3);
-        defaultTableModel8.setRowCount(5);
+        table4.setModel(defaultTableModel2);
         table4.getTableHeader().setSize(new Dimension(595, 16));
 
         JScrollPane scrollPane5 = new JScrollPane(table4);
