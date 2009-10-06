@@ -80,14 +80,11 @@ public class DebugController implements Debugger{
 		currentContact.addToClock(columns);
 		
 	}
-	public void messageDelivered(Message m) {
-		currentContact.addReceived(new Object[]{m.getUID(), m.getMessage(), m.getOriginUID()});
-		
-	}
 	public void messageReceived(Message m) {
-		System.out.println("kuuk");
+		currentContact.addReceived(new Object[]{m.getUID(), m.getMessage(), m.getOriginUID()});
+	}
+	public void messageDelivered(Message m) {
 		currentContact.addDelivered(new Object[]{m.getUID(), m.getMessage(), m.getOriginUID()});
-		
 	}
     
 }

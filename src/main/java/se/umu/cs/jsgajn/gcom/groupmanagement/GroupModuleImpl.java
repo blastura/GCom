@@ -21,6 +21,7 @@ import se.umu.cs.jsgajn.gcom.messageordering.OrderingModuleImpl;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingType;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingModule;
 import se.umu.cs.jsgajn.gcom.messageordering.Orderings;
+import se.umu.cs.jsgajn.gcom.debug.DebugMain;
 import se.umu.cs.jsgajn.gcom.debug.Debugger;
 
 import java.rmi.registry.Registry;
@@ -109,6 +110,7 @@ public class GroupModuleImpl implements GroupModule {
         }
 
         this.messageReceiverThread = new Thread(new MessageReceiver(), "GroupModule Thread");
+       
         start();
     }
 
