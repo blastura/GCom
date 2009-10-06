@@ -27,13 +27,13 @@ public class BasicMulticast implements Multicast {
         // Add this PID to the current path the message has traveled
         m.addToPath(GroupModule.PID);
         int i = 0;
-        int size = g.size();
         for (GroupMember member : g) {
             if(!crashed.contains(member)){
                 try {
+                    if (i == 1) {
+                        debugger.block();
+                    }
                     member.getReceiver().receive(m);
-                    // TODO: fix fix fix test
-                    debugger.messageReceived(m);
                     //debugger.possibleCrash(i, size);
                 } catch (RemoteException e) {
                     crashed.add(member);

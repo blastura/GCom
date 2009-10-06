@@ -59,7 +59,21 @@ public class DebugController implements DebugHandler {
 	public void deliverMessage() {
 		currentContact.addDelivered(new String[]{"hej", "heja2"});
 	}
-	public void crashMessage() {
+    
+    public void crash() {
+        // TODO: implement
+    }
+    
+    public void block() {
+        // TODO: implement
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void crashMessage() {
 		currentContact.addCrashed(new String[]{"hej", "heja3"});
 	}
 	
