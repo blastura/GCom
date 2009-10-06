@@ -91,6 +91,7 @@ public class CommunicationsModuleImpl implements CommunicationModule {
                     Message m = receiveQueue.take();
                     // TODO: clone copy message?
                     if (debugger != null) {
+                        logger.debug("Send message to debugger");
                         debugger.messageReceived(m);
                     }
                     if (mMethod.deliverCheck(m, groupModule.getGroupView())) {
