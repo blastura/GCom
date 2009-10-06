@@ -3,11 +3,11 @@ package se.umu.cs.jsgajn.gcom.messageordering;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class VectorClock<T extends Serializable> implements Comparable<VectorClock<T>> {
     private Map<T, Integer> map = new HashMap<T, Integer>();
     private T id;
-    private enum diff {STRICTLY_LESS, STRICTLY_LESS_OR_EQUAL, EQUAL, LARGER}
     
     public VectorClock(T id) {
         this.id = id;
@@ -34,6 +34,10 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
 
     public int get(T id) {
         return map.get(id);
+    }
+
+    public Set<T> keySet() {
+        return map.keySet();
     }
 
     /**
