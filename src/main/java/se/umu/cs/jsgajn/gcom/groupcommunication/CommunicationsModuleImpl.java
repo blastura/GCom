@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import se.umu.cs.jsgajn.gcom.Module;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
+import se.umu.cs.jsgajn.gcom.debug.Debugger;
 import java.rmi.NoSuchObjectException;
 
 public class CommunicationsModuleImpl implements CommunicationModule {
@@ -28,6 +29,8 @@ public class CommunicationsModuleImpl implements CommunicationModule {
     private Registry registry;
     private boolean running;
     
+    private Debugger debugger;
+        
     public CommunicationsModuleImpl(GroupModule groupModule)
         throws RemoteException, AlreadyBoundException, NotBoundException {
         this.groupModule = groupModule;
@@ -86,6 +89,8 @@ public class CommunicationsModuleImpl implements CommunicationModule {
             try {
                 while (running) {
                     Message m = receiveQueue.take();
+                    // TODO: clone copy message?
+                    debugger.messageReceived(m);
                     if (mMethod.deliverCheck(m, groupModule.getGroupView())) {
                         orderingModule.deliver(m);
                     }
@@ -103,5 +108,9 @@ public class CommunicationsModuleImpl implements CommunicationModule {
     public void deliver(Message m) {
         // Communicates directly  with receiver through queue
         throw new UnsupportedOperationException();
+    }
+
+    public void addDebugger(Debugger d) {
+        this.debugger = d;
     }
 }

@@ -21,23 +21,26 @@ import se.umu.cs.jsgajn.gcom.messageordering.OrderingModuleImpl;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingType;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingModule;
 import se.umu.cs.jsgajn.gcom.messageordering.Orderings;
+import se.umu.cs.jsgajn.gcom.debug.Debuggable;
+import se.umu.cs.jsgajn.gcom.debug.Debugger;
+
+
 
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 
-//import org.apache.log4j.Logger//
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author dit06ajn
- *
+ * author dit06ajn, dit06jsg
  */
-public class GroupModuleImpl implements GroupModule {
+public class GroupModuleImpl implements GroupModule, Debuggable {
     private static final Logger logger = LoggerFactory.getLogger(GroupModuleImpl.class);
 
     private Client client;
-
+    private Debugger debugger;
+    
     private String groupName;
     private GNS gns;
     private GroupView groupView;
@@ -269,4 +272,9 @@ public class GroupModuleImpl implements GroupModule {
         Registry gnsReg = LocateRegistry.getRegistry(host, port);
         return (GNS) gnsReg.lookup(GNS.STUB_NAME);
     }
+
+    public void addDebugger(Debugger d) {
+        this.debugger = d;
+        this.communicationModule.addDebugger(d);
+    }    
 }

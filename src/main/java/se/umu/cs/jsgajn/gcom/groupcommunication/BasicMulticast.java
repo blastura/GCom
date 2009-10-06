@@ -21,7 +21,8 @@ public class BasicMulticast implements Multicast {
      * @param m The message to send.
      */
     public void multicast(Message m, GroupView g) {
-
+        // Add this PID to the current path the message has traveled
+        m.addToPath(GroupModule.PID);
         for (GroupMember member : g) {
             if(!crashed.contains(member)){
                 try {

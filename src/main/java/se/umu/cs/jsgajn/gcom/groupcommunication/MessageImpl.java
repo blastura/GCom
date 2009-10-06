@@ -20,7 +20,10 @@ public class MessageImpl implements Message {
         this.groupViewUID = groupViewUID;
         this.ID = new UID();
         this.path = new ArrayList<UID>();
-        path.add(originID);
+        
+        //path.add(originID);  
+        // This is done first time message is sent
+        // TODO: test
     }
 
     public Object getMessage() {
@@ -47,7 +50,8 @@ public class MessageImpl implements Message {
     }
 
     public List<UID> getPath() {
-        return this.path;
+        // Shallow copy
+        return new ArrayList<UID>(this.path);
     }
 
     @Override

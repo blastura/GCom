@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import se.umu.cs.jsgajn.gcom.Module;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
-import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModuleImpl;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 
 /**
