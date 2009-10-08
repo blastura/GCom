@@ -24,6 +24,7 @@ public class ContactModel {
     private DefaultTableModel deliveredTable;
     private DefaultTableModel crashedTable;
     private DefaultTableModel clientInfo;
+    private DefaultTableModel groupMembers;
     private String messageInfo;
 
     private JPanel clientInfoPanel;
@@ -57,6 +58,9 @@ public class ContactModel {
         vectorclock.setNumRows(0);
         vectorclock.setColumnCount(0);
 
+        groupMembers.setNumRows(0);
+        groupMembers.setColumnCount(0);
+        
         TitledBorder title;
         title = BorderFactory.createTitledBorder("Client Name");
         clientInfoPanel.setBorder(title);
@@ -80,6 +84,8 @@ public class ContactModel {
 
         vectorclock.addColumn("UID");
         vectorclock.addColumn("Ticks");
+        
+        groupMembers.addColumn("Name");
     }
 
     public void addReceived(Object[] obj) {
@@ -162,4 +168,11 @@ public class ContactModel {
         this.tabs = tabs;
     }
 
+	public DefaultTableModel getGroupMembers() {
+		return groupMembers;
+	}
+
+	public void setGroupMembers(DefaultTableModel groupMembers) {
+		this.groupMembers = groupMembers;
+	}
 }

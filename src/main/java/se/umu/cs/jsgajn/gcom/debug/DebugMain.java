@@ -3,11 +3,14 @@ package se.umu.cs.jsgajn.gcom.debug;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import se.umu.cs.jsgajn.gcom.debug.Debugger;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import se.umu.cs.jsgajn.gcom.testapp.ChatMember;
+
+
+
 
 public class DebugMain {
 
@@ -20,9 +23,7 @@ public class DebugMain {
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     JFrame frame = DebugView.create(controller,
-                                                    controller.getDebugModel(),
                                                     controller.getCurrentContact());
-                    frame.pack();
                     frame.setLocationRelativeTo(null);
                     frame.setVisible(true);
                 }

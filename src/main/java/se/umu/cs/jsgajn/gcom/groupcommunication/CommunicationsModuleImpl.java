@@ -8,6 +8,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
@@ -108,13 +109,17 @@ public class CommunicationsModuleImpl implements CommunicationModule {
                     Message m = receiveQueue.take();
                     // TODO: clone copy message?
 
-                    if(debugger.hold()) {
+                    if(debugger.doHold()) {
                         debugger.holdMessage(m);
+                        logger.debug("hold message");
                     } else {
+                    	logger.debug("do not message");
                         if(debugger.hasHoldMessages()) {
-                            List<Message> messages = debugger.getHoldMessages();
-                            for(Message m2 : messages) {
-                                sendToOrderingModule(m2);                               
+                        	logger.debug("börja skicka holdade");
+                            Queue<Message> messages = debugger.getHoldMessages();
+                            logger.debug(messages.toString());
+                            while(!messages.isEmpty()) {
+                                sendToOrderingModule(messages.poll());                               
                             }
                         }
                         sendToOrderingModule(m);

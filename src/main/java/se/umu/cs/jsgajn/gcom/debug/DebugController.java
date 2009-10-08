@@ -7,10 +7,13 @@ import javax.swing.JList;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
+
+import java.util.Queue;
 import java.util.Stack;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.rmi.server.UID;
 
 
@@ -18,17 +21,18 @@ public class DebugController implements DebugHandler {
 
     private DebugModel debugModel;
     private JList clientList;
-    private ContactModel currentContact = new ContactModel();
-
+    private ContactModel currentContact;// = new ContactModel();
+    
+    private boolean doHold = false;
+    private Queue<Message> holdQueue = new LinkedBlockingQueue<Message>();
+    
     // For tmp usernames / Anton
     private Map<UID, String> userNames = new HashMap<UID, String>();
     private Stack<String> tmpUID;
 
 
-    public DebugController() {
-    }
-    public DebugController(DebugModel model) {
-        this.debugModel = model;
+    public DebugController(/*DebugModel model*/) {
+        /*this.debugModel = model;*/
         currentContact = new ContactModel();
     }
 
@@ -111,18 +115,25 @@ public class DebugController implements DebugHandler {
 
     }
 
-    public boolean hold() {
-        return false;
+    public void hold()	{
+    	if(doHold) {
+    		doHold = false;
+    	} else {
+    		doHold = true;
+    	}
+    }
+    
+    public boolean doHold() {
+        return doHold;
     }
     public void holdMessage(Message m)  {
-        // Add to some queue
+    	holdQueue.add(m);
     }
     public boolean hasHoldMessages() {
-        return false;
+        return !holdQueue.isEmpty();
     }
-    public ArrayList<Message> getHoldMessages() {
-        // TODO Auto-generated method stub
-        return null;
+    public Queue<Message> getHoldMessages() {
+        return holdQueue;
     }
 
         // Not tested but should work / Anton

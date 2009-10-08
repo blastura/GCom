@@ -1,6 +1,7 @@
 package se.umu.cs.jsgajn.gcom.debug;
 
 import java.util.ArrayList;
+import java.util.Queue;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
@@ -60,24 +61,26 @@ public class Debugger implements DebugHandler {
         return INSTANCE;
     }
 
-    public boolean hold() {
+    
+    public boolean doHold() {
         if (debugger == null) {
             return false;
         }
-        return debugger.hold();
+        return debugger.doHold();
     }
 
     public void holdMessage(Message m) {
-        
-        
+        debugger.holdMessage(m); 
     }
 
     public boolean hasHoldMessages() {
-        return false;
+        return debugger.hasHoldMessages();
     }
 
-    public ArrayList<Message> getHoldMessages() {
-        // TODO Auto-generated method stub
-        return null;
+    public Queue<Message> getHoldMessages() {
+        if (debugger == null) {
+            return null;
+        }
+        return debugger.getHoldMessages();
     }
 }

@@ -30,7 +30,7 @@ import javax.swing.JTabbedPane;
 public class DebugView {
 
     public static JFrame create(DebugController debugController,
-    		DebugModel model, ContactModel currentContact) {
+    		ContactModel currentContact) {
         JList list0 = new JList();
 
         DefaultListModel defaultListModel0 = new DefaultListModel();
@@ -74,35 +74,36 @@ public class DebugView {
         defaultTableModel2.setRowCount(5);
         currentContact.setDeliveredTable(defaultTableModel2);
 
+        DefaultTableModel defaultTableModel3 = new DefaultTableModel();
+        defaultTableModel3.setColumnCount(3);
+        defaultTableModel3.setRowCount(5);
+        currentContact.setGroupMembers(defaultTableModel3);
+
         JPanel panel1 = new JPanel();
 
         GridBagLayout gridBagLayout1 = new GridBagLayout();
         gridBagLayout1.columnWidths = new int[]{20};
-        gridBagLayout1.rowHeights = new int[]{20};
+        gridBagLayout1.rowHeights = new int[]{3, 20};
         gridBagLayout1.columnWeights = new double[]{1};
-        gridBagLayout1.rowWeights = new double[]{1};
+        gridBagLayout1.rowWeights = new double[]{0, 1};
         panel1.setLayout(gridBagLayout1);
 
-        JList list1 = new JList();
+        JTable table1 = new JTable();
+        table1.setModel(defaultTableModel3);
+        table1.getTableHeader().setSize(new Dimension(225, 16));
 
-        DefaultListModel defaultListModel1 = new DefaultListModel();
-        defaultListModel1.addElement("apples");
-        defaultListModel1.addElement("oranges");
-        defaultListModel1.addElement("pears");
-        list1.setModel(defaultListModel1);
-
-        JScrollPane scrollPane1 = new JScrollPane(list1);
-        scrollPane1.setPreferredSize(new Dimension(23, 23));
-        panel1.add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
+        JScrollPane scrollPane1 = new JScrollPane(table1);
+        scrollPane1.setPreferredSize(new Dimension(23, 27));
+        panel1.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
         panel1.setBorder(new TitledBorder("GroupView"));
         panel1.setPreferredSize(new Dimension(100, 100));
         currentContact.setGroupViewPanel(panel1);
         currentContact.setMessageInfo("<html>\n  <head>\n    \n  </head>\n  <body>\n    Message info\n  </body>\n</html>\n");
 
-        DefaultTableModel defaultTableModel3 = new DefaultTableModel();
-        defaultTableModel3.setColumnCount(3);
-        defaultTableModel3.setRowCount(5);
-        currentContact.setReceivedTable(defaultTableModel3);
+        DefaultTableModel defaultTableModel4 = new DefaultTableModel();
+        defaultTableModel4.setColumnCount(3);
+        defaultTableModel4.setRowCount(5);
+        currentContact.setReceivedTable(defaultTableModel4);
 
         JTabbedPane tabbedPane0 = new JTabbedPane();
         tabbedPane0.setPreferredSize(new Dimension(100, 100));
@@ -136,14 +137,14 @@ public class DebugView {
         gridBagLayout4.rowWeights = new double[]{1};
         panel4.setLayout(gridBagLayout4);
 
-        JTable table1 = new JTable();
+        JTable table2 = new JTable();
 
-        DefaultTableModel defaultTableModel4 = (DefaultTableModel) table1.getModel();
-        defaultTableModel4.setColumnCount(2);
-        defaultTableModel4.setRowCount(15);
-        table1.getTableHeader().setSize(new Dimension(150, 16));
+        DefaultTableModel defaultTableModel5 = (DefaultTableModel) table2.getModel();
+        defaultTableModel5.setColumnCount(2);
+        defaultTableModel5.setRowCount(15);
+        table2.getTableHeader().setSize(new Dimension(150, 16));
 
-        JScrollPane scrollPane2 = new JScrollPane(table1);
+        JScrollPane scrollPane2 = new JScrollPane(table2);
         scrollPane2.setPreferredSize(new Dimension(23, 27));
         panel4.add(scrollPane2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
         panel4.setBorder(new TitledBorder("Vector Clock"));
@@ -159,11 +160,11 @@ public class DebugView {
         gridBagLayout5.rowWeights = new double[]{1};
         panel5.setLayout(gridBagLayout5);
 
-        JTable table2 = new JTable();
-        table2.setModel(defaultTableModel1);
-        table2.getTableHeader().setSize(new Dimension(225, 16));
+        JTable table3 = new JTable();
+        table3.setModel(defaultTableModel1);
+        table3.getTableHeader().setSize(new Dimension(225, 16));
 
-        JScrollPane scrollPane3 = new JScrollPane(table2);
+        JScrollPane scrollPane3 = new JScrollPane(table3);
         scrollPane3.setPreferredSize(new Dimension(23, 27));
         panel5.add(scrollPane3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
         panel5.setBorder(new TitledBorder("Crashed"));
@@ -179,11 +180,11 @@ public class DebugView {
         gridBagLayout6.rowWeights = new double[]{1};
         panel6.setLayout(gridBagLayout6);
 
-        JTable table3 = new JTable();
-        table3.setModel(defaultTableModel2);
-        table3.getTableHeader().setSize(new Dimension(595, 16));
+        JTable table4 = new JTable();
+        table4.setModel(defaultTableModel2);
+        table4.getTableHeader().setSize(new Dimension(595, 16));
 
-        JScrollPane scrollPane4 = new JScrollPane(table3);
+        JScrollPane scrollPane4 = new JScrollPane(table4);
         scrollPane4.setPreferredSize(new Dimension(23, 27));
         panel6.add(scrollPane4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
         panel6.setBorder(new TitledBorder("Delivered"));
@@ -199,11 +200,11 @@ public class DebugView {
         gridBagLayout7.rowWeights = new double[]{1};
         panel7.setLayout(gridBagLayout7);
 
-        JTable table4 = new JTable();
-        table4.setModel(defaultTableModel3);
-        table4.getTableHeader().setSize(new Dimension(595, 16));
+        JTable table5 = new JTable();
+        table5.setModel(defaultTableModel4);
+        table5.getTableHeader().setSize(new Dimension(595, 16));
 
-        JScrollPane scrollPane5 = new JScrollPane(table4);
+        JScrollPane scrollPane5 = new JScrollPane(table5);
         scrollPane5.setPreferredSize(new Dimension(23, 27));
         panel7.add(scrollPane5, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
         panel7.setBorder(new TitledBorder("Received"));
@@ -225,7 +226,7 @@ public class DebugView {
         panel8.setVisible(false);
         tabbedPane0.addTab("Tab 1", null, panel8);
         currentContact.setTabs(tabbedPane0);
-        currentContact.setVectorclock(defaultTableModel4);
+        currentContact.setVectorclock(defaultTableModel5);
         currentContact.init();
 
         JFrame frame0 = new JFrame();
@@ -241,7 +242,7 @@ public class DebugView {
 
         JButton button0 = new JButton();
         button0.setText("Hold message");
-        button0.addActionListener(EventHandler.create(ActionListener.class, debugController, "updateClientList"));
+        button0.addActionListener(EventHandler.create(ActionListener.class, debugController, "hold"));
         panel9.add(button0, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, 16, 0, new Insets(0, 0, 0, 0), 0, 0));
 
         JButton button1 = new JButton();
@@ -254,7 +255,7 @@ public class DebugView {
         panel9.add(button2, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
         panel9.add(tabbedPane0, new GridBagConstraints(1, 3, 6, 1, 0.0, 0.0, 17, 1, new Insets(0, 0, 0, 0), 0, 0));
         frame0.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        frame0.setTitle("New Frame");
+        frame0.setTitle("Debugger");
         frame0.setBounds(new Rectangle(500, 0, 1066, 693));
 
         return frame0;
