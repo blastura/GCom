@@ -101,10 +101,10 @@ public class DebugController implements DebugHandler {
 
     }
     public void messageReceived(Message m) {
-        currentContact.addReceived(new Object[]{getUserNameForUID(m.getUID()), m.getMessage(), getUserNameForUID(m.getOriginUID())});
+        currentContact.addReceived(new Object[]{m.getUID(), m.getMessage(), getUserNameForUID(m.getOriginUID())});
     }
     public void messageDelivered(Message m) {
-        currentContact.addDelivered(new Object[]{getUserNameForUID(m.getUID()), m.getMessage(), getUserNameForUID(m.getOriginUID())});
+        currentContact.addDelivered(new Object[]{m.getUID(), m.getMessage(), getUserNameForUID(m.getOriginUID())});
     }
     public void groupChange(GroupView view) {
 
