@@ -20,7 +20,6 @@ import java.rmi.server.UID;
 public class DebugController implements DebugHandler {
 
     private DebugModel debugModel;
-    private JList clientList;
     private ContactModel currentContact;// = new ContactModel();
     
     private boolean doHold = false;
@@ -37,7 +36,6 @@ public class DebugController implements DebugHandler {
     }
 
     public void init() {
-        clientList.setModel(new DefaultListModel());
     }
 
 
@@ -53,12 +51,6 @@ public class DebugController implements DebugHandler {
         return currentContact;
     }
 
-    public JList getClientList() {
-        return clientList;
-    }
-    public void setClientList(JList clientList) {
-        this.clientList = clientList;
-    }
 
     public void receiveMessage() {
         currentContact.addReceived(new String[]{"hej", "heja1"});

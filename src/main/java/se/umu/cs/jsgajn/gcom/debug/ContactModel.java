@@ -7,8 +7,10 @@ import java.util.HashSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
@@ -25,8 +27,13 @@ public class ContactModel {
     private DefaultTableModel crashedTable;
     private DefaultTableModel clientInfo;
     private DefaultTableModel groupMembers;
+    
+    private JToggleButton holdButton;
+    private JToggleButton releaseAndResortButton;
+    
     private String messageInfo;
 
+    
     private JPanel clientInfoPanel;
     private JPanel groupViewPanel;
 
@@ -101,6 +108,14 @@ public class ContactModel {
         vectorclock.insertRow(0, rowData);
     }
 
+    public void toggleHoldButton() {
+    	
+    }
+    
+    
+    
+    
+    
 
     public DefaultTableModel getVectorclock() {
         return vectorclock;
@@ -174,5 +189,21 @@ public class ContactModel {
 
 	public void setGroupMembers(DefaultTableModel groupMembers) {
 		this.groupMembers = groupMembers;
+	}
+
+	public JToggleButton getHoldButton() {
+		return holdButton;
+	}
+
+	public void setHoldButton(JToggleButton holdButton) {
+		this.holdButton = holdButton;
+	}
+
+	public JToggleButton getReleaseAndResortButton() {
+		return releaseAndResortButton;
+	}
+
+	public void setReleaseAndResortButton(JToggleButton releaseAndResortButton) {
+		this.releaseAndResortButton = releaseAndResortButton;
 	}
 }

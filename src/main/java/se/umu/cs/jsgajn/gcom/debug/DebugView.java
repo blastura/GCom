@@ -25,20 +25,13 @@ import java.awt.event.ActionListener;
 import java.beans.EventHandler;
 import java.beans.PropertyChangeListener;
 import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
 
 
 public class DebugView {
 
     public static JFrame create(DebugController debugController,
     		ContactModel currentContact) {
-        JList list0 = new JList();
-
-        DefaultListModel defaultListModel0 = new DefaultListModel();
-        defaultListModel0.addElement("apples");
-        defaultListModel0.addElement("oranges");
-        defaultListModel0.addElement("pears");
-        list0.setModel(defaultListModel0);
-        debugController.setClientList(list0);
         debugController.init();
 
         JPanel panel0 = new JPanel();
@@ -98,12 +91,21 @@ public class DebugView {
         panel1.setBorder(new TitledBorder("GroupView"));
         panel1.setPreferredSize(new Dimension(100, 100));
         currentContact.setGroupViewPanel(panel1);
+
+        JToggleButton toggleButton0 = new JToggleButton();
+        toggleButton0.setText("Hold messages");
+        toggleButton0.addActionListener(EventHandler.create(ActionListener.class, debugController, "hold"));
+        currentContact.setHoldButton(toggleButton0);
         currentContact.setMessageInfo("<html>\n  <head>\n    \n  </head>\n  <body>\n    Message info\n  </body>\n</html>\n");
 
         DefaultTableModel defaultTableModel4 = new DefaultTableModel();
         defaultTableModel4.setColumnCount(3);
         defaultTableModel4.setRowCount(5);
         currentContact.setReceivedTable(defaultTableModel4);
+
+        JToggleButton toggleButton1 = new JToggleButton();
+        toggleButton1.setText("Release & Resort");
+        currentContact.setReleaseAndResortButton(toggleButton1);
 
         JTabbedPane tabbedPane0 = new JTabbedPane();
         tabbedPane0.setPreferredSize(new Dimension(100, 100));
@@ -234,26 +236,23 @@ public class DebugView {
         JPanel panel9 = (JPanel) frame0.getContentPane();
 
         GridBagLayout gridBagLayout9 = new GridBagLayout();
-        gridBagLayout9.columnWidths = new int[]{12, 0, 6, 0, 6, 0, 20, 21};
+        gridBagLayout9.columnWidths = new int[]{12, 0, 6, 0, 6, 0, 6, 0, 20, 21};
         gridBagLayout9.rowHeights = new int[]{12, 0, 6, 20, 14};
-        gridBagLayout9.columnWeights = new double[]{0, 0, 0, 0, 0, 0, 1, 0};
+        gridBagLayout9.columnWeights = new double[]{0, 0, 0, 0, 0, 0, 0, 0, 1, 0};
         gridBagLayout9.rowWeights = new double[]{0, 0, 0, 1, 0};
         panel9.setLayout(gridBagLayout9);
+        panel9.add(toggleButton1, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
+        panel9.add(toggleButton0, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, 16, 0, new Insets(0, 0, 0, 0), 0, 0));
 
         JButton button0 = new JButton();
-        button0.setText("Hold message");
-        button0.addActionListener(EventHandler.create(ActionListener.class, debugController, "hold"));
-        panel9.add(button0, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, 16, 0, new Insets(0, 0, 0, 0), 0, 0));
+        button0.setText("Loose message");
+        panel9.add(button0, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
 
         JButton button1 = new JButton();
-        button1.setText("Loose message");
-        panel9.add(button1, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
-
-        JButton button2 = new JButton();
-        button2.setText("CrashClient");
-        button2.addActionListener(EventHandler.create(ActionListener.class, debugController, "crashMessage"));
-        panel9.add(button2, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
-        panel9.add(tabbedPane0, new GridBagConstraints(1, 3, 6, 1, 0.0, 0.0, 17, 1, new Insets(0, 0, 0, 0), 0, 0));
+        button1.setText("CrashClient");
+        button1.addActionListener(EventHandler.create(ActionListener.class, debugController, "crashMessage"));
+        panel9.add(button1, new GridBagConstraints(7, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
+        panel9.add(tabbedPane0, new GridBagConstraints(1, 3, 8, 1, 0.0, 0.0, 17, 1, new Insets(0, 0, 0, 0), 0, 0));
         frame0.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame0.setTitle("Debugger");
         frame0.setBounds(new Rectangle(500, 0, 1066, 693));
