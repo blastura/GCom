@@ -42,7 +42,6 @@ public class GroupModuleImpl implements GroupModule {
     private GroupView groupView;
     private OrderingModule orderingModule;
     private CommunicationModule communicationModule;
-    //private Receiver receiverLeader;
     private GroupLeader gl;
     //private Receiver receiver;
 

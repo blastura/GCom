@@ -23,19 +23,33 @@ public class VectorClockTest {
     
     @Test
     public void testEqual() {
-        VectorClock<String> v1 = new VectorClock<String>("p1");
-        v1.newProcess("p2");
-        v1.newProcess("p3");
-        v1.newProcess("p4");
-        v1.newProcess("p5");
+        VectorClock<String> v1 = new VectorClock<String>("p1") {{
+                newProcess("p2");
+                newProcess("p3");
+                newProcess("p4");
+                newProcess("p5");
+            }};
 
-        VectorClock<String> v2 = new VectorClock<String>("p1");
-        v2.newProcess("p2");
-        v2.newProcess("p3");
-        v2.newProcess("p4");
-        v2.newProcess("p5");
+        VectorClock<String> v2 = new VectorClock<String>("p1") {{
+                newProcess("p2");
+                newProcess("p3");
+                newProcess("p4");
+                newProcess("p5");
+            }};
+
+        VectorClock<String> v3 = new VectorClock<String>("other") {{
+                newProcess("p2");
+                newProcess("p3");
+                newProcess("p4");
+                newProcess("p5");
+            }};
         
         assertTrue(v1.equals(v2));
+        assertTrue(v2.equals(v1));
+        assertTrue(v1.equals(v1));
+        assertFalse(v1.equals(v3));
+        assertFalse(v2.equals(v3));
+        assertFalse(v3.equals(v2));
     }
 
     @Test
@@ -65,7 +79,3 @@ public class VectorClockTest {
         // TODO: more tests
     }
 }
-
-
-
-

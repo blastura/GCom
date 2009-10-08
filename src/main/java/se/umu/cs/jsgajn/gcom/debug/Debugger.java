@@ -45,7 +45,7 @@ public class Debugger implements DebugHandler {
         debugger.block();
     }
 
-    public static synchronized Debugger getDebugger() {
+    public static Debugger getDebugger() {
         return INSTANCE;
     }
 }
