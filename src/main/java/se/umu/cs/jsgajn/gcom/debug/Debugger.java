@@ -1,6 +1,7 @@
 package se.umu.cs.jsgajn.gcom.debug;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
