@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import se.umu.cs.jsgajn.gcom.Module;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
-import se.umu.cs.jsgajn.gcom.debug.Debugger;
 
 /**
  * Module to handle different orderings of messages.

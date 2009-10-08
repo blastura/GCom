@@ -228,6 +228,7 @@ public class GroupModuleImpl implements GroupModule {
             case GROUPCHANGE:
                 System.out.println("We have a new member!!");
                 groupView = (GroupView) m.getMessage();
+                debugger.groupChange(groupView);
                 break;
             case CLIENTMESSAGE:
                 client.deliver(m.getMessage());

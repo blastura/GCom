@@ -4,6 +4,7 @@ import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 
 public class Debugger implements DebugHandler {
     private static final Logger logger = LoggerFactory.getLogger(Debugger.class);
@@ -43,6 +44,13 @@ public class Debugger implements DebugHandler {
             return;
         }
         debugger.block();
+    }
+
+    public void groupChange(GroupView g) {
+        if (debugger == null) {
+            return;
+        }
+        debugger.groupChange(g);
     }
 
     public static Debugger getDebugger() {
