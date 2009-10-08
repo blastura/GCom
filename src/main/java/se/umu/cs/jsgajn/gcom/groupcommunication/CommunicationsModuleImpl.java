@@ -6,6 +6,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
@@ -105,13 +106,27 @@ public class CommunicationsModuleImpl implements CommunicationModule {
                 while (running) {
                     Message m = receiveQueue.take();
                     // TODO: clone copy message?
-                    debugger.messageReceived(m);
-                    if (mMethod.deliverCheck(m, groupModule.getGroupView())) {
-                        orderingModule.deliver(m);
+
+                    if(debugger.hold()) {
+                        debugger.holdMessage(m);
+                    } else {
+                        if(debugger.hasHoldMessages()) {
+                            ArrayList<Message> messages = debugger.getHoldMessages();
+                            for(Message m2 : messages) {
+                                sendToOrderingModule(m2);                               
+                            }
+                        }
+                        sendToOrderingModule(m);
                     }
                 }
             } catch (InterruptedException e) {
                 System.out.println(e);
+            }
+        }
+        public void sendToOrderingModule(Message m){
+            debugger.messageReceived(m);
+            if (mMethod.deliverCheck(m, groupModule.getGroupView())) {
+                orderingModule.deliver(m);
             }
         }
     }

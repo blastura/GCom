@@ -1,5 +1,7 @@
 package se.umu.cs.jsgajn.gcom.debug;
 
+import java.util.ArrayList;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
@@ -101,6 +103,18 @@ public class DebugController implements DebugHandler {
         
         
     }
-    
+    public boolean hold() {
+        return false;
+    }
+    public void holdMessage(Message m)  {
+        // Add to some queue
+    }
+    public boolean hasHoldMessages() {
+        return false;
+    }
+    public ArrayList<Message> getHoldMessages() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }
