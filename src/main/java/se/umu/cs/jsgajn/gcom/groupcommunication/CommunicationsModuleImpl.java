@@ -7,6 +7,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
@@ -111,7 +112,7 @@ public class CommunicationsModuleImpl implements CommunicationModule {
                         debugger.holdMessage(m);
                     } else {
                         if(debugger.hasHoldMessages()) {
-                            ArrayList<Message> messages = debugger.getHoldMessages();
+                            List<Message> messages = debugger.getHoldMessages();
                             for(Message m2 : messages) {
                                 sendToOrderingModule(m2);                               
                             }
