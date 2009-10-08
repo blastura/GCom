@@ -37,7 +37,10 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
      */
     public void merge(final VectorClock<T> other) {
         checkEqualKeySets(other);
-        
+	for (T id : keySet()) {
+	    int max = Math.max(get(id), other.get(id));
+	    map.put(id, max);
+	}
     }
     
     public int get() {

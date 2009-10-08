@@ -78,4 +78,46 @@ public class VectorClockTest {
         assertEquals(1, v2.compareTo(v1));
         // TODO: more tests
     }
+
+    @Test
+    public void testMerge() {
+	final String p1 = "p1";
+	final String p2 = "p2";
+	
+        VectorClock<String> v1 = new VectorClock<String>(p1) {{
+                newProcess(p2);
+            }};
+
+        VectorClock<String> v2 = new VectorClock<String>(p2) {{
+                newProcess(p1);
+            }};
+
+	assertEquals(v1.get(), v1.get(p2));
+	v1.merge(v2); // 0 0
+	assertEquals(v1.get(), v1.get(p2));
+
+	v2.tick(); // 0 1
+	assertEquals(v1.get(), 0);
+	assertEquals(v1.get(p2), 0);
+	v1.merge(v2); // v1: 0 1
+	assertEquals(v1.get(), 0);
+	assertEquals(v1.get(p2), 1);
+	assertEquals(v1.compareTo(v2), 0);
+
+	v1.tick(); // v1: 1 1
+	v1.tick(); // v1: 2 1
+	v1.merge(v2); // v1
+	assertEquals(v1.get(), 2);
+	assertEquals(v1.get(p2), 1);
+	v2.tick(); // 0 2
+	v1.merge(v2);
+	assertEquals(v1.get(), 2);
+	assertEquals(v1.get(p2), 2);
+	for (int i = 0; i < 100; i++) {
+	    v2.tick();
+	} // v2: 0 102
+	assertEquals(v2.get(), 102);
+	v1.merge(v2);
+	assertEquals(v1.get(p2), 102);
+    }
 }
