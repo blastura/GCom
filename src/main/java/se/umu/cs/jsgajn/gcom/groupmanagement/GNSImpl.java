@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
@@ -45,8 +46,12 @@ public class GNSImpl implements GNS {
             if (portString == null) { // Try application properties
                 try {
                     Properties prop = new Properties();
-                    prop.load(this.getClass().getResourceAsStream("/application.properties"));
-                    portString = prop.getProperty("gcom.gns.port");
+                    
+                    InputStream propStream = this.getClass().getResourceAsStream("/application.properties");
+                    if(propStream != null) {
+                        prop.load(this.getClass().getResourceAsStream("/application.properties"));
+                        portString = prop.getProperty("gcom.gns.port");
+                    }
                 } catch (IOException e) {
                     logger.warn("application.properties not found");
                 }
