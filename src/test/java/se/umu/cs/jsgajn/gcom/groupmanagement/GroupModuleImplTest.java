@@ -61,6 +61,7 @@ public class GroupModuleImplTest {
             GroupModule m1 = new GroupModuleImpl(c1, "localhost", gnsPort, "testgroup", 1099);
             GroupModule m2 = new GroupModuleImpl(c2, "localhost", gnsPort, "testgroup", 1100);
             GroupModule m3 = new GroupModuleImpl(c3, "localhost", gnsPort, "testgroup", 1101);
+            // TODO: Will this stop clients before they are created?
             m1.stop();
             m2.stop();
             m3.stop();
@@ -70,10 +71,11 @@ public class GroupModuleImplTest {
         }
     }
     
-    @Ignore
+    @Ignore // Empty client implementation
     private static class ClientTest implements Client {
         public ClientTest() {
             
+
         }
 
         public void deliver(Object message) {

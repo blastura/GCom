@@ -28,6 +28,18 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
         map.put(id, map.get(id) + 1);
     }
 
+    /**
+     * Merge this vector clock with supplied v-clock. For every process in both
+     * other and this vectorclock, compare counters and change own counter to
+     * the maximum value of the two.
+     *
+     * @param other The vector clock to merge with.
+     */
+    public void merge(final VectorClock<T> other) {
+        checkEqualKeySets(other);
+        
+    }
+    
     public int get() {
         return map.get(this.id);
     }
@@ -47,12 +59,8 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
      *         smaller or equal, possitive numbers if it is greater than the
      *         parameter clock.
      */
-    public int compareTo(VectorClock<T> o) {
-        if ((map.size() != o.getMap().size())
-            && !(map.keySet().equals(o.getMap().keySet()))) {
-            // TODO: what now?
-            throw new AssertionError("Vectorclocks doesn't match sizes, and keySets");
-        }
+    public int compareTo(final VectorClock<T> o) {
+        checkEqualKeySets(o);
         // TODO: use this or somehting else
         // =, <=, <
         Map<T, Integer> oMap = o.getMap();
@@ -63,6 +71,7 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
         int larger = 0;
         int smaller = 0;
         for (T id : map.keySet()) {
+            // TODO: Possible error for large or small values
             int diff = map.get(id) - oMap.get(id);
             if (diff < 0) {
                 smaller =+ diff;
@@ -76,9 +85,9 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
         if (nrEqual > 0 && larger == 0) {
             return 0;
         } else if (nrEqual == 0 && larger == 0) {
-            return smaller;
+            return smaller; // Will be negative
         } else {
-            return larger;
+            return larger; // Will be positive
         }
     }
 
@@ -104,5 +113,13 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
     @Override
     public int hashCode() {
         return map.hashCode();
+    }
+
+    private void checkEqualKeySets(final VectorClock<T> o) {
+        if ((map.size() != o.getMap().size())
+            && !(map.keySet().equals(o.getMap().keySet()))) {
+            // TODO: what now? Fix this, so program don't crash.
+            throw new AssertionError("Vectorclocks doesn't match sizes, and keySets");
+        }
     }
 }
