@@ -83,6 +83,7 @@ public class GroupModuleImpl implements GroupModule {
         this.orderingModule.setCommunicationsModule(this.communicationModule);
 
         this.groupMember = new GroupMember(communicationModule.getReceiver());
+        // Temp groupview
         this.groupView =  new GroupViewImpl(groupName, this.groupMember);
         this.groupName = groupName;
         GroupSettings gs = initGroupSettings(groupMember, groupName);
@@ -103,6 +104,7 @@ public class GroupModuleImpl implements GroupModule {
         if (gs.isNew()) { // Group is empty I am leader
             logger.debug("Got new group from GNS, this member is leader");
             this.gl = new GroupLeaderImpl();
+            debugger.groupChange(this.groupView);
         } else {
             logger.debug("Got existing group from DNS, sending join message");
             MessageImpl joinMessage =
