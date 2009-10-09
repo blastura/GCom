@@ -207,7 +207,10 @@ public class GroupModuleImpl implements GroupModule {
 
             // Multicast new groupView
             orderingModule.send(new MessageImpl(groupView,
-                                                MessageType.GROUPCHANGE, PID, groupView.getID()), groupView);
+                                                MessageType.GROUPCHANGE,
+                                                PID,
+                                                groupView.getID()),
+                                groupView);
         }
     }
 

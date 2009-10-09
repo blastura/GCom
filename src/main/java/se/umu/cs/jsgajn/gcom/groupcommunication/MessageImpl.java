@@ -3,17 +3,26 @@ package se.umu.cs.jsgajn.gcom.groupcommunication;
 import java.rmi.server.UID;
 import java.util.ArrayList;
 import java.util.List;
+import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
 
+/**
+ * Default implementation of {@link Message} interface.
+ *
+ * @author dit06ajn, dit06jsg
+ * @version 1.0
+ */
 public class MessageImpl implements Message {
     private static final long serialVersionUID = 1L;
     private final UID ID;
     private MessageType messageType;
     private List<UID> path;
-    private UID originID;
-    private UID groupViewUID;
+    private final UID originID;
+    private final UID groupViewUID;
     private Object m;
-
-    public MessageImpl(Object m, MessageType messageType, UID originID, UID groupViewUID) {
+    private VectorClock<UID> vc;
+    
+    public MessageImpl(Object m, MessageType messageType,
+                       final UID originID, final UID groupViewUID) {
         this.m = m;
         this.messageType = messageType;
         this.originID = originID;
@@ -25,7 +34,19 @@ public class MessageImpl implements Message {
         // This is done first time message is sent
         // TODO: test
     }
-
+    
+    public VectorClock<UID> getVectorClock() {
+        return this.vc;
+    }
+    
+    
+    public void setVectorClock(VectorClock<UID> vc) {
+        if (!getOriginUID().equals(vc.getID())) {
+            throw new IllegalArgumentException("Vector clock origin should be the same as Message origin");
+        }
+        this.vc = vc;
+    }
+    
     public Object getMessage() {
         return m;
     }

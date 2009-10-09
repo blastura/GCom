@@ -44,8 +44,7 @@ public class GroupModuleImplTest {
             GroupModule m = new GroupModuleImpl(c, "localhost", 6554, "testgroup");
             m.stop();
         } catch (Exception e) {
-            System.err.println(e.getMessage());
-            fail();
+            fail(e.getMessage());
         }
     }
 
@@ -65,8 +64,7 @@ public class GroupModuleImplTest {
             m2.stop();
             m3.stop();
         } catch (Exception e) {
-            e.printStackTrace();
-            fail();
+            fail(e.getMessage());
         }
     }
 

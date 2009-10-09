@@ -4,12 +4,31 @@ import java.io.Serializable;
 import java.rmi.server.UID;
 import java.util.List;
 
+import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
+
 public interface Message extends Serializable {
     public MessageType getMessageType();
     public UID getOriginUID();
     public UID getGroupViewUID();
     public Object getMessage();
     public UID getUID();
+    
+    /**
+     * Sets the vector clock of this message, should probably only be set once.
+     *
+     * @param vc The VectorClock of this Message.
+     */
+    public void setVectorClock(VectorClock<UID> vc);
+    
+    /**
+     * Gets the vector clock of this message, should probably only be set by
+     * first sender.
+     *
+     * @return The VectorClock of this Message.
+     */
+    public VectorClock<UID> getVectorClock();
+    
+    
     /**
      * Add process id to path for every member of a group this message passed 
      * through.
