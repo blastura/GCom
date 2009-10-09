@@ -110,7 +110,9 @@ public class GroupModuleImpl implements GroupModule {
             MessageImpl joinMessage =
                 new MessageImpl(this.groupMember,
                                 MessageType.JOIN, PID, groupView.getID());
-            gs.getLeader().getReceiver().receive(joinMessage);
+            this.groupView = new GroupViewImpl(groupName, gs.getLeader());
+            //.getReceiver().receive(joinMessage);
+            send(joinMessage, this.groupView);
         }
 
         this.messageReceiverThread = new Thread(new MessageReceiver(), "GroupModule Thread");
