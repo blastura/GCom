@@ -14,6 +14,8 @@ import javax.swing.JToggleButton;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
+import ch.qos.logback.classic.Logger;
+
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
 import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
@@ -74,7 +76,7 @@ public class ContactModel {
 
         TitledBorder groupViewPanel;
         groupViewPanel = BorderFactory.createTitledBorder("Group View Name");
-        clientInfoPanel.setBorder(groupViewPanel);
+        groupViewPanel.setBorder(groupViewPanel);
 
     }
 
@@ -107,9 +109,18 @@ public class ContactModel {
     public void addToClock(String[] rowData) {
         vectorclock.insertRow(0, rowData);
     }
-
-    public void toggleHoldButton() {
-    	
+    public void addGroupMember(Object[] rowData) {
+    	while(groupMembers == null) {
+    		try {
+				Thread.sleep(1);
+				System.out.println("sleeep");
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	System.out.println("add: " + rowData[0]);
+        groupMembers.insertRow(0, rowData);
     }
     
     

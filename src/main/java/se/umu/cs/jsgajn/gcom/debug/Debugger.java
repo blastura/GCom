@@ -70,31 +70,10 @@ public class Debugger implements DebugHandler {
         return debugger.doHold();
     }
 
-    public void holdMessage(Message m) {
-        if (debugger == null) {
-            return;
-        }
-        debugger.holdMessage(m); 
-    }
-
     public boolean holdMessage(Message m, Receiver r) {
         if (debugger == null) {
             return false;
         }
         return debugger.holdMessage(m, r);
-    }
-
-    public boolean hasHoldMessages() {
-        if (debugger == null) {
-            return false;
-        }
-        return debugger.hasHoldMessages();
-    }
-
-    public Queue<Message> getHoldMessages() {
-        if (debugger == null) {
-            return null;
-        }
-        return debugger.getHoldMessages();
     }
 }

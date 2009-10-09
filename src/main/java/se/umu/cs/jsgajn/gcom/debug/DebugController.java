@@ -6,14 +6,18 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Queue;
 import java.util.Stack;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.rmi.RemoteException;
 import java.rmi.server.UID;
 import java.util.concurrent.atomic.AtomicInteger;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
@@ -27,6 +31,7 @@ public class DebugController implements DebugHandler {
     private DebugModel debugModel;
     private ContactModel currentContact;// = new ContactModel();
     
+    private Receiver receiver;
     private boolean doHold = false;
     private Queue<Message> holdQueue = new LinkedBlockingQueue<Message>();
     
@@ -37,9 +42,11 @@ public class DebugController implements DebugHandler {
     private Map<UID, Integer> messageIDs = new HashMap<UID, Integer>();
 
 
-    public DebugController(/*DebugModel model*/) {
-        /*this.debugModel = model;*/
-        currentContact = new ContactModel();
+    public DebugController() {
+     
+    }
+    public DebugController(ContactModel model) {
+        currentContact = model;
     }
 
     public void init() {
@@ -58,16 +65,8 @@ public class DebugController implements DebugHandler {
         return currentContact;
     }
 
-
-    public void receiveMessage() {
-        currentContact.addReceived(new String[]{"hej", "heja1"});
-    }
-    public void deliverMessage() {
-        currentContact.addDelivered(new String[]{"hej", "heja2"});
-    }
-
     public void crash() {
-        // TODO: implement
+        System.exit(0);
     }
 
     public void block() {
@@ -104,19 +103,25 @@ public class DebugController implements DebugHandler {
 
     }
     public void messageReceived(Message m) {
-        currentContact.addReceived(new Object[]{m.getUID(), m.getMessage(), getUserNameForUID(m.getOriginUID())});
+        currentContact.addReceived(new Object[]{getShortUIDForMessage(m.getUID()), 
+        		m.getMessage(), getUserNameForUID(m.getOriginUID())});
     }
     public void messageDelivered(Message m) {
-        currentContact.addDelivered(new Object[]{m.getUID(), m.getMessage(), getUserNameForUID(m.getOriginUID())});
-    }
-    public void groupChange(GroupView view) {
-
-
+        currentContact.addDelivered(new Object[]{getShortUIDForMessage(m.getUID()), 
+        		m.getMessage(), getUserNameForUID(m.getOriginUID())});
     }
 
     public void hold()	{
     	if(doHold) {
     		doHold = false;
+    		while(!holdQueue.isEmpty()) {
+    			try {
+					receiver.receive(holdQueue.poll());
+				} catch (RemoteException e) {
+					e.printStackTrace();
+					System.out.println("Debugger: Error while receiving.");
+				}
+    		}
     	} else {
     		doHold = true;
     	}
@@ -125,10 +130,6 @@ public class DebugController implements DebugHandler {
     public boolean doHold() {
         return doHold;
     }
-    public void holdMessage(Message m)  {
-    	holdQueue.add(m);
-    }
-
 
     // TODO: implement
     public boolean holdMessage(Message m, Receiver r) {
@@ -136,16 +137,22 @@ public class DebugController implements DebugHandler {
         boolean holdMessages = false; // Get from ui
         // Add to some queue, must be quick this method will be invoked from
         // messageHandler thread in CommunicationsModuleImpl
-        return holdMessages; 
-        // Reinject message by r.receive(m)
+        if(doHold){
+        	receiver = r; 
+        	holdQueue.add(m);
+        	return doHold;
+        } else {
+        	return doHold;
+        }
     }
 
-    
-    public boolean hasHoldMessages() {
-        return !holdQueue.isEmpty();
-    }
-    public Queue<Message> getHoldMessages() {
-        return holdQueue;
+    public void resortHoldMessages() {
+    	List list = new ArrayList<Message>();
+    	while(!holdQueue.isEmpty()){
+    		list.add(holdQueue.poll());
+    	}
+    	Collections.shuffle(list);
+    	holdQueue.addAll(list);
     }
 
         // Not tested but should work / Anton
@@ -168,5 +175,13 @@ public class DebugController implements DebugHandler {
             messageIDs.put(uid, mIDcounter.incrementAndGet());
         }
         return messageIDs.get(uid);
+    }
+    
+    public void groupChange(GroupView group) {
+    	/*
+    	for(GroupMember gm : group) {
+    		currentContact.addGroupMember(new Object[]{"HEEEJ"});
+    	}
+    	*/
     }
 }

@@ -104,6 +104,7 @@ public class DebugView {
         currentContact.setReceivedTable(defaultTableModel4);
 
         JToggleButton toggleButton1 = new JToggleButton();
+        toggleButton1.setBounds(new Rectangle(158, 12, 148, 29));
         toggleButton1.setText("Release & Resort");
         currentContact.setReleaseAndResortButton(toggleButton1);
 
@@ -241,17 +242,22 @@ public class DebugView {
         gridBagLayout9.columnWeights = new double[]{0, 0, 0, 0, 0, 0, 0, 0, 1, 0};
         gridBagLayout9.rowWeights = new double[]{0, 0, 0, 1, 0};
         panel9.setLayout(gridBagLayout9);
-        panel9.add(toggleButton1, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
-        panel9.add(toggleButton0, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, 16, 0, new Insets(0, 0, 0, 0), 0, 0));
 
         JButton button0 = new JButton();
-        button0.setText("Loose message");
-        panel9.add(button0, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
+        button0.setText("Resort holdqueue");
+        button0.addActionListener(EventHandler.create(ActionListener.class, debugController, "resortHoldMessages"));
+        panel9.add(button0, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
+        panel9.add(toggleButton0, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, 16, 0, new Insets(0, 0, 0, 0), 0, 0));
 
         JButton button1 = new JButton();
-        button1.setText("CrashClient");
-        button1.addActionListener(EventHandler.create(ActionListener.class, debugController, "crashMessage"));
-        panel9.add(button1, new GridBagConstraints(7, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
+        button1.setText("Loose message");
+        panel9.add(button1, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
+
+        JButton button2 = new JButton();
+        button2.setText("CrashClient");
+        button2.addActionListener(EventHandler.create(ActionListener.class, debugController, "crashMessage"));
+        button2.addActionListener(EventHandler.create(ActionListener.class, debugController, "crash"));
+        panel9.add(button2, new GridBagConstraints(7, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
         panel9.add(tabbedPane0, new GridBagConstraints(1, 3, 8, 1, 0.0, 0.0, 17, 1, new Insets(0, 0, 0, 0), 0, 0));
         frame0.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame0.setTitle("Debugger");

@@ -17,7 +17,8 @@ public class DebugMain {
     ChatMember chatmember;
 
     public DebugMain(final String[] args) {
-        final DebugController controller = new DebugController();
+    	ContactModel model = new ContactModel();
+        final DebugController controller = new DebugController(model);
         Debugger.setDebugHandler(controller);
 
         SwingUtilities.invokeLater(new Runnable() {

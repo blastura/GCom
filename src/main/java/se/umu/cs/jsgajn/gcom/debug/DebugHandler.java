@@ -14,7 +14,4 @@ public interface DebugHandler {
     public void block();
     public boolean holdMessage(Message m, Receiver r);
     public boolean doHold();
-    public void holdMessage(Message m);
-    public boolean hasHoldMessages();
-    public Queue<Message> getHoldMessages();
 }
