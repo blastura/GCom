@@ -31,9 +31,11 @@ public class BasicMulticast implements Multicast {
         for (GroupMember member : g) {
             if(!crashed.contains(member)){
                 try {
+                	/*
                     if (i == 1) {
                         debugger.block();
                     }
+                    */
                     member.getReceiver().receive(m);
                     //debugger.possibleCrash(i, size);
                 } catch (RemoteException e) {

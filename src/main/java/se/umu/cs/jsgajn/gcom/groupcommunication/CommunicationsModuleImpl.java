@@ -105,10 +105,13 @@ public class CommunicationsModuleImpl implements CommunicationModule {
             try {
                 while (running) {
                     Message m = receiveQueue.take();
+                    System.out.println("#################### got mess: " + m);
                     debugger.messageReceived(m);
+                    
                     if (debugger.holdMessage(m, getReceiver())) {
                         continue;
                     }
+                    
                     if (mMethod.deliverCheck(m, groupModule.getGroupView())) {
                         deliver(m);
                     }
