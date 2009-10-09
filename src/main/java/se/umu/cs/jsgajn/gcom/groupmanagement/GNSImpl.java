@@ -72,7 +72,7 @@ public class GNSImpl implements GNS {
         this.stub = (GNS) UnicastRemoteObject.exportObject(this, 0);
         Registry registry = LocateRegistry.createRegistry(port);
         registry.bind(GNS.STUB_NAME, stub);
-        System.out.println("Server is running at port " + port);
+        logger.info("Server is running at port " + port);
     }
 
     public GroupSettings connect(GroupSettings gs) {
@@ -107,7 +107,7 @@ public class GNSImpl implements GNS {
 
     private void save() {
         try {
-            OutputStream buffer = new BufferedOutputStream(new FileOutputStream( "GroupSettingMap.ser" ));
+            OutputStream buffer = new BufferedOutputStream(new FileOutputStream("GroupSettingMap.ser" ));
             ObjectOutput output = new ObjectOutputStream(buffer);
             try {
                 output.writeObject(this.groups);

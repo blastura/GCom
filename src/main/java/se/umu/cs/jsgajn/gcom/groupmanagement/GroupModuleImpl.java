@@ -224,29 +224,32 @@ public class GroupModuleImpl implements GroupModule {
         }
 
         private void handleDelivered(Message m) {
-            System.out.println("Got message!");
+            logger.info("Got message!");
             MessageType type = m.getMessageType();
             switch (type) {
             case GROUPCHANGE:
-                System.out.println("We have a new member!!");
+                logger.info("GROUPCHANGE");
                 groupView = (GroupView) m.getMessage();
                 debugger.groupChange(groupView);
                 break;
             case CLIENTMESSAGE:
+                logger.info("CLIENTMESSAGE");
                 client.deliver(m.getMessage());
                 break;
             case MEMBERCRASH:
+                logger.info("MEMBERCRASH");
                 handelCrash((GroupMember)(m.getMessage()));
                 break;
             case JOIN:
                 if (gl == null) {
-                    System.err.println("Got join message but I'm not leader");
+                    logger.error("Got join message but I'm not leader");
                 } else {
+                    logger.info("Join message new member, (THIS module is the group leader)");
                     gl.addMemberToGroup((GroupMember) m.getMessage());
                 }
                 break;
             default:
-                System.out.println("error i header");
+                logger.error("Unkwon MessageType in message: " + m);
             }
         }
 

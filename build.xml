@@ -77,9 +77,12 @@
 
    <!-- Run tests -->
    <target name="test" depends="compile-tests">
-      <junit haltonfailure="true" dir="${build.test.dir}" fork="true">
+      <junit haltonfailure="true"
+             dir="${build.test.dir}"
+             fork="true"
+             printsummary="true">
          <classpath refid="project.classpath" />
-         <formatter type="plain" usefile="false" />
+         <formatter type="brief" usefile="false" />
          <batchtest>
             <!-- Run junit tests on all classes with filenames that end with -->
             <!-- Test.class -->
@@ -88,6 +91,7 @@
          </batchtest>
          <sysproperty key="doc.dir" value="${doc.dir}" />
          <sysproperty key="index.dir" value="${index.dir}" />
+         <sysproperty key="logback.root.level" value="OFF" />
       </junit>
    </target>
 
@@ -97,15 +101,6 @@
          <classpath refid="project.classpath" />
          <fileset dir="${src.dir}/" includes="**/*.java"/>
       </javadoc>
-   </target>
-
-   <!-- Start? -->
-   <target name="start-server" description="Starts server" depends="compile">
-      <java classname="se.umu.cs.jsgajn.gcom.Server" fork="true" dir="${build.main.dir}">
-         <!-- <sysproperty key="java.rmi.server.codebase" value="file:${build.main.dir}"/> -->
-         <classpath refid="project.classpath" />
-         <arg value="-Djava.rmi.server.codebase=file:/Users/anton/Documents/skola/dist/GCom/bin/main/java/"/>
-      </java>
    </target>
 
    <!--   Create jar -->

@@ -15,10 +15,15 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.rmi.server.UID;
+import java.util.concurrent.atomic.AtomicInteger;
+import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DebugController implements DebugHandler {
-
+    private static final Logger logger = LoggerFactory.getLogger(DebugController.class);
+    
     private DebugModel debugModel;
     private ContactModel currentContact;// = new ContactModel();
     
@@ -28,6 +33,8 @@ public class DebugController implements DebugHandler {
     // For tmp usernames / Anton
     private Map<UID, String> userNames = new HashMap<UID, String>();
     private Stack<String> tmpUID;
+    private AtomicInteger mIDcounter = new AtomicInteger(0);
+    private Map<UID, Integer> messageIDs = new HashMap<UID, Integer>();
 
 
     public DebugController(/*DebugModel model*/) {
@@ -121,6 +128,19 @@ public class DebugController implements DebugHandler {
     public void holdMessage(Message m)  {
     	holdQueue.add(m);
     }
+
+
+    // TODO: implement
+    public boolean holdMessage(Message m, Receiver r) {
+        logger.warn("TODO: holdMessage(Message m, Receiver r) -> Not implemented");
+        boolean holdMessages = false; // Get from ui
+        // Add to some queue, must be quick this method will be invoked from
+        // messageHandler thread in CommunicationsModuleImpl
+        return holdMessages; 
+        // Reinject message by r.receive(m)
+    }
+
+    
     public boolean hasHoldMessages() {
         return !holdQueue.isEmpty();
     }
@@ -141,5 +161,12 @@ public class DebugController implements DebugHandler {
         }
 
         return userNames.get(uid);
+    }
+
+    private int getShortUIDForMessage(UID uid) {
+        if (!messageIDs.containsKey(uid)) {
+            messageIDs.put(uid, mIDcounter.incrementAndGet());
+        }
+        return messageIDs.get(uid);
     }
 }

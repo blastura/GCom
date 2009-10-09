@@ -21,7 +21,7 @@ public class GroupModuleImplTest {
     @After
     public void tearDown() throws Exception {
     }
-    
+
     @Test
     public void testInitWithPort() throws RemoteException, AlreadyBoundException, NotBoundException {
         try {
@@ -31,11 +31,10 @@ public class GroupModuleImplTest {
             GroupModule m = new GroupModuleImpl(c, "localhost", gnsport, "testgroup");
             m.stop();
         } catch (Exception e) {
-            System.err.println(e.getMessage());
-            fail();
+            fail(e.getMessage());
         }
     }
-    
+
     @Test
     public void testInitSystemPort() {
         System.getProperties().setProperty("gcom.gns.port", "6554");
@@ -70,17 +69,17 @@ public class GroupModuleImplTest {
             fail();
         }
     }
-    
+
     @Ignore // Empty client implementation
     private static class ClientTest implements Client {
         public ClientTest() {
-            
+
 
         }
 
         public void deliver(Object message) {
             // TODO Auto-generated method stub
-            
+
         }
     }
 }

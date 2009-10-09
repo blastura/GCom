@@ -9,6 +9,7 @@ import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
+import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
 
 public class Debugger implements DebugHandler {
     private static final Logger logger = LoggerFactory.getLogger(Debugger.class);
@@ -70,10 +71,23 @@ public class Debugger implements DebugHandler {
     }
 
     public void holdMessage(Message m) {
+        if (debugger == null) {
+            return;
+        }
         debugger.holdMessage(m); 
     }
 
+    public boolean holdMessage(Message m, Receiver r) {
+        if (debugger == null) {
+            return false;
+        }
+        return debugger.holdMessage(m, r);
+    }
+
     public boolean hasHoldMessages() {
+        if (debugger == null) {
+            return false;
+        }
         return debugger.hasHoldMessages();
     }
 

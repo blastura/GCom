@@ -3,12 +3,13 @@
 
    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
       <layout class="ch.qos.logback.classic.PatternLayout">
-         <Pattern>%logger{0}:[%thread]:%-5level> %msg%n</Pattern>
+         <Pattern>%logger{0}:%-4level:[%thread]:> %msg%n</Pattern>
          <!--<Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern> -->
       </layout>
    </appender>
 
-   <root level="debug">
+   <!-- if system property logback.root.level is set use that otherwise use DEBUG -->
+   <root level="${logback.root.level:-DEBUG}">
       <appender-ref ref="STDOUT" />
    </root>
 </configuration>

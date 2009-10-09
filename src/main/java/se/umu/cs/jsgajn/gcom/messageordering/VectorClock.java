@@ -58,18 +58,13 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
     /**
      * Compare this VectorClock to another VectorClock.
      *
-     * @return negative numbers if clock is smaller than parameter, 0 if it's
-     *         smaller or equal, possitive numbers if it is greater than the
-     *         parameter clock.
+     * @return negative numbers if clock is smaller than every value in
+     *         parameter, 0 if it's smaller or equal, possitive numbers if it is
+     *         greater than the parameter clock.
      */
     public int compareTo(final VectorClock<T> o) {
         checkEqualKeySets(o);
-        // TODO: use this or somehting else
-        // =, <=, <
         Map<T, Integer> oMap = o.getMap();
-        System.out.println("myMap: " + map.toString());
-        System.out.println("oMap: " + oMap.toString());
-        System.out.println("===========");
         int nrEqual = 0;
         int larger = 0;
         int smaller = 0;

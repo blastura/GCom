@@ -30,9 +30,16 @@ public class DebugMain {
             });
 
         try {
-            DebugMain.this.chatmember = new ChatMember(args[0],
-                                                       Integer.parseInt(args[1]),
-                                                       args[2]);
+            if (args.length == 3) 
+                DebugMain.this.chatmember = new ChatMember(args[0],
+                                                           Integer.parseInt(args[1]),
+                                                           args[2]);
+            else if (args.length == 4)
+                DebugMain.this.chatmember = new ChatMember(args[0],
+                                                           Integer.parseInt(args[1]),
+                                                           args[2],
+                                                           Integer.parseInt(args[3]));
+            
         } catch (NumberFormatException e) {
             e.printStackTrace();
         } catch (RemoteException e) {
