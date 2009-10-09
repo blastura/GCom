@@ -48,8 +48,4 @@ public class GroupViewImpl implements GroupView {
         // TODO Auto-generated method stub
         throw new Error("not implemented");
     }
-    
-    public List getMembers() {
-    	return members;
-    }
 }

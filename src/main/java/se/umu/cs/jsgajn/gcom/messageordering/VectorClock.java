@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class VectorClock<T extends Serializable> implements Comparable<VectorClock<T>> {
+public class VectorClock<T extends Serializable> implements Comparable<VectorClock<T>>, Serializable {
+    private static final long serialVersionUID = 1L;
     private Map<T, Integer> map = new HashMap<T, Integer>();
     private T id;
 
@@ -20,7 +21,7 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
 
     public void newProcess(T newId) {
         if (newId.equals(this.id)) {
-            throw new AssertionError("Own process id added");
+            throw new IllegalArgumentException("Own process id added");
         }
         map.put(newId, 0);
     }

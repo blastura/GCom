@@ -109,7 +109,9 @@ public class GroupModuleImpl implements GroupModule {
             logger.debug("Got existing group from DNS, sending join message");
             MessageImpl joinMessage =
                 new MessageImpl(this.groupMember,
-                                MessageType.JOIN, PID, groupView.getID());
+                                MessageType.JOIN,
+                                PID,
+                                groupView.getID());
             this.groupView = new GroupViewImpl(groupName, gs.getLeader());
             //.getReceiver().receive(joinMessage);
             send(joinMessage, this.groupView);

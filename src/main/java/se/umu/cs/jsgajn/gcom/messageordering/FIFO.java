@@ -58,8 +58,10 @@ public class FIFO implements Ordering {
 
     public Message prepareOutgoingMessage(Message m) {
         logger.debug("Prepare outgoing message: " + m);
+        // Tick counter for sent messages
+        msgCounter.incrementAndGet();
         VectorClock<UID> vc = new VectorClock<UID>(GroupModule.PID,
-                                                   msgCounter.getAndIncrement());
+                                                   msgCounter.get());
         m.setVectorClock(vc);
         return m;
     }
@@ -83,12 +85,16 @@ public class FIFO implements Ordering {
             // TODO: Auto-generated method stub
             logger.debug("Checking deliver. TODO: implement");
             if (!vc.containsKey(m.getOriginUID())) {
+                logger.debug("New process added to VectorClock");
                 vc.newProcess(m.getOriginUID());
             }
             
+            // Tick counter for receiving message process
+            vc.tick(m.getOriginUID());
+            
             int otherCounter = m.getVectorClock().get();
             int ownCounterForProcess = vc.get(m.getOriginUID());
-            logger.debug("OwnCounter: " + ownCounterForProcess + ", inMessageCounter: " + otherCounter);
+            logger.debug("OwnCounterForProcess: {}, inMessageCounter: {}", ownCounterForProcess, otherCounter);
             return true;
         }
     }

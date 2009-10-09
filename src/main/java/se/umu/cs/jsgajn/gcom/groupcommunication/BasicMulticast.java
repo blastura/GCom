@@ -10,12 +10,12 @@ import org.slf4j.LoggerFactory;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
-import se.umu.cs.jsgajn.gcom.debug.Debugger;
+//import se.umu.cs.jsgajn.gcom.debug.Debugger;
 
 public class BasicMulticast implements Multicast {
     private static final Logger logger = LoggerFactory.getLogger(BasicMulticast.class);
-    private static final Debugger debugger = Debugger.getDebugger();
-    
+    //private static final Debugger debugger = Debugger.getDebugger();
+
     private Set<GroupMember> crashed = new HashSet<GroupMember>();
 
     /**
@@ -29,22 +29,23 @@ public class BasicMulticast implements Multicast {
         m.addToPath(GroupModule.PID);
         int i = 0;
         for (GroupMember member : g) {
-            if(!crashed.contains(member)){
+            if(!crashed.contains(member)) {
                 try {
-                	/*
-                    if (i == 1) {
-                        debugger.block();
-                    }
-                    */
                     member.getReceiver().receive(m);
+                    /*
+                      if (i == 1) {
+                      debugger.block();
+                      }
+                    */
                     //debugger.possibleCrash(i, size);
                 } catch (RemoteException e) {
+                    logger.info("Oh, no! This bitch crashed: " + member.getPID());
+                    e.printStackTrace();
                     crashed.add(member);
-                    
-                    Message crashMessage = new MessageImpl(member, 
-                            MessageType.MEMBERCRASH, GroupModule.PID, g.getID());
+
+                    Message crashMessage = new MessageImpl(member,
+                                                           MessageType.MEMBERCRASH, GroupModule.PID, g.getID());
                     multicast(crashMessage, g);
-                    logger.debug("Oh, no! This bitch crashed: " + member.getPID());
                 }
             }
             i++;

@@ -32,7 +32,7 @@ public class ChatMember implements Client {
         new Thread (new Runnable() {
                 public void run() {
                     while (true) {
-                        System.out.print(GroupModule.PID + " - message: ");
+                        logger.info(GroupModule.PID + " - message: ");
                         Scanner sc = new Scanner(System.in);
                         String msg;
                         msg = sc.nextLine();
