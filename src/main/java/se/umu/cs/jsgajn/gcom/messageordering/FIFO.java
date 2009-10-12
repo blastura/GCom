@@ -11,6 +11,9 @@ import se.umu.cs.jsgajn.gcom.debug.Debugger;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import java.rmi.server.UID;
+import java.util.LinkedList;
+
+import java.util.Queue;
 
 /**
  * Implementation of FIFO ordering. "If a correct process issues multicast(g, m)
@@ -24,18 +27,19 @@ import java.rmi.server.UID;
 public class FIFO implements Ordering {
     private static final Logger logger = LoggerFactory.getLogger(FIFO.class);
     private static final Debugger debugger = Debugger.getDebugger();
-    
-    private BlockingQueue<Message> holdBackQueue;
+
+    private BlockingQueue<Message> receiveQueue;
     private BlockingQueue<Message> deliverQueue;
+
     private AtomicInteger msgCounter = new AtomicInteger(0);
     private boolean running = false;
-    
+
     /** Should contain information about the number of messages this module has
      * received from other GroupMembers */
     private VectorClock<UID> vc  = new VectorClock<UID>(GroupModule.PID);
-    
+
     public FIFO() {
-        this.holdBackQueue = new LinkedBlockingQueue<Message>();
+        this.receiveQueue = new LinkedBlockingQueue<Message>();
         this.deliverQueue = new LinkedBlockingQueue<Message>();
         this.running = true;
         new Thread(new MessageHandler(), "FIFO thread").start();
@@ -53,9 +57,19 @@ public class FIFO implements Ordering {
 
     public void put(Message m) {
         try {
-            holdBackQueue.put(m);
+            if (!vc.containsKey(m.getOriginUID())) {
+                logger.debug("New process added to VectorClock");
+                vc.newProcess(m.getOriginUID());
+            }
+            
+            // Tick counter for receiving message process
+            vc.tick(m.getOriginUID());
+            debugger.updateVectorClock(vc);
+
+            receiveQueue.put(m);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
+            // TODO: How do we handle this 
+            logger.error("TODO: Warning vc is not in sync anymore");
             e.printStackTrace();
         }
     }
@@ -71,13 +85,27 @@ public class FIFO implements Ordering {
     }
 
     private class MessageHandler implements Runnable {
+        private Queue<Message> holdBackQueue = new LinkedList<Message>();
+
         public void run() {
-            while (running) { 
+            while (running) {
                 try {
-                    Message m = holdBackQueue.take();
+                    Message m = receiveQueue.take();
+                    
                     if (deliverCheck(m)) {
                         deliverQueue.put(m);
+                        
+                        // Check every message in holdBackQueue and deliver if
+                        // possible
+                        for (Message hm : holdBackQueue) {
+                            if (deliverCheck(hm)) {
+                                deliverQueue.put(m);
+                            }
+                        }
+                    } else {
+                        holdBackQueue.add(m);
                     }
+
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -86,19 +114,12 @@ public class FIFO implements Ordering {
         }
 
         private boolean deliverCheck(Message m) {
-            if (!vc.containsKey(m.getOriginUID())) {
-                logger.debug("New process added to VectorClock");
-                vc.newProcess(m.getOriginUID());
-            }
-            
-            // Tick counter for receiving message process
-            vc.tick(m.getOriginUID());
-            debugger.updateVectorClock(vc);
             int otherHasSent = m.getVectorClock().get();
             int hasReceived = vc.get(m.getOriginUID());
             if (otherHasSent != hasReceived) {
                 logger.info("Message lost, will hold it back {}, diff = ",
                             m, otherHasSent - hasReceived);
+                return false;
             }
             logger.debug("otherHasSent: {}, hasReceived: {}",
                          otherHasSent, hasReceived);
