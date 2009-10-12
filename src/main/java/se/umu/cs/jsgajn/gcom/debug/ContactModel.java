@@ -82,11 +82,14 @@ public class ContactModel {
     }
 
     public void setupTables() {
-        receivedTable.addColumn("UID");
+    	receivedTable.addColumn("Count");
+        receivedTable.addColumn("ID");
+        receivedTable.addColumn("UID-short");
         receivedTable.addColumn("Message");
         receivedTable.addColumn("Origin");	
 
-        deliveredTable.addColumn("UID");
+        deliveredTable.addColumn("ID");
+        deliveredTable.addColumn("UID-short");
         deliveredTable.addColumn("Message");
         deliveredTable.addColumn("Origin");
 
@@ -103,7 +106,7 @@ public class ContactModel {
     }
 
     public void addReceived(Object[] obj) {
-        receivedTable.insertRow(0, obj);
+    	receivedTable.insertRow(0, obj);
     }
     public void addDelivered(Object[] obj) {
         deliveredTable.insertRow(0, obj);
@@ -115,15 +118,6 @@ public class ContactModel {
         vectorclock.insertRow(0, rowData);
     }
     public void addGroupMember(Object[] rowData) {
-    	while(groupMembers == null) {
-    		try {
-				Thread.sleep(1);
-				System.out.println("sleeep");
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	}
     	System.out.println("add: " + rowData[0]);
         groupMembers.insertRow(0, rowData);
     }
@@ -221,5 +215,9 @@ public class ContactModel {
 
 	public void setReleaseAndResortButton(JToggleButton releaseAndResortButton) {
 		this.releaseAndResortButton = releaseAndResortButton;
+	}
+
+	public void clearGroup() {
+        groupMembers.setNumRows(0);	
 	}
 }

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
+import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
 
 public class Debugger implements DebugHandler {
     private static final Logger logger = LoggerFactory.getLogger(Debugger.class);
@@ -26,15 +27,7 @@ public class Debugger implements DebugHandler {
         if (debugger == null) {
             return;
         }
-        if(!debugger.isInit()) {
-        	while(debugger.isInit() == false){
-        		try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					System.out.println("Thread in debugger couldn't sleep.");
-				}
-        	}
-        }
+        waitForModel();
         //logger.debug("Received: " + m);
         debugger.messageReceived(m);
     }
@@ -64,6 +57,7 @@ public class Debugger implements DebugHandler {
         if (debugger == null) {
             return;
         }
+        waitForModel();
         debugger.groupChange(g);
     }
 
@@ -88,5 +82,24 @@ public class Debugger implements DebugHandler {
 
 	public boolean isInit() {
 		return debugger.isInit();
+	}
+	
+	public void waitForModel() {
+		if(!debugger.isInit()) {
+        	while(debugger.isInit() == false){
+        		try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					System.out.println("Thread in debugger couldn't sleep.");
+				}
+        	}
+        }
+	}
+
+	public void updateVectorClock(VectorClock vc) {
+        if (debugger == null) {
+            return;
+        }
+        debugger.updateVectorClock(vc);
 	}
 }

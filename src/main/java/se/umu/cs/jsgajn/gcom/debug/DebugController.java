@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import javax.swing.table.DefaultTableModel;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
@@ -21,72 +22,73 @@ import java.rmi.RemoteException;
 import java.rmi.server.UID;
 import java.util.concurrent.atomic.AtomicInteger;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
+import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DebugController implements DebugHandler {
-    private static final Logger logger = LoggerFactory.getLogger(DebugController.class);
-    
-    private DebugModel debugModel;
-    private ContactModel currentContact;// = new ContactModel();
-    
-    private Receiver receiver;
-    private boolean doHold = false;
-    private Queue<Message> holdQueue = new LinkedBlockingQueue<Message>();
-    
-    // For tmp usernames / Anton
-    private Map<UID, String> userNames = new HashMap<UID, String>();
-    private Stack<String> tmpUID;
-    private AtomicInteger mIDcounter = new AtomicInteger(0);
-    private Map<UID, Integer> messageIDs = new HashMap<UID, Integer>();
+	private static final Logger logger = LoggerFactory.getLogger(DebugController.class);
+
+	private DebugModel debugModel;
+	private ContactModel currentContact;// = new ContactModel();
+
+	private Receiver receiver;
+	private boolean doHold = false;
+	private Queue<Message> holdQueue = new LinkedBlockingQueue<Message>();
+
+	// For tmp usernames / Anton
+	private Map<UID, String> userNames = new HashMap<UID, String>();
+	private Stack<String> tmpUID;
+	private AtomicInteger mIDcounter = new AtomicInteger(0);
+	private Map<UID, Integer> messageIDs = new HashMap<UID, Integer>();
 
 
-    public DebugController() {
-     
-    }
-    public DebugController(ContactModel model) {
-        currentContact = model;
-    }
+	public DebugController() {
 
-    public void init() {
-    }
+	}
+	public DebugController(ContactModel model) {
+		currentContact = model;
+	}
 
-
-    public DebugModel getDebugModel() {
-        return debugModel;
-    }
-    public void setDebugModel(DebugModel debugModel) {
-        this.debugModel = debugModel;
-    }
+	public void init() {
+	}
 
 
-    public ContactModel getCurrentContact() {
-        return currentContact;
-    }
+	public DebugModel getDebugModel() {
+		return debugModel;
+	}
+	public void setDebugModel(DebugModel debugModel) {
+		this.debugModel = debugModel;
+	}
 
-    public void crash() {
-        System.exit(0);
-    }
 
-    public void block() {
-        // TODO: implement
-        boolean blocking = true;
-        while (blocking) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+	public ContactModel getCurrentContact() {
+		return currentContact;
+	}
 
-    public void crashMessage() {
-        currentContact.addCrashed(new String[]{"hej", "heja3"});
-    }
+	public void crash() {
+		System.exit(0);
+	}
 
-    public void updateVectorClock() {
-        /*
+	public void block() {
+		// TODO: implement
+		boolean blocking = true;
+	while (blocking) {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	}
+
+	public void crashMessage() {
+		currentContact.addCrashed(new String[]{"hej", "heja3"});
+	}
+
+	public void updateVectorClock() {
+		/*
           DefaultTableModel vectorclock = new DefaultTableModel();
           for(int i = 0; i < 10; i++) {
           String[] columns = new String[2];
@@ -95,95 +97,121 @@ public class DebugController implements DebugHandler {
           vectorclock.addRow(columns);
           }
           currentContact.updateVectorclock(vectorclock);
-        */
-        String[] columns = new String[2];
-        columns[0] = Integer.toString(1);
-        columns[1] = Integer.toString(2);
-        currentContact.addToClock(columns);
+		 */
+		String[] columns = new String[2];
+		columns[0] = Integer.toString(1);
+		columns[1] = Integer.toString(2);
+		currentContact.addToClock(columns);
 
-    }
-    public void messageReceived(Message m) {
-        currentContact.addReceived(new Object[]{getShortUIDForMessage(m.getUID()), 
-        		m.getMessage(), getUserNameForUID(m.getOriginUID())});
-    }
-    public void messageDelivered(Message m) {
-        currentContact.addDelivered(new Object[]{getShortUIDForMessage(m.getUID()), 
-        		m.getMessage(), getUserNameForUID(m.getOriginUID())});
-    }
+	}
+	public void messageReceived(Message m) {
+		boolean found = false;
+		DefaultTableModel receivedTable = currentContact.getReceivedTable();
+		for(int i = 0; i < receivedTable.getRowCount(); i++) {
+			if(receivedTable.getValueAt(i, 2).equals(getShorterUIDForMessage(m.getUID()))) {
+				int newCount = Integer.parseInt(receivedTable.getValueAt(i, 0).toString());
+				newCount++;
+				receivedTable.setValueAt(newCount, i, 0);
+				found = true;
+			}
+		}
+		if(found == false) {
+			currentContact.addReceived(
+					new Object[]{
+							1,
+							getShortUIDForMessage(m.getUID()),
+							getShorterUIDForMessage(m.getUID()), 
+							m.getMessage(), 
+							getUserNameForUID(m.getOriginUID())});
+		}
+	}
+	public void messageDelivered(Message m) {
+		currentContact.addDelivered(new Object[]{getShortUIDForMessage(m.getUID()),
+				getShorterUIDForMessage(m.getUID()), 
+				m.getMessage(), getUserNameForUID(m.getOriginUID())});
+	}
+	
+	public void updateVectorClock(VectorClock vc) {
 
-    public void hold()	{
-    	if(doHold) {
-    		doHold = false;
-    		while(!holdQueue.isEmpty()) {
-    			try {
+
+	}
+
+	public void hold()	{
+		if(doHold) {
+			doHold = false;
+			while(!holdQueue.isEmpty()) {
+				try {
 					receiver.receive(holdQueue.poll());
 				} catch (RemoteException e) {
 					e.printStackTrace();
 					System.out.println("Debugger: Error while receiving.");
 				}
-    		}
-    	} else {
-    		doHold = true;
-    	}
-    }
-    
-    public boolean doHold() {
-        return doHold;
-    }
+			}
+		} else {
+			doHold = true;
+		}
+	}
 
-    // TODO: implement
-    public boolean holdMessage(Message m, Receiver r) {
-        logger.warn("TODO: holdMessage(Message m, Receiver r) -> Not implemented");
-        boolean holdMessages = false; // Get from ui
-        // Add to some queue, must be quick this method will be invoked from
-        // messageHandler thread in CommunicationsModuleImpl
-        if(doHold){
-        	receiver = r; 
-        	holdQueue.add(m);
-        	return doHold;
-        } else {
-        	return doHold;
-        }
-    }
+	public boolean doHold() {
+		return doHold;
+	}
 
-    public void resortHoldMessages() {
-    	List list = new ArrayList<Message>();
-    	while(!holdQueue.isEmpty()){
-    		list.add(holdQueue.poll());
-    	}
-    	Collections.shuffle(list);
-    	holdQueue.addAll(list);
-    }
+	// TODO: implement
+	public boolean holdMessage(Message m, Receiver r) {
+		logger.warn("TODO: holdMessage(Message m, Receiver r) -> Not implemented");
+		boolean holdMessages = false; // Get from ui
+		// Add to some queue, must be quick this method will be invoked from
+		// messageHandler thread in CommunicationsModuleImpl
+		if(doHold){
+			receiver = r; 
+			holdQueue.add(m);
+			return doHold;
+		} else {
+			return doHold;
+		}
+	}
 
-        // Not tested but should work / Anton
-    private String getUserNameForUID(UID uid) {
-        if (tmpUID == null) {
-            Stack<String> tmp = new Stack<String>();
-            tmp.addAll(Arrays.asList("B.L.Ä.B", "B.Ä.R.S", "backpacker", "Baconballe", "Baconrosrekyl", "Bajsamera", "Bajsbergsbyggare", "Bajsbröder", "Bajsbröder", "Bajsdildo", "Bajsfest", "Bajsförnedring", "Bajsfötter", "Bajshatt", "Bajskork", "Bajspackare", "Bajspassare", "Bajspärla", "baka kladdkaka", "Bakmus", "Baktanke", "bakterie-runk", "Bakteriebög", "Bakteriedopp", "Ballhojta", "Ballongen", "Ballongknut", "Banankontakt", "Bandtraktor", "Bangbros", "Barbagay", "Barkbåt", "Barmhärtighetsknull", "Barra", "bastuballe", "Bastukorv", "Basturace", "Batongluder", "beer googles", "Bergsslyna", "Berlinsk Gasmask", "Bert Karlsson", "Bertofili", "Bibelcitat", "Big sausage pizza", "Bingo-Hora", "Bjud-fitta", "Björn Borg runk", "Björnfitta", "Björnkuk", "Blattehora", "BlindDate", "Blinga", "Blixten", "Blockmongo", "Blodig kuk", "Blodkanoten", "Blodpudding", "Blodrunka", "Blomsterfitta", "Blueballs", "Blåbärsmutta", "Blåsjobb", "Blöjbärare", "Blöjgång", "BOB", "Bolibompa", "Boll-lek", "Bolljude", "Bomben", "bombmatta", "Bomullsplockare", "Bondlurken", "Bosniensnygg", "Boston Tea Party", "Boulla", "Boven", "Bowling-greppet", "Bracka", "Bronka", "Broskfitta", "Brown Brown", "Brunkch", "Brutalrunkare", "BrytSkryt", "Buddha-Effekten", "Budgetrunkare", "Bukbröder", "Buktrumma", "Bulldogs-Fitta", "Bullfitta", "Bulls-eye", "bumbibjörn", "Burkosexuell", "Bussbög", "Bussrunkare", "bygga teddy björn", "Byhora", "Byta-filter", "Bäverdräparn", "Bäverjakt", "Bävernäve", "Bögbajsa", "böghandtag", "Böghandtag", "Böghora", "Böglyft", "bögnylle", "Bögporr-maraton", "Bögpölsa", "Bögslunga", "Bögsmälla", "Bögsmör", "Bögsnara", "Bögulv", "Bögvinkel"));
-            this.tmpUID = tmp;
-        }
+	public void resortHoldMessages() {
+		List list = new ArrayList<Message>();
+		while(!holdQueue.isEmpty()){
+			list.add(holdQueue.poll());
+		}
+		Collections.shuffle(list);
+		holdQueue.addAll(list);
+	}
 
-        if (!userNames.containsKey(uid)) {
-            userNames.put(uid, tmpUID.pop());
-        }
+	// Not tested but should work / Anton
+	private String getUserNameForUID(UID uid) {
+		if (tmpUID == null) {
+			Stack<String> tmp = new Stack<String>();
+			tmp.addAll(Arrays.asList("B.L.Ä.B", "B.Ä.R.S", "backpacker", "Baconballe", "Baconrosrekyl", "Bajsamera", "Bajsbergsbyggare", "Bajsbröder", "Bajsbröder", "Bajsdildo", "Bajsfest", "Bajsförnedring", "Bajsfötter", "Bajshatt", "Bajskork", "Bajspackare", "Bajspassare", "Bajspärla", "baka kladdkaka", "Bakmus", "Baktanke", "bakterie-runk", "Bakteriebög", "Bakteriedopp", "Ballhojta", "Ballongen", "Ballongknut", "Banankontakt", "Bandtraktor", "Bangbros", "Barbagay", "Barkbåt", "Barmhärtighetsknull", "Barra", "bastuballe", "Bastukorv", "Basturace", "Batongluder", "beer googles", "Bergsslyna", "Berlinsk Gasmask", "Bert Karlsson", "Bertofili", "Bibelcitat", "Big sausage pizza", "Bingo-Hora", "Bjud-fitta", "Björn Borg runk", "Björnfitta", "Björnkuk", "Blattehora", "BlindDate", "Blinga", "Blixten", "Blockmongo", "Blodig kuk", "Blodkanoten", "Blodpudding", "Blodrunka", "Blomsterfitta", "Blueballs", "Blåbärsmutta", "Blåsjobb", "Blöjbärare", "Blöjgång", "BOB", "Bolibompa", "Boll-lek", "Bolljude", "Bomben", "bombmatta", "Bomullsplockare", "Bondlurken", "Bosniensnygg", "Boston Tea Party", "Boulla", "Boven", "Bowling-greppet", "Bracka", "Bronka", "Broskfitta", "Brown Brown", "Brunkch", "Brutalrunkare", "BrytSkryt", "Buddha-Effekten", "Budgetrunkare", "Bukbröder", "Buktrumma", "Bulldogs-Fitta", "Bullfitta", "Bulls-eye", "bumbibjörn", "Burkosexuell", "Bussbög", "Bussrunkare", "bygga teddy björn", "Byhora", "Byta-filter", "Bäverdräparn", "Bäverjakt", "Bävernäve", "Bögbajsa", "böghandtag", "Böghandtag", "Böghora", "Böglyft", "bögnylle", "Bögporr-maraton", "Bögpölsa", "Bögslunga", "Bögsmälla", "Bögsmör", "Bögsnara", "Bögulv", "Bögvinkel"));
+			this.tmpUID = tmp;
+		}
 
-        return userNames.get(uid);
-    }
+		if (!userNames.containsKey(uid)) {
+			userNames.put(uid, tmpUID.pop());
+		}
 
-    private int getShortUIDForMessage(UID uid) {
-        if (!messageIDs.containsKey(uid)) {
-            messageIDs.put(uid, mIDcounter.incrementAndGet());
-        }
-        return messageIDs.get(uid);
-    }
-    
-    public void groupChange(GroupView group) {
-    	/*
-    	for(GroupMember gm : group) {
-    		currentContact.addGroupMember(new Object[]{"HEEEJ"});
-    	}
-    	*/
-    }
+		return userNames.get(uid);
+	}
+
+	private int getShortUIDForMessage(UID uid) {
+		if (!messageIDs.containsKey(uid)) {
+			messageIDs.put(uid, mIDcounter.incrementAndGet());
+		}
+		return messageIDs.get(uid);
+	}
+
+	private String getShorterUIDForMessage(UID uid) {
+		return uid.toString().substring(16);
+	}
+
+	public void groupChange(GroupView group) {
+		currentContact.clearGroup();
+		for(GroupMember gm : group) {
+			currentContact.addGroupMember(new Object[]{getUserNameForUID(gm.getPID())});
+		}
+	}
 	public boolean isInit() {
 		return currentContact.isInit();
 	}
