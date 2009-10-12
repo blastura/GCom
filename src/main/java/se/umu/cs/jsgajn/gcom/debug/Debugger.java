@@ -1,5 +1,6 @@
 package se.umu.cs.jsgajn.gcom.debug;
 
+import java.rmi.server.UID;
 import java.util.ArrayList;
 import java.util.Queue;
 
@@ -96,7 +97,7 @@ public class Debugger implements DebugHandler {
         }
 	}
 
-	public void updateVectorClock(VectorClock vc) {
+	public void updateVectorClock(VectorClock<UID> vc) {
         if (debugger == null) {
             return;
         }

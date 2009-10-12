@@ -1,5 +1,6 @@
 package se.umu.cs.jsgajn.gcom.debug;
 
+import java.rmi.server.UID;
 import java.util.Queue;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
@@ -13,7 +14,7 @@ public interface DebugHandler {
     public void groupChange(GroupView g);
     public void crash();
     public void block();
-    public void updateVectorClock(VectorClock vc);
+    public void updateVectorClock(VectorClock<UID> vc);
     public boolean holdMessage(Message m, Receiver r);
     public boolean doHold();
 	public boolean isInit();

@@ -6,6 +6,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import se.umu.cs.jsgajn.gcom.debug.Debugger;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import java.rmi.server.UID;
@@ -21,6 +23,8 @@ import java.rmi.server.UID;
  */
 public class FIFO implements Ordering {
     private static final Logger logger = LoggerFactory.getLogger(FIFO.class);
+    private static final Debugger debugger = Debugger.getDebugger();
+    
     private BlockingQueue<Message> holdBackQueue;
     private BlockingQueue<Message> deliverQueue;
     private AtomicInteger msgCounter = new AtomicInteger(0);
@@ -89,7 +93,7 @@ public class FIFO implements Ordering {
             
             // Tick counter for receiving message process
             vc.tick(m.getOriginUID());
-            
+            debugger.updateVectorClock(vc);
             int otherHasSent = m.getVectorClock().get();
             int hasReceived = vc.get(m.getOriginUID());
             if (otherHasSent != hasReceived) {

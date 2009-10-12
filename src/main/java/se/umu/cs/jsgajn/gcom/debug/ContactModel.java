@@ -114,7 +114,7 @@ public class ContactModel {
     public void addCrashed(Object[] obj) {
         crashedTable.insertRow(0,obj);
     }
-    public void addToClock(String[] rowData) {
+    public void addToClock(Object[] rowData) {
         vectorclock.insertRow(0, rowData);
     }
     public void addGroupMember(Object[] rowData) {
@@ -219,5 +219,8 @@ public class ContactModel {
 
 	public void clearGroup() {
         groupMembers.setNumRows(0);	
+	}
+	public void clearVectorClock() {
+		vectorclock.setNumRows(0);
 	}
 }

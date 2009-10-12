@@ -131,9 +131,14 @@ public class DebugController implements DebugHandler {
 				m.getMessage(), getUserNameForUID(m.getOriginUID())});
 	}
 	
-	public void updateVectorClock(VectorClock vc) {
-
-
+	public void updateVectorClock(VectorClock<UID> vc) {
+		currentContact.clearVectorClock();
+		for(UID vcid : vc.keySet()) {
+			currentContact.addToClock(new String[]{
+					getUserNameForUID(vcid).toString(),
+					Integer.toString(vc.get(vcid))
+					});
+		}
 	}
 
 	public void hold()	{
