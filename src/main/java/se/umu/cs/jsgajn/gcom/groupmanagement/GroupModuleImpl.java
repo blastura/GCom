@@ -113,6 +113,7 @@ public class GroupModuleImpl implements GroupModule {
                                 PID,
                                 groupView.getID());
             this.groupView = new GroupViewImpl(groupName, gs.getLeader());
+            this.groupView.add(this.groupMember);
             //.getReceiver().receive(joinMessage);
             send(joinMessage, this.groupView);
         }

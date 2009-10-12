@@ -92,7 +92,7 @@ public class MessageImpl implements Message {
 
     @Override
     public String toString() {
-        return "[origin: " + this.originID + ", object: '" + this.m.toString()
-        + "', messageID: " + this.ID + "]";
+        return "[vc: " + getVectorClock() + ", origin: " + this.originID + ", object: '" + this.m.toString()
+            + "', messageID: " + this.ID + "]";
     }
 }

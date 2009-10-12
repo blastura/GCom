@@ -145,6 +145,11 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
         return map.hashCode();
     }
 
+    @Override
+    public String toString() {
+        return this.map.toString();
+    }
+
     private void checkEqualKeySets(final VectorClock<T> o) {
         if ((map.size() != o.getMap().size())
             && !(map.keySet().equals(o.getMap().keySet()))) {

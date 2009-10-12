@@ -57,12 +57,12 @@ public class FIFO implements Ordering {
     }
 
     public Message prepareOutgoingMessage(Message m) {
-        logger.debug("Prepare outgoing message: " + m);
         // Tick counter for sent messages
         msgCounter.incrementAndGet();
         VectorClock<UID> vc = new VectorClock<UID>(GroupModule.PID,
                                                    msgCounter.get());
         m.setVectorClock(vc);
+        logger.debug("Prepared outgoing message: " + m);
         return m;
     }
 
@@ -82,8 +82,6 @@ public class FIFO implements Ordering {
         }
 
         private boolean deliverCheck(Message m) {
-            // TODO: Auto-generated method stub
-            logger.debug("Checking deliver. TODO: implement");
             if (!vc.containsKey(m.getOriginUID())) {
                 logger.debug("New process added to VectorClock");
                 vc.newProcess(m.getOriginUID());
@@ -92,9 +90,14 @@ public class FIFO implements Ordering {
             // Tick counter for receiving message process
             vc.tick(m.getOriginUID());
             
-            int otherCounter = m.getVectorClock().get();
-            int ownCounterForProcess = vc.get(m.getOriginUID());
-            logger.debug("OwnCounterForProcess: {}, inMessageCounter: {}", ownCounterForProcess, otherCounter);
+            int otherHasSent = m.getVectorClock().get();
+            int hasReceived = vc.get(m.getOriginUID());
+            if (otherHasSent != hasReceived) {
+                logger.info("Message lost, will hold it back {}, diff = ",
+                            m, otherHasSent - hasReceived);
+            }
+            logger.debug("otherHasSent: {}, hasReceived: {}",
+                         otherHasSent, hasReceived);
             return true;
         }
     }
