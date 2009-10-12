@@ -26,6 +26,15 @@ public class Debugger implements DebugHandler {
         if (debugger == null) {
             return;
         }
+        if(!debugger.isInit()) {
+        	while(debugger.isInit() == false){
+        		try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					System.out.println("Thread in debugger couldn't sleep.");
+				}
+        	}
+        }
         //logger.debug("Received: " + m);
         debugger.messageReceived(m);
     }
@@ -76,4 +85,8 @@ public class Debugger implements DebugHandler {
         }
         return debugger.holdMessage(m, r);
     }
+
+	public boolean isInit() {
+		return debugger.isInit();
+	}
 }

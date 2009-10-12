@@ -184,4 +184,7 @@ public class DebugController implements DebugHandler {
     	}
     	*/
     }
+	public boolean isInit() {
+		return currentContact.isInit();
+	}
 }

@@ -34,7 +34,7 @@ public class ContactModel {
     private JToggleButton releaseAndResortButton;
     
     private String messageInfo;
-
+    private boolean init = false;
     
     private JPanel clientInfoPanel;
     private JPanel groupViewPanel;
@@ -52,6 +52,7 @@ public class ContactModel {
         messageInfo = "Meddelandeinfo";
         tabs.setTitleAt(0, "Overview");
         tabs.setTitleAt(1, "Ordering");
+        init = true;
     }
 
     public void clearContent() {
@@ -95,6 +96,10 @@ public class ContactModel {
         vectorclock.addColumn("Ticks");
         
         groupMembers.addColumn("Name");
+    }
+    
+    public boolean isInit(){
+    	return init;
     }
 
     public void addReceived(Object[] obj) {

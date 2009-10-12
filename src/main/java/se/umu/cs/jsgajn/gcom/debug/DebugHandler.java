@@ -14,4 +14,5 @@ public interface DebugHandler {
     public void block();
     public boolean holdMessage(Message m, Receiver r);
     public boolean doHold();
+	public boolean isInit();
 }
