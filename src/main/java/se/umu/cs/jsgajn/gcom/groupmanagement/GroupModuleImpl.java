@@ -29,7 +29,6 @@ import java.rmi.registry.Registry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.Set;
 import java.util.Map;
 
 /**
@@ -40,7 +39,6 @@ public class GroupModuleImpl implements GroupModule {
     private static final Debugger debugger = Debugger.getDebugger();
     
     private Client client;
-    private String groupName;
     private GNS gns;
     private GroupView groupView;
     private OrderingModule orderingModule;
@@ -74,8 +72,8 @@ public class GroupModuleImpl implements GroupModule {
      * @throws AlreadyBoundException If it's not possible to bind this to own register.
      * @throws NotBoundException If GNS stub is not found in GNS register.
      */
-    public GroupModuleImpl(Client client, String gnsHost, int gnsPort,
-                           String groupName, int clientPort)
+    public GroupModuleImpl(final Client client, final String gnsHost, final int gnsPort,
+                           final String groupName, final int clientPort)
         throws RemoteException, AlreadyBoundException, NotBoundException {
         this.client = client;
         this.receiveQueue = new LinkedBlockingQueue<Message>();
@@ -88,7 +86,6 @@ public class GroupModuleImpl implements GroupModule {
         this.groupMember = new GroupMember(communicationModule.getReceiver());
         // Temp groupview
         this.groupView =  new GroupViewImpl(groupName, this.groupMember);
-        this.groupName = groupName;
         GroupSettings gs = initGroupSettings(groupMember, groupName);
 
         this.gns = getGNS(gnsHost, gnsPort);
@@ -281,7 +278,7 @@ public class GroupModuleImpl implements GroupModule {
         }
 
         private void handelCrash(Object o) {
-                logger.warn("Not implemented: " + o);
+            logger.warn("Handle crasch, obj received: " + o + " TODO: not implemented");
             // TODO: Election om de e ledaren annars groupchange
         }
     }

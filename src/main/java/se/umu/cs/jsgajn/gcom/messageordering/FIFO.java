@@ -92,7 +92,7 @@ public class FIFO implements Ordering {
         VectorClock<UID> vc = new VectorClock<UID>(GroupModule.PID,
                                                    msgCounter.get());
         m.setVectorClock(vc);
-        logger.debug("Prepared outgoing message: " + m);
+        logger.debug("OUT: Prepared outgoing message: " + m);
         return m;
     }
 
@@ -136,8 +136,10 @@ public class FIFO implements Ordering {
             int hasReceived = vc.get(m.getOriginUID());
             // If this message is the next in order for sending process
             if (otherHasSent == (hasReceived + 1)) {
-                logger.debug("otherHasSent: {}, hasReceived: {}",
-                             otherHasSent, hasReceived);
+                logger.debug("otherHasSent: {}, hasReceived: {}, from: {}",
+                             new Object[] {otherHasSent,
+                                           hasReceived,
+                                           m.getOriginUID().equals(GroupModule.PID) ? "ME" : m.getOriginUID().toString()});
 
                 // Tick counter for receiving message process
                 vc.tick(m.getOriginUID());
@@ -145,8 +147,8 @@ public class FIFO implements Ordering {
                 return true;
             } else { // TODO: what if message are before the ones we already
                      // received, how do we get rid of them?
-                logger.info("Message lost, will hold it back {}, diff = {}",
-                            m, (otherHasSent - hasReceived));
+                logger.info("Message lost, will hold it diff {}, message = {}",
+                            (otherHasSent - hasReceived), m);
                 return false;
             }
         }

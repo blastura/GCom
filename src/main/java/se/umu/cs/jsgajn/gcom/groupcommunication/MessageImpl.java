@@ -4,6 +4,7 @@ import java.rmi.server.UID;
 import java.util.ArrayList;
 import java.util.List;
 import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 
 /**
  * Default implementation of {@link Message} interface.
@@ -92,7 +93,10 @@ public class MessageImpl implements Message {
 
     @Override
     public String toString() {
-        return "[vc: " + getVectorClock() + ", origin: " + this.originID + ", object: '" + this.m.toString()
+        String origin = this.originID.equals(GroupModule.PID) ? "ME" : this.originID.toString();
+        return "[origin: " + origin
+            + ", vc: " + getVectorClock()
+            + ", object: '" + this.m.toString()
             + "', messageID: " + this.ID + "]";
     }
 }

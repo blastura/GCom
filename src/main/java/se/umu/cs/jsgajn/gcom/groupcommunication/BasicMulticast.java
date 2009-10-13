@@ -1,8 +1,6 @@
 package se.umu.cs.jsgajn.gcom.groupcommunication;
 
 import java.rmi.RemoteException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,20 +31,19 @@ public class BasicMulticast implements Multicast {
         crashed.clear();
         for (GroupMember member : g) {
             try {
-                if (crashed.containsKey(member)) {
-                    logger.info("Old crashed: " + member.getPID());
-                    continue;
-                }
                 member.getReceiver().receive(m);
+                logger.debug("Sent message to: " + member);
             } catch (RemoteException re) {
                 if (!(re.getCause() instanceof java.net.ConnectException)) {
                     logger.error("RemoteException not ConnectException");
                     re.printStackTrace();
                 }
+                
                 logger.info("Receiver exception: " + member.getPID());
                 crashed.put(member, re);
             }
         }
+        
         if (!crashed.isEmpty()) {
             //throw new MemberCrashException();
             throw new MemberCrashException(crashed);

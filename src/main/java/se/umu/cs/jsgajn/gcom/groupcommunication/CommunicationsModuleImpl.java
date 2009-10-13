@@ -17,10 +17,6 @@ import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 import se.umu.cs.jsgajn.gcom.debug.Debugger;
 import java.rmi.NoSuchObjectException;
 import java.util.concurrent.BlockingQueue;
-import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
-import java.util.Map;
-import java.util.Set;
-import java.util.Collections;
 
 public class CommunicationsModuleImpl implements CommunicationModule {
     private static final Logger logger = LoggerFactory.getLogger(CommunicationsModuleImpl.class);

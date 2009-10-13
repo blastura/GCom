@@ -3,8 +3,8 @@
 
    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
       <layout class="ch.qos.logback.classic.PatternLayout">
-         <!-- <pattern>%-4level:%logger{0}:[%thread]:> %msg%n</Pattern> -->
-         <Pattern>%logger{0}:>%msg%n</Pattern>
+         <Pattern>%logger{0}.%method:[%thread]:> %msg%n</Pattern>
+         <!--       <Pattern>%logger{0}:>%msg%n</Pattern> -->
          <!--<Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern> -->
       </layout>
    </appender>
@@ -20,6 +20,7 @@
    <!--    </logger> -->
 
    <!-- if system property logback.root.level is set use that otherwise use supplied -->
+   
    <root>
       <level value="${logback.root.level:-DEBUG}"/>
       <appender-ref ref="STDOUT" />

@@ -47,6 +47,8 @@ public class GroupMember implements Serializable {
     
     @Override
     public String toString() {
-        return getPID().toString();
+        return getPID().equals(GroupModule.PID)
+            ? "ME"
+            : getPID().toString();
     }
 }
