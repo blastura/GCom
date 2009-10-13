@@ -27,7 +27,7 @@ import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DebugController /*implements DebugHandler*/ {
+public class DebugController implements DebugHandler {
 	private static final Logger logger = LoggerFactory.getLogger(DebugController.class);
 
 	private ContactModel currentContact;// = new ContactModel();
@@ -79,17 +79,31 @@ public class DebugController /*implements DebugHandler*/ {
 		currentContact.addCrashed(new String[]{"hej", "heja3"});
 	}
 
-	public void messageReceived(Message m) {
-		boolean found = false;
+	public boolean allreadyFoundCheck(Message m) {
 		DefaultTableModel receivedTable = currentContact.getReceivedTable();
 		for(int i = 0; i < receivedTable.getRowCount(); i++) {
 			if(receivedTable.getValueAt(i, 2).equals(getShorterUIDForMessage(m.getUID()))) {
 				int newCount = Integer.parseInt(receivedTable.getValueAt(i, 0).toString());
 				newCount++;
 				receivedTable.setValueAt(newCount, i, 0);
-				found = true;
+				return true;
 			}
 		}
+		return false;
+	}
+	public boolean allreadyHoldCheck(Message m) {
+		DefaultTableModel holdTable = currentContact.getHoldTable();
+		for(int i = 0; i < holdTable.getRowCount(); i++) {
+			if(holdTable.getValueAt(i, 1).equals(getShorterUIDForMessage(m.getUID()))) {
+				return true;
+			}
+		}
+		return false;
+	}	
+	
+	public void messageReceived(Message m) {
+		boolean found = false;
+		found = allreadyFoundCheck(m);
 		if(found == false) {
 			currentContact.addReceived(
 					new Object[]{
@@ -119,6 +133,8 @@ public class DebugController /*implements DebugHandler*/ {
 	public void hold()	{
 		if(doHold) {
 			doHold = false;
+
+			System.out.println("######## size: " + holdQueue.size());
 			while(!holdQueue.isEmpty()) {
 				try {
 					receiver.receive(holdQueue.poll());
@@ -145,20 +161,39 @@ public class DebugController /*implements DebugHandler*/ {
 		// messageHandler thread in CommunicationsModuleImpl
 		if(doHold){
 			receiver = r; 
-			holdQueue.add(m);
-			currentContact.addHold(new Object[]{m.getMessage(), getShorterUIDForMessage(m.getUID())});
+			boolean found = false;
+			found = allreadyHoldCheck(m);
+			if(found == false) {
+				holdQueue.add(m);
+				currentContact.addHold(new Object[]{m.getMessage(), getShorterUIDForMessage(m.getUID())});
+			}
 			return doHold;
 		} else {
 			return doHold;
 		}
 	}
 
-	public void resortHoldMessages() {
+	public void shuffleHoldMessages() {
+		currentContact.clearHoldTable();
 		List list = new ArrayList<Message>();
 		while(!holdQueue.isEmpty()){
-			list.add(holdQueue.poll());
+			Message m = holdQueue.poll();
+			currentContact.addHold(new Object[]{m.getMessage(), getShorterUIDForMessage(m.getUID())});
+			list.add(m);
 		}
 		Collections.shuffle(list);
+		holdQueue.addAll(list);
+	}
+
+	public void reversHoldMessages() {
+		currentContact.clearHoldTable();
+		List list = new ArrayList<Message>();
+		while(!holdQueue.isEmpty()){
+			Message m = holdQueue.poll();
+			currentContact.addHold(new Object[]{m.getMessage(), getShorterUIDForMessage(m.getUID())});
+			list.add(m);
+		}
+		Collections.reverse(list);
 		holdQueue.addAll(list);
 	}
 
@@ -185,7 +220,7 @@ public class DebugController /*implements DebugHandler*/ {
 	}
 
 	private String getShorterUIDForMessage(UID uid) {
-		return uid.toString().substring(16);
+		return uid.toString().substring(12);
 	}
 
 	public void groupChange(GroupView group) {
@@ -195,7 +230,7 @@ public class DebugController /*implements DebugHandler*/ {
 		}
 	}
 	
-	public boolean isModelIsInit(int sven) {
+	public boolean isModelInitialized(int hack) {
 		return currentContact.isModelIsInit();
 	}
 	

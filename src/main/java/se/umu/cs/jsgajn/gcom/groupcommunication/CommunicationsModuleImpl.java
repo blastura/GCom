@@ -105,7 +105,6 @@ public class CommunicationsModuleImpl implements CommunicationModule {
             try {
                 while (running) {
                     Message m = receiveQueue.take();
-                    logger.debug("#################### got mess: " + m);
                     debugger.messageReceived(m);
                     
                     if (debugger.holdMessage(m, getReceiver())) {

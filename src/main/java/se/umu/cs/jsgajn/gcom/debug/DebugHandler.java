@@ -17,5 +17,5 @@ public interface DebugHandler {
     public void updateVectorClock(VectorClock<UID> vc);
     public boolean holdMessage(Message m, Receiver r);
     public boolean doHold();
-	public boolean isInit();
+	public boolean isModelInitialized(int hack);
 }

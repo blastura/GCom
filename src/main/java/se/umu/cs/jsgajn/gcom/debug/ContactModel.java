@@ -74,11 +74,7 @@ public class ContactModel {
 
         groupMembers.setNumRows(0);
         groupMembers.setColumnCount(0);
-        
-        TitledBorder title;
-        title = BorderFactory.createTitledBorder("Client Name");
-        clientInfoPanel.setBorder(title);
-
+    
         TitledBorder groupViewPanel;
         groupViewPanel = BorderFactory.createTitledBorder("Group View Name");
         groupViewPanel.setBorder(groupViewPanel);

@@ -81,13 +81,13 @@ public class Debugger implements DebugHandler {
         return debugger.holdMessage(m, r);
     }
 
-	public boolean isInit() {
-		return debugger.isInit();
+	public boolean isModelInitialized(int hack) {
+		return debugger.isModelInitialized(1);
 	}
 	
 	public void waitForModel() {
-		if(!debugger.isInit()) {
-        	while(debugger.isInit() == false){
+		if(!debugger.isModelInitialized(1)) {
+        	while(debugger.isModelInitialized(1) == false){
         		try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
