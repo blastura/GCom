@@ -26,6 +26,7 @@ import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.io.UnsupportedEncodingException;
 
 public class DebugController implements DebugHandler {
 	private static final Logger logger = LoggerFactory.getLogger(DebugController.class);
@@ -134,13 +135,14 @@ public class DebugController implements DebugHandler {
 		if(doHold) {
 			doHold = false;
 
-			System.out.println("######## size: " + holdQueue.size());
-			while(!holdQueue.isEmpty()) {
+			while (!holdQueue.isEmpty()) {
 				try {
-					receiver.receive(holdQueue.poll());
+                Message m = holdQueue.poll();
+                logger.debug("Sending back message-with-text: {}", m.getMessage().toString());
+					receiver.receive(m);
 				} catch (RemoteException e) {
 					e.printStackTrace();
-					System.out.println("Debugger: Error while receiving.");
+					System.err.println("Debugger: Error while receiving.");
 				}
 			}
 			currentContact.clearHoldTable();
@@ -155,11 +157,10 @@ public class DebugController implements DebugHandler {
 
 	// TODO: implement
 	public boolean holdMessage(Message m, Receiver r) {
-		logger.warn("TODO: holdMessage(Message m, Receiver r) -> Not implemented");
-		boolean holdMessages = false; // Get from ui
 		// Add to some queue, must be quick this method will be invoked from
 		// messageHandler thread in CommunicationsModuleImpl
-		if(doHold){
+		if (doHold) {
+          logger.debug("Holding message {}", m);
 			receiver = r; 
 			boolean found = false;
 			found = allreadyHoldCheck(m);
@@ -208,8 +209,14 @@ public class DebugController implements DebugHandler {
 		if (!userNames.containsKey(uid)) {
 			userNames.put(uid, tmpUID.pop());
 		}
-
-		return userNames.get(uid);
+      
+      try {
+          return new String(userNames.get(uid).getBytes(), "UTF-8");
+      } catch (UnsupportedEncodingException e) {
+          // TODO - fix error message
+          //e.printStackTrace();
+          return e.getMessage();
+      }
 	}
 
 	private int getShortUIDForMessage(UID uid) {

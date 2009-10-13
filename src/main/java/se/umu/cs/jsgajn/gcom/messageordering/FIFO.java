@@ -108,9 +108,9 @@ public class FIFO implements Ordering {
                         deliverQueue.put(m);
                         // Check every message in holdBackQueue and deliver if
                         // possible
-                        for (Message hm : holdBackQueue) {
-                            if (deliverCheck(hm)) {
-                                deliverQueue.put(m);
+                        for (Message holdMessage : holdBackQueue) {
+                            if (deliverCheck(holdMessage)) {
+                                deliverQueue.put(holdMessage);
                             }
                         }
                     } else {
