@@ -1,6 +1,11 @@
-import org.junit.*;
+package se.umu.cs.jsgajn.gcom.groupcommunication;
 
 import java.rmi.server.UID;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;

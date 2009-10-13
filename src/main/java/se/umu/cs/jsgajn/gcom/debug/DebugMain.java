@@ -19,7 +19,7 @@ public class DebugMain {
     public DebugMain(final String[] args) {
     	ContactModel model = new ContactModel();
         final DebugController controller = new DebugController(model);
-        Debugger.setDebugHandler(controller);
+        //Debugger.setDebugHandler(controller);
 
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {

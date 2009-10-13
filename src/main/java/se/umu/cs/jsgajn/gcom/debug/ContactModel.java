@@ -26,6 +26,7 @@ public class ContactModel {
     private UID pid;
     private DefaultTableModel receivedTable;
     private DefaultTableModel deliveredTable;
+    private DefaultTableModel holdTable;
     private DefaultTableModel crashedTable;
     private DefaultTableModel clientInfo;
     private DefaultTableModel groupMembers;
@@ -34,7 +35,7 @@ public class ContactModel {
     private JToggleButton releaseAndResortButton;
     
     private String messageInfo;
-    private boolean init = false;
+    private boolean modelIsInit = false;
     
     private JPanel clientInfoPanel;
     private JPanel groupViewPanel;
@@ -52,7 +53,7 @@ public class ContactModel {
         messageInfo = "Meddelandeinfo";
         tabs.setTitleAt(0, "Overview");
         tabs.setTitleAt(1, "Ordering");
-        init = true;
+        modelIsInit = true;
     }
 
     public void clearContent() {
@@ -61,6 +62,9 @@ public class ContactModel {
 
         deliveredTable.setNumRows(0);
         deliveredTable.setColumnCount(0);
+        
+        holdTable.setNumRows(0);
+        holdTable.setColumnCount(0);
 
         crashedTable.setNumRows(0);
         crashedTable.setColumnCount(0);
@@ -93,6 +97,9 @@ public class ContactModel {
         deliveredTable.addColumn("Message");
         deliveredTable.addColumn("Origin");
 
+        holdTable.addColumn("Name");
+        holdTable.addColumn("UID-short");
+        
         crashedTable.addColumn("UID");
 
         vectorclock.addColumn("UID");
@@ -101,8 +108,8 @@ public class ContactModel {
         groupMembers.addColumn("Name");
     }
     
-    public boolean isInit(){
-    	return init;
+    public boolean isModelIsInit(){
+    	return modelIsInit;
     }
 
     public void addReceived(Object[] obj) {
@@ -110,6 +117,9 @@ public class ContactModel {
     }
     public void addDelivered(Object[] obj) {
         deliveredTable.insertRow(0, obj);
+    }
+    public void addHold(Object[] obj) {
+        holdTable.insertRow(0, obj);
     }
     public void addCrashed(Object[] obj) {
         crashedTable.insertRow(0,obj);
@@ -222,5 +232,16 @@ public class ContactModel {
 	}
 	public void clearVectorClock() {
 		vectorclock.setNumRows(0);
+	}
+	public void clearHoldTable() {
+		holdTable.setNumRows(0);
+	}
+
+	public DefaultTableModel getHoldTable() {
+		return holdTable;
+	}
+
+	public void setHoldTable(DefaultTableModel holdTable) {
+		this.holdTable = holdTable;
 	}
 }

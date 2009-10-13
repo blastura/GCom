@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.6.0_15" class="java.beans.XMLDecoder">
+ <object class="guide.ui.WorkspaceSettings">
+  <void property="boundsMap">
+   <void method="put">
+    <string>MainFrame</string>
+    <object class="java.awt.Rectangle">
+     <int>0</int>
+     <int>22</int>
+     <int>1436</int>
+     <int>878</int>
+    </object>
+   </void>
+  </void>
+  <void property="lastDesignInvocable">
+   <object class="guide.MethodDescriptor2">
+    <string>se.umu.cs.jsgajn.gcom.debug.DebugView</string>
+    <string>create</string>
+    <array class="java.lang.String" length="2">
+     <void index="0">
+      <string>se.umu.cs.jsgajn.gcom.debug.DebugController</string>
+     </void>
+     <void index="1">
+      <string>se.umu.cs.jsgajn.gcom.debug.ContactModel</string>
+     </void>
+    </array>
+   </object>
+  </void>
+  <void property="lastDesignPath">
+   <object class="path.Path" method="get">
+    <string>src/main/java/se/umu/cs/jsgajn/gcom/debug/DebugView.java</string>
+   </object>
+  </void>
+ </object>
+</java>

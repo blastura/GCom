@@ -27,10 +27,9 @@ import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DebugController implements DebugHandler {
+public class DebugController /*implements DebugHandler*/ {
 	private static final Logger logger = LoggerFactory.getLogger(DebugController.class);
 
-	private DebugModel debugModel;
 	private ContactModel currentContact;// = new ContactModel();
 
 	private Receiver receiver;
@@ -54,13 +53,6 @@ public class DebugController implements DebugHandler {
 	public void init() {
 	}
 
-
-	public DebugModel getDebugModel() {
-		return debugModel;
-	}
-	public void setDebugModel(DebugModel debugModel) {
-		this.debugModel = debugModel;
-	}
 
 
 	public ContactModel getCurrentContact() {
@@ -87,23 +79,6 @@ public class DebugController implements DebugHandler {
 		currentContact.addCrashed(new String[]{"hej", "heja3"});
 	}
 
-	public void updateVectorClock() {
-		/*
-          DefaultTableModel vectorclock = new DefaultTableModel();
-          for(int i = 0; i < 10; i++) {
-          String[] columns = new String[2];
-          columns[0] = Integer.toString(i);
-          columns[1] = Integer.toString(2);
-          vectorclock.addRow(columns);
-          }
-          currentContact.updateVectorclock(vectorclock);
-		 */
-		String[] columns = new String[2];
-		columns[0] = Integer.toString(1);
-		columns[1] = Integer.toString(2);
-		currentContact.addToClock(columns);
-
-	}
 	public void messageReceived(Message m) {
 		boolean found = false;
 		DefaultTableModel receivedTable = currentContact.getReceivedTable();
@@ -152,6 +127,7 @@ public class DebugController implements DebugHandler {
 					System.out.println("Debugger: Error while receiving.");
 				}
 			}
+			currentContact.clearHoldTable();
 		} else {
 			doHold = true;
 		}
@@ -170,6 +146,7 @@ public class DebugController implements DebugHandler {
 		if(doHold){
 			receiver = r; 
 			holdQueue.add(m);
+			currentContact.addHold(new Object[]{m.getMessage(), getShorterUIDForMessage(m.getUID())});
 			return doHold;
 		} else {
 			return doHold;
@@ -217,7 +194,9 @@ public class DebugController implements DebugHandler {
 			currentContact.addGroupMember(new Object[]{getUserNameForUID(gm.getPID())});
 		}
 	}
-	public boolean isInit() {
-		return currentContact.isInit();
+	
+	public boolean isModelIsInit(int sven) {
+		return currentContact.isModelIsInit();
 	}
+	
 }
