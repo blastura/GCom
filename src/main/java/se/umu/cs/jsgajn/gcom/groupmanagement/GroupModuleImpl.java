@@ -28,6 +28,7 @@ import java.rmi.registry.Registry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.Set;
 
 /**
  * author dit06ajn, dit06jsg
@@ -246,7 +247,7 @@ public class GroupModuleImpl implements GroupModule {
                 break;
             case MEMBERCRASH:
                 logger.info("MEMBERCRASH");
-                handelCrash((GroupMember)(m.getMessage()));
+                handelCrash((Set<GroupMember>)(m.getMessage()));
                 break;
             case JOIN:
                 if (gl == null) {
@@ -261,7 +262,7 @@ public class GroupModuleImpl implements GroupModule {
             }
         }
 
-        private void handelCrash(GroupMember m) {
+        private void handelCrash(Set<GroupMember> m) {
             // TODO: Election om de e ledaren annars groupchange
         }
     }

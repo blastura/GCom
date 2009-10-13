@@ -20,10 +20,14 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
     }
 
     public void newProcess(T newId) {
+        newProcess(newId, 0);
+    }
+
+    public void newProcess(T newId, int startValue) {
         if (newId.equals(this.id)) {
             throw new IllegalArgumentException("Own process id added");
         }
-        map.put(newId, 0);
+        map.put(newId, startValue);
     }
 
     /**

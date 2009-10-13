@@ -55,20 +55,32 @@ public class FIFO implements Ordering {
         }
     }
 
-    public void put(Message m) {
+    /**
+     * Will put a message in the modules receiveQueue and create a new counter
+     * for the sending process if this is the first message received from that
+     * process. Initial value for that counter will be set from the value the
+     * sending process piggybacked on this message.
+     *
+     * This means that messages can be lost when connecting to an existing group
+     * if messages are received after the first received that was sent before
+     * first message which set the counter.
+     * TODO: fix?
+     *
+     * @param m The Message to put in this Ordering Module.
+     */
+    public void put(final Message m) {
         try {
             if (!vc.containsKey(m.getOriginUID())) {
-                logger.debug("New process added to VectorClock");
-                vc.newProcess(m.getOriginUID());
+                logger.debug("New process added to VectorClock, process {} has sent {} messages",
+                             m.getOriginUID(), m.getVectorClock().get());
+                // Add new process with init value from message - 1 since we
+                // have not confirmed this message should be delivered yet.
+                vc.newProcess(m.getOriginUID(), (m.getVectorClock().get() - 1));
             }
-            
-            // Tick counter for receiving message process
-            vc.tick(m.getOriginUID());
-            debugger.updateVectorClock(vc);
 
             receiveQueue.put(m);
         } catch (InterruptedException e) {
-            // TODO: How do we handle this 
+            // TODO: How do we handle this
             logger.error("TODO: Warning vc is not in sync anymore");
             e.printStackTrace();
         }
@@ -91,10 +103,9 @@ public class FIFO implements Ordering {
             while (running) {
                 try {
                     Message m = receiveQueue.take();
-                    
+
                     if (deliverCheck(m)) {
                         deliverQueue.put(m);
-                        
                         // Check every message in holdBackQueue and deliver if
                         // possible
                         for (Message hm : holdBackQueue) {
@@ -113,17 +124,31 @@ public class FIFO implements Ordering {
             }
         }
 
-        private boolean deliverCheck(Message m) {
+        /**
+         * Method to make sure a Message is not lost from the sending process.
+         *
+         * @param m The message to check.
+         * @return true if message is next in line to be delivered, false
+         *         otherwise.
+         */
+        private boolean deliverCheck(final Message m) {
             int otherHasSent = m.getVectorClock().get();
             int hasReceived = vc.get(m.getOriginUID());
-            if (otherHasSent != hasReceived) {
-                logger.info("Message lost, will hold it back {}, diff = ",
-                            m, otherHasSent - hasReceived);
+            // If this message is the next in order for sending process
+            if (otherHasSent == (hasReceived + 1)) {
+                logger.debug("otherHasSent: {}, hasReceived: {}",
+                             otherHasSent, hasReceived);
+
+                // Tick counter for receiving message process
+                vc.tick(m.getOriginUID());
+                debugger.updateVectorClock(vc);
+                return true;
+            } else { // TODO: what if message are before the ones we already
+                     // received, how do we get rid of them?
+                logger.info("Message lost, will hold it back {}, diff = {}",
+                            m, (otherHasSent - hasReceived));
                 return false;
             }
-            logger.debug("otherHasSent: {}, hasReceived: {}",
-                         otherHasSent, hasReceived);
-            return true;
         }
     }
 }

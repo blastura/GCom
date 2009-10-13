@@ -17,6 +17,9 @@ import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 import se.umu.cs.jsgajn.gcom.debug.Debugger;
 import java.rmi.NoSuchObjectException;
 import java.util.concurrent.BlockingQueue;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
+import java.util.Set;
+import java.util.Map;
 
 public class CommunicationsModuleImpl implements CommunicationModule {
     private static final Logger logger = LoggerFactory.getLogger(CommunicationsModuleImpl.class);
@@ -97,7 +100,20 @@ public class CommunicationsModuleImpl implements CommunicationModule {
     }
 
     public void send(Message m, GroupView g) {
-        mMethod.multicast(m, g);
+        try {
+            mMethod.multicast(m, g);
+        } catch (MemberCrashException e) {
+            Map<GroupMember, RemoteException> crashedMembers = e.getCrashedMembers();
+            Message crashMessage = new MessageImpl(crashedMembers.keySet(),
+                                                   MessageType.MEMBERCRASH,
+                                                   GroupModule.PID,
+                                                   g.getID());
+            boolean changed = g.removeAll(crashedMembers.keySet());
+            if (!changed) {
+                logger.warn("Tried to remove crashed members, but none were removed");
+            }
+            groupModule.send(crashMessage, g);
+        }
     }
 
     private class MessageReceiver implements Runnable {

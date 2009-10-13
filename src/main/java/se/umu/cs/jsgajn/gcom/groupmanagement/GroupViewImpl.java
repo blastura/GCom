@@ -4,6 +4,7 @@ import java.rmi.server.UID;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Collection;
 
 public class GroupViewImpl implements GroupView {
     private static final long serialVersionUID = 1L;
@@ -44,8 +45,11 @@ public class GroupViewImpl implements GroupView {
         return members.size();
     }
 
-    public boolean remove(GroupMember r) {
-        // TODO Auto-generated method stub
-        throw new Error("not implemented");
+    public boolean remove(GroupMember gm) {
+        return members.remove(gm);
+    }
+
+    public boolean removeAll(Collection<GroupMember> gm) {
+        return members.removeAll(gm);
     }
 }

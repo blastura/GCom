@@ -10,45 +10,44 @@ import org.slf4j.LoggerFactory;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
+import java.util.Map;
+import java.util.HashMap;
+
 //import se.umu.cs.jsgajn.gcom.debug.Debugger;
 
 public class BasicMulticast implements Multicast {
     private static final Logger logger = LoggerFactory.getLogger(BasicMulticast.class);
     //private static final Debugger debugger = Debugger.getDebugger();
 
-    private Set<GroupMember> crashed = new HashSet<GroupMember>();
+    private Map<GroupMember, RemoteException> crashed =
+        new HashMap<GroupMember, RemoteException>();
 
     /**
      * Send message to all members of the group.
      * TODO: move method to interface or Ordering-layer.
      * @param m The message to send.
      */
-    public void multicast(Message m, GroupView g) {
+    public void multicast(Message m, GroupView g) throws MemberCrashException {
         // Add this PID to the current path the message has traveled
-
         m.addToPath(GroupModule.PID);
-        int i = 0;
+        crashed.clear();
         for (GroupMember member : g) {
-            if(!crashed.contains(member)) {
-                try {
-                    member.getReceiver().receive(m);
-                    /*
-                      if (i == 1) {
-                      debugger.block();
-                      }
-                    */
-                    //debugger.possibleCrash(i, size);
-                } catch (RemoteException e) {
-                    logger.info("Oh, no! This bitch crashed: " + member.getPID());
-                    e.printStackTrace();
-                    crashed.add(member);
-
-                    Message crashMessage = new MessageImpl(member,
-                                                           MessageType.MEMBERCRASH, GroupModule.PID, g.getID());
-                    multicast(crashMessage, g);
+            try {
+                if (crashed.containsKey(member)) {
+                    logger.info("Old crashed: " + member.getPID());
+                    continue;
                 }
+                member.getReceiver().receive(m);
+            } catch (RemoteException re) {
+                if (!(re.getCause() instanceof java.net.ConnectException)) {
+                    re.printStackTrace();
+                }
+                logger.info("Receiver exception: " + member.getPID());
+                crashed.put(member, re);
             }
-            i++;
+        }
+        if (!crashed.isEmpty()) {
+            throw new MemberCrashException(crashed);
         }
     }
 
