@@ -10,6 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import se.umu.cs.jsgajn.gcom.Client;
 import se.umu.cs.jsgajn.gcom.debug.Debugger;
 import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationModule;
+import se.umu.cs.jsgajn.gcom.groupcommunication.MemberCrashException;
 import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationsModuleImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
@@ -29,6 +30,7 @@ import java.rmi.registry.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Set;
+import java.util.Map;
 
 /**
  * author dit06ajn, dit06jsg
@@ -196,7 +198,23 @@ public class GroupModuleImpl implements GroupModule {
     public void send(Message m, GroupView g) {
         orderingModule.send(m, this.groupView);
     }
-
+    
+    public void handleMemberCrashException(MemberCrashException e) {
+            Map<GroupMember, RemoteException> crashedMembers =
+                e.getCrashedMembers();
+            //Set<GroupMember> mSet = Collections.unmodifiableSet(crashedMembers.keySet());
+            Message crashMessage =
+                new MessageImpl(crashedMembers, MessageType.MEMBERCRASH,
+                                GroupModule.PID, groupView.getID());
+            // TODO: sync or copy            
+            boolean changed = groupView.removeAll(crashedMembers.keySet());
+            if (!changed) {
+                logger.warn("Tried to remove crashed members, but none were removed");
+            }
+            send(crashMessage, groupView);
+    }
+    
+    
     public GroupView getGroupView() {
         return groupView;
     }
@@ -247,7 +265,7 @@ public class GroupModuleImpl implements GroupModule {
                 break;
             case MEMBERCRASH:
                 logger.info("MEMBERCRASH");
-                handelCrash((Set<GroupMember>)(m.getMessage()));
+                handelCrash(m.getMessage());
                 break;
             case JOIN:
                 if (gl == null) {
@@ -262,7 +280,8 @@ public class GroupModuleImpl implements GroupModule {
             }
         }
 
-        private void handelCrash(Set<GroupMember> m) {
+        private void handelCrash(Object o) {
+                logger.warn("Not implemented: " + o);
             // TODO: Election om de e ledaren annars groupchange
         }
     }

@@ -40,6 +40,7 @@ public class BasicMulticast implements Multicast {
                 member.getReceiver().receive(m);
             } catch (RemoteException re) {
                 if (!(re.getCause() instanceof java.net.ConnectException)) {
+                    logger.error("RemoteException not ConnectException");
                     re.printStackTrace();
                 }
                 logger.info("Receiver exception: " + member.getPID());
@@ -47,6 +48,7 @@ public class BasicMulticast implements Multicast {
             }
         }
         if (!crashed.isEmpty()) {
+            //throw new MemberCrashException();
             throw new MemberCrashException(crashed);
         }
     }

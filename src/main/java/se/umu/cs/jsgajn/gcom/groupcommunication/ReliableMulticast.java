@@ -20,11 +20,11 @@ public class ReliableMulticast implements Multicast {
      * TODO: move method to interface or Ordering-layer.
      * @param m The message to send.
      */
-    public void multicast(Message m, GroupView g) {
+    public void multicast(Message m, GroupView g) throws MemberCrashException {
         bMulticast.multicast(m, g);
     }
 
-    public boolean deliverCheck(Message m, GroupView g) {
+    public boolean deliverCheck(Message m, GroupView g) throws MemberCrashException {
         //System.out.println(m.getUID() + " \n " + m.getOriginUID() + " \n " + m.toString() + "\n" +  m.getMessage().toString() +"\n\n");
         if (!received.contains(m)) {
             received.add(m);

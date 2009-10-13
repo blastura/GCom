@@ -1,7 +1,7 @@
 package se.umu.cs.jsgajn.gcom.groupmanagement;
 
 import java.rmi.server.UID;
-
+import se.umu.cs.jsgajn.gcom.groupcommunication.MemberCrashException;
 import se.umu.cs.jsgajn.gcom.Module;
 
 public interface GroupModule extends Module {
@@ -16,4 +16,6 @@ public interface GroupModule extends Module {
 
     /** Current groupview, used by communicationsmodel... */
     public GroupView getGroupView();
+
+    public void handleMemberCrashException(MemberCrashException e);
 }

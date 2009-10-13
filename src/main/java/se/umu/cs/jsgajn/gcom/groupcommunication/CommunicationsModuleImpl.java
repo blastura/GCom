@@ -18,8 +18,9 @@ import se.umu.cs.jsgajn.gcom.debug.Debugger;
 import java.rmi.NoSuchObjectException;
 import java.util.concurrent.BlockingQueue;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
-import java.util.Set;
 import java.util.Map;
+import java.util.Set;
+import java.util.Collections;
 
 public class CommunicationsModuleImpl implements CommunicationModule {
     private static final Logger logger = LoggerFactory.getLogger(CommunicationsModuleImpl.class);
@@ -103,16 +104,9 @@ public class CommunicationsModuleImpl implements CommunicationModule {
         try {
             mMethod.multicast(m, g);
         } catch (MemberCrashException e) {
-            Map<GroupMember, RemoteException> crashedMembers = e.getCrashedMembers();
-            Message crashMessage = new MessageImpl(crashedMembers.keySet(),
-                                                   MessageType.MEMBERCRASH,
-                                                   GroupModule.PID,
-                                                   g.getID());
-            boolean changed = g.removeAll(crashedMembers.keySet());
-            if (!changed) {
-                logger.warn("Tried to remove crashed members, but none were removed");
-            }
-            groupModule.send(crashMessage, g);
+            logger.warn("MemberCrashException", e.getMessage());
+
+            groupModule.handleMemberCrashException(e);
         }
     }
 
@@ -120,19 +114,26 @@ public class CommunicationsModuleImpl implements CommunicationModule {
         public void run() {
             try {
                 while (running) {
-                    Message m = receiveQueue.take();
-                    debugger.messageReceived(m);
-                    
-                    if (debugger.holdMessage(m, getReceiver())) {
-                        continue;
-                    }
-                    
-                    if (mMethod.deliverCheck(m, groupModule.getGroupView())) {
-                        deliver(m);
-                    }
+                    handleMessage(receiveQueue.take());
                 }
             } catch (InterruptedException e) {
                 System.out.println(e);
+            }
+        }
+
+        public void handleMessage(Message m) {
+            debugger.messageReceived(m);
+            
+            if (debugger.holdMessage(m, getReceiver())) {
+                return;
+            }
+            
+            try {
+                if (mMethod.deliverCheck(m, groupModule.getGroupView())) {
+                    deliver(m);
+                }
+            } catch (MemberCrashException e) {
+                groupModule.handleMemberCrashException(e);
             }
         }
     }
