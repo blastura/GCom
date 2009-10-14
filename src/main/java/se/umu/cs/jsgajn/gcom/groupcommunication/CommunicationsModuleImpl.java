@@ -124,12 +124,8 @@ public class CommunicationsModuleImpl implements CommunicationModule {
                 return;
             }
             
-            try {
-                if (mMethod.deliverCheck(m, groupModule.getGroupView())) {
-                    deliver(m);
-                }
-            } catch (MemberCrashException e) {
-                groupModule.handleMemberCrashException(e);
+            if (mMethod.deliverCheck(m, groupModule.getGroupView())) {
+                deliver(m);
             }
         }
     }

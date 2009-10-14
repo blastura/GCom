@@ -24,7 +24,7 @@ public class ReliableMulticast implements Multicast {
         bMulticast.multicast(m, g);
     }
 
-    public boolean deliverCheck(Message m, GroupView g) throws MemberCrashException {
+    public boolean deliverCheck(Message m, GroupView g) {
         //System.out.println(m.getUID() + " \n " + m.getOriginUID() + " \n " + m.toString() + "\n" +  m.getMessage().toString() +"\n\n");
         if (!received.contains(m)) {
             received.add(m);
