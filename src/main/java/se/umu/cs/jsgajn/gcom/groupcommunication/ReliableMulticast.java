@@ -30,7 +30,12 @@ public class ReliableMulticast implements Multicast {
             received.add(m);
             if (!m.getOriginUID().equals(GroupModule.PID)) {
                 // TODO: which groupview to send this to?
-                multicast(m, g);
+                try {
+                    multicast(m, g);
+                } catch (MemberCrashException e) {
+                    // TODO - fix error message
+                    e.printStackTrace();
+                }
             } 
             return true;
         }
