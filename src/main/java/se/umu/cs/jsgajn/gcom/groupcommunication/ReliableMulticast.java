@@ -36,7 +36,7 @@ public class ReliableMulticast implements Multicast {
                     // TODO - fix error message
                     e.printStackTrace();
                 }
-            } 
+            }
             return true;
         }
         return false;

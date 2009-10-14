@@ -162,12 +162,12 @@ public class DebugController implements DebugHandler {
 		if (doHold) {
           logger.debug("Holding message {}", m);
 			receiver = r; 
-			boolean found = false;
-			found = allreadyHoldCheck(m);
-			if(found == false) {
-				holdQueue.add(m);
-				currentContact.addHold(new Object[]{m.getMessage(), getShorterUIDForMessage(m.getUID())});
-			}
+         // 			boolean found = false;
+         // 			found = allreadyHoldCheck(m);
+         // 			if(found == false) {
+         holdQueue.add(m);
+         currentContact.addHold(new Object[]{m.getMessage(), getShorterUIDForMessage(m.getUID())});
+         //			}
 			return doHold;
 		} else {
 			return doHold;

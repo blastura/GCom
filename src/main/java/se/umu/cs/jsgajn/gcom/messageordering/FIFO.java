@@ -13,9 +13,11 @@ import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 
 import java.rmi.server.UID;
-import java.util.LinkedList;
 
-import java.util.Queue;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.Comparator;
+import java.util.Iterator;
 
 /**
  * Implementation of FIFO ordering. "If a correct process issues multicast(g, m)
@@ -99,8 +101,12 @@ public class FIFO implements Ordering {
     }
 
     private class MessageHandler implements Runnable {
-        private Queue<Message> holdBackQueue = new LinkedList<Message>();
-
+        private SortedSet<Message> holdBackSortedSet = new TreeSet<Message>(new Comparator<Message>() {
+                public int compare(Message m1, Message m2) {
+                    return m1.getVectorClock().get() - m2.getVectorClock().get();
+                }
+            });
+        
         public void run() {
             while (running) {
                 try {
@@ -108,17 +114,20 @@ public class FIFO implements Ordering {
 
                     if (deliverCheck(m)) {
                         deliverQueue.put(m);
-                        // Check every message in holdBackQueue and deliver if
+                        // Check every message in holdBackSortedSet and deliver if
                         // possible
-                        for (Message holdMessage : holdBackQueue) {
+                        //for (Message holdMessage : holdBackSortedSet) {
+                        for (Iterator<Message> i = holdBackSortedSet.iterator(); i.hasNext();) {
+                            Message holdMessage = i.next();
+                            logger.debug("Looping holdback m.vc.get: {}", holdMessage.getVectorClock().get());
                             if (deliverCheck(holdMessage)) {
                                 deliverQueue.put(holdMessage);
+                                i.remove();
                             }
                         }
                     } else {
-                        holdBackQueue.add(m);
+                        holdBackSortedSet.add(m);
                     }
-
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();

@@ -44,7 +44,7 @@ public class CommunicationsModuleImpl implements CommunicationModule {
     public CommunicationsModuleImpl(GroupModule groupModule)
         throws RemoteException, AlreadyBoundException, NotBoundException {
         this(groupModule, Registry.REGISTRY_PORT);
-    }    
+    }
         
     public CommunicationsModuleImpl(GroupModule groupModule, final int port)
         throws RemoteException, AlreadyBoundException, NotBoundException {

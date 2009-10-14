@@ -106,7 +106,7 @@ public class GroupModuleImpl implements GroupModule {
             this.gl = new GroupLeaderImpl();
             debugger.groupChange(this.groupView);
         } else {
-            logger.debug("Got existing group from DNS, sending join message");
+            logger.debug("Got existing group from GNS, sending join message");
             MessageImpl joinMessage =
                 new MessageImpl(this.groupMember,
                                 MessageType.JOIN,
@@ -203,7 +203,7 @@ public class GroupModuleImpl implements GroupModule {
             Message crashMessage =
                 new MessageImpl(crashedMembers, MessageType.MEMBERCRASH,
                                 GroupModule.PID, groupView.getID());
-            // TODO: sync or copy            
+            // TODO: sync or copy ?
             boolean changed = groupView.removeAll(crashedMembers.keySet());
             if (!changed) {
                 logger.warn("Tried to remove crashed members, but none were removed");

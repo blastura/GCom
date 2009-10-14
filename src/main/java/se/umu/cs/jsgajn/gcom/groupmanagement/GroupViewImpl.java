@@ -11,13 +11,13 @@ public class GroupViewImpl implements GroupView {
     private List<GroupMember> members;
     private String name;
     private GroupMember groupLeader;
-    private final UID ID;
+    private UID id;
 
     public GroupViewImpl(String name, GroupMember groupLeader) {
         this.members = new ArrayList<GroupMember>();
         this.name = name;
         this.groupLeader = groupLeader;
-        this.ID = new UID();
+        this.id = new UID();
         add(groupLeader);
     }
 
@@ -30,10 +30,11 @@ public class GroupViewImpl implements GroupView {
     }
     
     public UID getID() {
-        return ID;
+        return id;
     }
     
     public boolean add(GroupMember m) {
+        groupChanged();
         return members.add(m);
     }
 
@@ -46,10 +47,19 @@ public class GroupViewImpl implements GroupView {
     }
 
     public boolean remove(GroupMember gm) {
+        groupChanged();
         return members.remove(gm);
     }
 
     public boolean removeAll(Collection<GroupMember> gm) {
+        groupChanged();
         return members.removeAll(gm);
+    }
+    
+    /**
+     * Should be called by all methods that change the state of this group.
+     */
+    private void groupChanged() {
+        this.id = new UID();
     }
 }
