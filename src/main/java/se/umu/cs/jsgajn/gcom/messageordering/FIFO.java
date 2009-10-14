@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import se.umu.cs.jsgajn.gcom.debug.Debugger;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
+
 import java.rmi.server.UID;
 import java.util.LinkedList;
 
@@ -86,7 +88,7 @@ public class FIFO implements Ordering {
         }
     }
 
-    public Message prepareOutgoingMessage(Message m) {
+    public Message prepareOutgoingMessage(Message m, GroupView g) {
         // Tick counter for sent messages
         msgCounter.incrementAndGet();
         VectorClock<UID> vc = new VectorClock<UID>(GroupModule.PID,

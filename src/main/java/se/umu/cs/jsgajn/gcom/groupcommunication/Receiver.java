@@ -23,4 +23,12 @@ public interface Receiver extends Remote {
      * @throws RemoteException
      */
     public UID getPID() throws RemoteException;
+    
+    
+    /**
+     * Return the sequence number
+     * 
+     * @return
+     */
+    public int getSequenceNumber();
 }

@@ -6,19 +6,22 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UID;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ReceiverImpl implements Receiver, Serializable {
     private static final long serialVersionUID = 1L;
     // This will not be sent when object is serialized
     private transient BlockingQueue<Message> q;
     private final UID PID;
+    private transient AtomicInteger sequenceNumber;
 
     public ReceiverImpl(BlockingQueue<Message> q, final UID processID) 
     throws RemoteException, AlreadyBoundException, NotBoundException {
         this.q = q;
         this.PID = processID;
+        this.sequenceNumber = new AtomicInteger(0);
     } 
-
+    
     public void receive(Message m) throws RemoteException {
         // Simply add message to blockingQueue, if queue is busy, it will block.
         try {
@@ -29,8 +32,12 @@ public class ReceiverImpl implements Receiver, Serializable {
             e.printStackTrace();
         }
     }
-
+    
     public UID getPID() throws RemoteException {
         return this.PID;
     }
+    
+    public int getSequenceNumber() {
+    	return sequenceNumber.incrementAndGet();
+	}
 }

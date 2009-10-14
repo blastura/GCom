@@ -53,7 +53,7 @@ public class OrderingModuleImpl implements OrderingModule {
     }
 
     public void send(Message m, GroupView g) {
-        communicationsModule.send(ordering.prepareOutgoingMessage(m), g);
+        communicationsModule.send(ordering.prepareOutgoingMessage(m, g), g);
     }
 
     public void deliver(Message m) {
