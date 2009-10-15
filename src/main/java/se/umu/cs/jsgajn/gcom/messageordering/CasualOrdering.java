@@ -16,6 +16,16 @@ import java.rmi.server.UID;
 import org.slf4j.Logger;
 import java.util.Iterator;
 
+/**
+ * Implementation of Casual ordering. "If multicast(g, m) -> multicast(g, m'),
+ * where -> is the happened-before relation induced only by messages sent
+ * between the members of g, then any correct process that delivers m' will
+ * deliver m before m'", from DISTRIBUTED SYSTEMS CONCEPTS AND DESIGN, George
+ * Coulouris, Jean Dollimore, Tim Kindberg.
+ *
+ * @author dit06ajn, dit06jsg
+ * @version 1.0
+ */
 public class CasualOrdering implements Ordering {
     private static final Logger logger = LoggerFactory.getLogger(CasualOrdering.class);
     private static final Debugger debugger = Debugger.getDebugger();
@@ -23,7 +33,6 @@ public class CasualOrdering implements Ordering {
     private BlockingQueue<Message> receiveQueue;
     private BlockingQueue<Message> deliverQueue;
 
-    private AtomicInteger msgCounter = new AtomicInteger(0);
     private boolean running = false;
 
     /** Should contain information about the number of messages this module has
@@ -35,6 +44,15 @@ public class CasualOrdering implements Ordering {
         this.deliverQueue = new LinkedBlockingQueue<Message>();
         this.running = true;
         new Thread(new MessageHandler(), "CausalOrder thread").start();
+    }
+
+    public Message prepareOutgoingMessage(Message m, GroupView g) {
+        // Tick counter for sent messages
+        vc.tick(); // Increment own counter
+        // Add a copy of the current vc to message
+        m.setVectorClock(vc.clone());
+        logger.debug("OUT: Prepared outgoing message: {}, with vc: {}", m, vc);
+        return m;
     }
 
     public Message take() {
@@ -76,16 +94,6 @@ public class CasualOrdering implements Ordering {
             logger.error("TODO: Warning vc is not in sync anymore");
             e.printStackTrace();
         }
-    }
-
-    public Message prepareOutgoingMessage(Message m, GroupView g) {
-        // Tick counter for sent messages
-        msgCounter.incrementAndGet();
-        VectorClock<UID> vc = new VectorClock<UID>(GroupModule.PID,
-                                                   msgCounter.get());
-        m.setVectorClock(vc);
-        logger.debug("OUT: Prepared outgoing message: " + m);
-        return m;
     }
 
     private class MessageHandler implements Runnable {

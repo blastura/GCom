@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class VectorClock<T extends Serializable> implements Comparable<VectorClock<T>>, Serializable {
+public class VectorClock<T extends Serializable> implements Comparable<VectorClock<T>>, Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
     private Map<T, Integer> map = new HashMap<T, Integer>();
     private T id;
@@ -97,6 +97,7 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
      * @return negative numbers if clock is smaller than every value in
      *         parameter, 0 if it's smaller or equal, possitive numbers if it is
      *         greater than the parameter clock.
+     * TODO: ignore different lenghts
      */
     public int compareTo(final VectorClock<T> o) {
         checkEqualKeySets(o);
@@ -153,7 +154,24 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
     public String toString() {
         return this.map.toString();
     }
+    
+    @Override
+    public VectorClock<T> clone() {
+        try {
+            VectorClock<T> newVC = (VectorClock<T>) super.clone();
+            newVC.setMap(new HashMap(this.map));
+            return newVC;
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+            throw new Error("Object " + this.getClass().getName()
+                            + " is not Cloneable");
+        }
+    }
 
+    private void setMap(Map<T, Integer> map) {
+        this.map = map;
+    }
+    
     private void checkEqualKeySets(final VectorClock<T> o) {
         if ((map.size() != o.getMap().size())
             && !(map.keySet().equals(o.getMap().keySet()))) {

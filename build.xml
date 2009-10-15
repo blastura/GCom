@@ -82,7 +82,7 @@
              fork="true"
              printsummary="true">
          <classpath refid="project.classpath" />
-         <formatter type="brief" usefile="false" />
+         <formatter type="plain" usefile="false" />
          <batchtest>
             <!-- Run junit tests on all classes with filenames that end with -->
             <!-- Test.class -->

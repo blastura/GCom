@@ -6,7 +6,7 @@ import java.util.List;
 
 import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
 
-public interface Message extends Serializable {
+public interface Message extends Serializable, Comparable<Message> {
     public MessageType getMessageType();
     public UID getOriginUID();
     public UID getGroupViewUID();

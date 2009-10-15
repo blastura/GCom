@@ -21,7 +21,7 @@ public class MessageImpl implements Message {
     private final UID groupViewUID;
     private Object m;
     private VectorClock<UID> vc;
-    
+
     public MessageImpl(Object m, MessageType messageType,
                        final UID originID, final UID groupViewUID) {
         this.m = m;
@@ -30,24 +30,24 @@ public class MessageImpl implements Message {
         this.groupViewUID = groupViewUID;
         this.ID = new UID();
         this.path = new ArrayList<UID>();
-        
-        //path.add(originID);  
+
+        //path.add(originID);
         // This is done first time message is sent
         // TODO: test
     }
-    
+
     public VectorClock<UID> getVectorClock() {
         return this.vc;
     }
-    
-    
+
+
     public void setVectorClock(VectorClock<UID> vc) {
         if (!getOriginUID().equals(vc.getID())) {
             throw new IllegalArgumentException("Vector clock origin should be the same as Message origin");
         }
         this.vc = vc;
     }
-    
+
     public Object getMessage() {
         return m;
     }
@@ -98,5 +98,10 @@ public class MessageImpl implements Message {
             + ", vc: " + getVectorClock()
             + ", object: '" + this.m.toString()
             + "', messageID: " + this.ID + "]";
+    }
+
+    @Override
+    public int compareTo(final Message other) {
+        return this.vc.compareTo(other.getVectorClock());
     }
 }

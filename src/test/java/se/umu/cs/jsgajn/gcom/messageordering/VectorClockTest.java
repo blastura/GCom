@@ -1,6 +1,9 @@
 package se.umu.cs.jsgajn.gcom.messageordering;
 
 import org.junit.*;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import static org.junit.Assert.*;
 
 public class VectorClockTest {
@@ -14,7 +17,66 @@ public class VectorClockTest {
     public void tearDown() {
         // After every test is run
     }
+    
+    @Test
+    public void testSort() {
+        VectorClock<String> v1 = new VectorClock<String>("p1") {{
+                newProcess("p2");
+                newProcess("p3");
+                newProcess("p4");
+                newProcess("p5");
+            }};
 
+        VectorClock<String> v2 = new VectorClock<String>("p1") {{
+                newProcess("p2");
+                newProcess("p3");
+                newProcess("p4");
+                newProcess("p5");
+            }};
+
+        VectorClock<String> v3 = new VectorClock<String>("other") {{
+                newProcess("p2");
+                newProcess("p3");
+                newProcess("p4");
+                newProcess("p5");
+            }};
+
+        v1.tick(); // Smallest
+        v2.tick(); v2.tick(); // Bigger
+        v3.tick(); v3.tick(); v3.tick(); // Biggest
+        SortedSet<VectorClock<String>> sortSet = new TreeSet<VectorClock<String>>();
+        sortSet.add(v1);
+        sortSet.add(v2);
+        sortSet.add(v3);
+        System.out.println(sortSet);
+    }
+    
+    
+    @Test
+    public void testReference() {
+        VectorClock<String> v1 = new VectorClock<String>("p1") {{
+                newProcess("p2");
+                newProcess("p3");
+                newProcess("p4");
+                newProcess("p5");
+            }};
+        v1.tick();
+        assertEquals(1, v1.get());
+        VectorClock<String> vclone = v1.clone();
+        assertTrue(v1.equals(vclone));        
+        assertEquals(0, v1.compareTo(vclone));
+        assertNotSame(v1, vclone);
+        
+        changeVC(vclone);
+        assertFalse(v1.equals(vclone));
+        assertEquals(1, v1.get());
+    }
+
+    @Ignore
+    private void changeVC(VectorClock<String> vc) {
+        vc.tick();
+    }
+    
     @Test
     public void testEqual() {
         VectorClock<String> v1 = new VectorClock<String>("p1") {{
