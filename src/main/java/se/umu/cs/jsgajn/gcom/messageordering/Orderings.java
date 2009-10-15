@@ -16,6 +16,10 @@ public class Orderings {
             return new FIFO();
         case TOTAL_ORDER:
             return new Total();
+        case NO_ORDERING:
+            return new NoOrdering();
+        case CASUAL_ORDERING:
+            return new CasualOrdering();
         default:
             throw new UnsupportedOperationException("OrderingType: " + type 
                     + " is not supported, yet."); 
