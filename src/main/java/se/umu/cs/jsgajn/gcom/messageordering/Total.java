@@ -2,8 +2,12 @@ package se.umu.cs.jsgajn.gcom.messageordering;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UID;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -54,6 +58,7 @@ public class Total implements Ordering {
 			int sequenceNumber = m.getVectorClock().get();
 			if(this.latestReceivedSequenceNumber == 0) {
 				this.latestReceivedSequenceNumber = (sequenceNumber-1);
+				logger.debug("No sequencenumber, got " + latestReceivedSequenceNumber);
 			}
 			receiveQueue.put(m);
 		} catch (InterruptedException e) {
@@ -73,8 +78,14 @@ public class Total implements Ordering {
 
 
 	private class MessageHandler implements Runnable {
-		private Queue<Message> holdBackQueue = new LinkedList<Message>();
+		//private Queue<Message> holdBackQueue = new LinkedList<Message>();
 
+        private SortedSet<Message> holdBackSortedSet = new TreeSet<Message>(new Comparator<Message>() {
+            public int compare(Message m1, Message m2) {
+                return m1.getVectorClock().get() - m2.getVectorClock().get();
+            }
+        });
+		
 		public void run() {
 			while (running) {
 				try {
@@ -82,16 +93,20 @@ public class Total implements Ordering {
 
 					if (deliverCheck(m)) {
 						deliverQueue.put(m);
-						// TODO: Sort
-						// Check every message in holdBackQueue and deliver if
-						// possible
-						for (Message holdMessage : holdBackQueue) {
-							if (deliverCheck(holdMessage)) {
-								deliverQueue.put(holdMessage);
-							}
-						}
+	                    
+						// Check every message in holdBackSortedSet and deliver if
+                        // possible
+                        //for (Message holdMessage : holdBackSortedSet) {
+                        for (Iterator<Message> i = holdBackSortedSet.iterator(); i.hasNext();) {
+                            Message holdMessage = i.next();
+                            logger.debug("Looping holdback m.vc.get: {}", holdMessage.getVectorClock().get());
+                            if (deliverCheck(holdMessage)) {
+                                deliverQueue.put(holdMessage);
+                                i.remove();
+                            }
+                        }
 					} else {
-						holdBackQueue.add(m);
+						holdBackSortedSet.add(m);
 					}
 
 				} catch (InterruptedException e) {
@@ -110,7 +125,7 @@ public class Total implements Ordering {
 		 */
 		private boolean deliverCheck(final Message m) {
 			int sequenceNumber = m.getVectorClock().get();
-			
+			logger.debug("Delivercheck: Message got " + sequenceNumber + " compare with " + (latestReceivedSequenceNumber+1));
 			if(sequenceNumber == (Total.this.latestReceivedSequenceNumber + 1)) {
 				Total.this.latestReceivedSequenceNumber++;
 				return true;
