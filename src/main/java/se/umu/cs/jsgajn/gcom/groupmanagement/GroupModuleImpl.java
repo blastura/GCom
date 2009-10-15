@@ -74,7 +74,7 @@ public class GroupModuleImpl implements GroupModule {
      */
     public GroupModuleImpl(final Client client, final String gnsHost, final int gnsPort,
                            final String groupName, final int clientPort)
-        throws RemoteException, AlreadyBoundException, NotBoundException {
+        throws RemoteException, AlreadyBoundException, NotBoundException,IllegalArgumentException {
         this.client = client;
         this.receiveQueue = new LinkedBlockingQueue<Message>();
 

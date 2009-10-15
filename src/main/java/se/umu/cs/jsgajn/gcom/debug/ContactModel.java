@@ -8,6 +8,7 @@ import java.util.HashSet;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
@@ -18,10 +19,13 @@ import ch.qos.logback.classic.Logger;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
 
 public class ContactModel {
 
+	private JFrame mainFrame;
+	
     private JTabbedPane tabs;
     private UID pid;
     private DefaultTableModel receivedTable;
@@ -74,11 +78,6 @@ public class ContactModel {
 
         groupMembers.setNumRows(0);
         groupMembers.setColumnCount(0);
-    
-        TitledBorder groupViewPanel;
-        groupViewPanel = BorderFactory.createTitledBorder("Group View Name");
-        groupViewPanel.setBorder(groupViewPanel);
-
     }
 
     public void setupTables() {
@@ -239,5 +238,21 @@ public class ContactModel {
 
 	public void setHoldTable(DefaultTableModel holdTable) {
 		this.holdTable = holdTable;
+	}
+
+	public void setMainFrame(JFrame mainFrame) {
+		this.mainFrame = mainFrame;
+	}
+
+	public JFrame getMainFrame() {
+		return mainFrame;
+	}
+	public void updateMainFrameTitle(String title) {
+		mainFrame.setTitle(title);
+	}
+	public void updateGroupViewPanelTitle(String title) {
+        TitledBorder groupViewBorderPanel;
+        groupViewBorderPanel = BorderFactory.createTitledBorder(title);
+        groupViewPanel.setBorder(groupViewBorderPanel);
 	}
 }

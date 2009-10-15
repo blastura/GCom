@@ -30,5 +30,5 @@ public interface Receiver extends Remote {
      * 
      * @return
      */
-    public int getSequenceNumber();
+    public int getSequenceNumber() throws RemoteException;
 }

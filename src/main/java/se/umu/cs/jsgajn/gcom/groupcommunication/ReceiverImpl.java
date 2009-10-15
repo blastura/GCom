@@ -13,10 +13,10 @@ public class ReceiverImpl implements Receiver, Serializable {
     // This will not be sent when object is serialized
     private transient BlockingQueue<Message> q;
     private final UID PID;
-    private transient AtomicInteger sequenceNumber;
-
+    private AtomicInteger sequenceNumber;
+    
     public ReceiverImpl(BlockingQueue<Message> q, final UID processID) 
-    throws RemoteException, AlreadyBoundException, NotBoundException {
+    throws RemoteException, AlreadyBoundException, NotBoundException,IllegalArgumentException {
         this.q = q;
         this.PID = processID;
         this.sequenceNumber = new AtomicInteger(0);

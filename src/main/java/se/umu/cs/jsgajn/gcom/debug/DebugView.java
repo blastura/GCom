@@ -78,59 +78,60 @@ public class DebugView {
         defaultTableModel3.setColumnCount(3);
         defaultTableModel3.setRowCount(5);
         currentContact.setHoldTable(defaultTableModel3);
-        currentContact.setMessageInfo("<html>\n  <head>\n    \n  </head>\n  <body>\n    Message info\n  </body>\n</html>\n");
 
-        DefaultTableModel defaultTableModel4 = new DefaultTableModel();
-        defaultTableModel4.setColumnCount(3);
-        defaultTableModel4.setRowCount(5);
-        currentContact.setReceivedTable(defaultTableModel4);
+        JFrame frame0 = new JFrame();
 
-        JToggleButton toggleButton1 = new JToggleButton();
-        toggleButton1.setBounds(new Rectangle(158, 12, 148, 29));
-        toggleButton1.setText("Release & Resort");
-        currentContact.setReleaseAndResortButton(toggleButton1);
+        JPanel panel1 = (JPanel) frame0.getContentPane();
+
+        GridBagLayout gridBagLayout1 = new GridBagLayout();
+        gridBagLayout1.columnWidths = new int[]{12, 0, 6, 0, 0, 6, 0, 6, 0, 20, 21};
+        gridBagLayout1.rowHeights = new int[]{12, 0, 6, 20, 14};
+        gridBagLayout1.columnWeights = new double[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0};
+        gridBagLayout1.rowWeights = new double[]{0, 0, 0, 1, 0};
+        panel1.setLayout(gridBagLayout1);
+
+        JButton button0 = new JButton();
+        button0.setText("Reverse hold queue");
+        button0.addActionListener(EventHandler.create(ActionListener.class, debugController, "reversHoldMessages"));
+        panel1.add(button0, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
+
+        JButton button1 = new JButton();
+        button1.setText("Shuffle holdqueue");
+        button1.addActionListener(EventHandler.create(ActionListener.class, debugController, "shuffleHoldMessages"));
+        panel1.add(button1, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
+        panel1.add(toggleButton0, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, 16, 0, new Insets(0, 0, 0, 0), 0, 0));
+
+        JButton button2 = new JButton();
+        button2.setText("Loose message");
+        panel1.add(button2, new GridBagConstraints(6, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
+
+        JButton button3 = new JButton();
+        button3.setText("CrashClient");
+        button3.addActionListener(EventHandler.create(ActionListener.class, debugController, "crashMessage"));
+        button3.addActionListener(EventHandler.create(ActionListener.class, debugController, "crash"));
+        panel1.add(button3, new GridBagConstraints(8, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
 
         JTabbedPane tabbedPane0 = new JTabbedPane();
         tabbedPane0.setPreferredSize(new Dimension(100, 100));
 
-        JPanel panel1 = new JPanel();
-
-        GridBagLayout gridBagLayout1 = new GridBagLayout();
-        gridBagLayout1.columnWidths = new int[]{20};
-        gridBagLayout1.rowHeights = new int[]{20};
-        gridBagLayout1.columnWeights = new double[]{1};
-        gridBagLayout1.rowWeights = new double[]{1};
-        panel1.setLayout(gridBagLayout1);
-
         JPanel panel2 = new JPanel();
 
         GridBagLayout gridBagLayout2 = new GridBagLayout();
-        gridBagLayout2.columnWidths = new int[]{12, 20, 6, 199, 6, 166, 12};
-        gridBagLayout2.rowHeights = new int[]{12, 20, 6, 154, 17};
-        gridBagLayout2.columnWeights = new double[]{0, 1, 0, 0, 0, 0, 0};
-        gridBagLayout2.rowWeights = new double[]{0, 1, 0, 0, 0};
+        gridBagLayout2.columnWidths = new int[]{20};
+        gridBagLayout2.rowHeights = new int[]{20};
+        gridBagLayout2.columnWeights = new double[]{1};
+        gridBagLayout2.rowWeights = new double[]{1};
         panel2.setLayout(gridBagLayout2);
-        panel2.add(panel0, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0, 14, 1, new Insets(0, 0, 0, 0), 0, 0));
 
         JPanel panel3 = new JPanel();
 
         GridBagLayout gridBagLayout3 = new GridBagLayout();
-        gridBagLayout3.columnWidths = new int[]{20};
-        gridBagLayout3.rowHeights = new int[]{20};
-        gridBagLayout3.columnWeights = new double[]{1};
-        gridBagLayout3.rowWeights = new double[]{1};
+        gridBagLayout3.columnWidths = new int[]{12, 20, 6, 199, 6, 166, 12};
+        gridBagLayout3.rowHeights = new int[]{12, 156, 20, 12};
+        gridBagLayout3.columnWeights = new double[]{0, 1, 0, 0, 0, 0, 0};
+        gridBagLayout3.rowWeights = new double[]{0, 0, 1, 0};
         panel3.setLayout(gridBagLayout3);
-
-        JTable table1 = new JTable();
-        table1.setModel(defaultTableModel3);
-        table1.getTableHeader().setSize(new Dimension(225, 16));
-
-        JScrollPane scrollPane1 = new JScrollPane(table1);
-        scrollPane1.setPreferredSize(new Dimension(23, 27));
-        panel3.add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
-        panel3.setBorder(new TitledBorder("Hold queue"));
-        panel3.setPreferredSize(new Dimension(100, 100));
-        panel2.add(panel3, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, 14, 1, new Insets(0, 0, 0, 0), 0, 0));
+        panel3.add(panel0, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0, 14, 1, new Insets(0, 0, 0, 0), 0, 0));
 
         JPanel panel4 = new JPanel();
 
@@ -141,19 +142,16 @@ public class DebugView {
         gridBagLayout4.rowWeights = new double[]{1};
         panel4.setLayout(gridBagLayout4);
 
-        JTable table2 = new JTable();
+        JTable table1 = new JTable();
+        table1.setModel(defaultTableModel3);
+        table1.getTableHeader().setSize(new Dimension(225, 16));
 
-        DefaultTableModel defaultTableModel5 = (DefaultTableModel) table2.getModel();
-        defaultTableModel5.setColumnCount(2);
-        defaultTableModel5.setRowCount(15);
-        table2.getTableHeader().setSize(new Dimension(150, 16));
-
-        JScrollPane scrollPane2 = new JScrollPane(table2);
-        scrollPane2.setPreferredSize(new Dimension(23, 27));
-        panel4.add(scrollPane2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
-        panel4.setBorder(new TitledBorder("Vector Clock"));
+        JScrollPane scrollPane1 = new JScrollPane(table1);
+        scrollPane1.setPreferredSize(new Dimension(23, 27));
+        panel4.add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
+        panel4.setBorder(new TitledBorder("Hold queue"));
         panel4.setPreferredSize(new Dimension(100, 100));
-        panel2.add(panel4, new GridBagConstraints(5, 3, 1, 1, 0.0, 0.0, 14, 1, new Insets(0, 0, 0, 0), 0, 0));
+        panel3.add(panel4, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, 14, 1, new Insets(0, 0, 0, 0), 0, 0));
 
         JPanel panel5 = new JPanel();
 
@@ -164,16 +162,19 @@ public class DebugView {
         gridBagLayout5.rowWeights = new double[]{1};
         panel5.setLayout(gridBagLayout5);
 
-        JTable table3 = new JTable();
-        table3.setModel(defaultTableModel0);
-        table3.getTableHeader().setSize(new Dimension(225, 16));
+        JTable table2 = new JTable();
 
-        JScrollPane scrollPane3 = new JScrollPane(table3);
-        scrollPane3.setPreferredSize(new Dimension(23, 27));
-        panel5.add(scrollPane3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
-        panel5.setBorder(new TitledBorder("Crashed"));
+        DefaultTableModel defaultTableModel4 = (DefaultTableModel) table2.getModel();
+        defaultTableModel4.setColumnCount(2);
+        defaultTableModel4.setRowCount(15);
+        table2.getTableHeader().setSize(new Dimension(150, 16));
+
+        JScrollPane scrollPane2 = new JScrollPane(table2);
+        scrollPane2.setPreferredSize(new Dimension(23, 27));
+        panel5.add(scrollPane2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
+        panel5.setBorder(new TitledBorder("Vector Clock"));
         panel5.setPreferredSize(new Dimension(100, 100));
-        panel2.add(panel5, new GridBagConstraints(3, 3, 1, 1, 0.0, 0.0, 14, 1, new Insets(0, 0, 0, 0), 0, 0));
+        panel3.add(panel5, new GridBagConstraints(5, 2, 1, 1, 0.0, 0.0, 14, 1, new Insets(0, 0, 0, 0), 0, 0));
 
         JPanel panel6 = new JPanel();
 
@@ -184,16 +185,16 @@ public class DebugView {
         gridBagLayout6.rowWeights = new double[]{1};
         panel6.setLayout(gridBagLayout6);
 
-        JTable table4 = new JTable();
-        table4.setModel(defaultTableModel1);
-        table4.getTableHeader().setSize(new Dimension(555, 16));
+        JTable table3 = new JTable();
+        table3.setModel(defaultTableModel0);
+        table3.getTableHeader().setSize(new Dimension(225, 16));
 
-        JScrollPane scrollPane4 = new JScrollPane(table4);
-        scrollPane4.setPreferredSize(new Dimension(23, 27));
-        panel6.add(scrollPane4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
-        panel6.setBorder(new TitledBorder("Delivered"));
+        JScrollPane scrollPane3 = new JScrollPane(table3);
+        scrollPane3.setPreferredSize(new Dimension(23, 27));
+        panel6.add(scrollPane3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
+        panel6.setBorder(new TitledBorder("Crashed"));
         panel6.setPreferredSize(new Dimension(100, 100));
-        panel2.add(panel6, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, 14, 1, new Insets(0, 0, 0, 0), 0, 0));
+        panel3.add(panel6, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0, 14, 1, new Insets(0, 0, 0, 0), 0, 0));
 
         JPanel panel7 = new JPanel();
 
@@ -204,18 +205,16 @@ public class DebugView {
         gridBagLayout7.rowWeights = new double[]{1};
         panel7.setLayout(gridBagLayout7);
 
-        JTable table5 = new JTable();
-        table5.setModel(defaultTableModel4);
-        table5.getTableHeader().setSize(new Dimension(555, 16));
+        JTable table4 = new JTable();
+        table4.setModel(defaultTableModel1);
+        table4.getTableHeader().setSize(new Dimension(555, 16));
 
-        JScrollPane scrollPane5 = new JScrollPane(table5);
-        scrollPane5.setPreferredSize(new Dimension(23, 27));
-        panel7.add(scrollPane5, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
-        panel7.setBorder(new TitledBorder("Received"));
+        JScrollPane scrollPane4 = new JScrollPane(table4);
+        scrollPane4.setPreferredSize(new Dimension(23, 27));
+        panel7.add(scrollPane4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
+        panel7.setBorder(new TitledBorder("Delivered"));
         panel7.setPreferredSize(new Dimension(100, 100));
-        panel2.add(panel7, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, 14, 1, new Insets(0, 0, 0, 0), 0, 0));
-        panel1.add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
-        tabbedPane0.addTab("Tab", null, panel1);
+        panel3.add(panel7, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, 14, 1, new Insets(0, 0, 0, 0), 0, 0));
 
         JPanel panel8 = new JPanel();
 
@@ -225,49 +224,50 @@ public class DebugView {
         gridBagLayout8.columnWeights = new double[]{1};
         gridBagLayout8.rowWeights = new double[]{1};
         panel8.setLayout(gridBagLayout8);
-        panel8.setBorder(new TitledBorder("OrderType"));
+
+        JTable table5 = new JTable();
+
+        DefaultTableModel defaultTableModel5 = (DefaultTableModel) table5.getModel();
+        defaultTableModel5.setColumnCount(3);
+        defaultTableModel5.setRowCount(5);
+        table5.getTableHeader().setSize(new Dimension(555, 16));
+
+        JScrollPane scrollPane5 = new JScrollPane(table5);
+        scrollPane5.setPreferredSize(new Dimension(23, 27));
+        panel8.add(scrollPane5, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
+        panel8.setBorder(new TitledBorder("Received"));
         panel8.setPreferredSize(new Dimension(100, 100));
-        panel8.setVisible(false);
-        tabbedPane0.addTab("Tab 1", null, panel8);
-        currentContact.setTabs(tabbedPane0);
-        currentContact.setVectorclock(defaultTableModel5);
-        currentContact.init();
+        panel3.add(panel8, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, 14, 1, new Insets(0, 0, 0, 0), 0, 0));
+        panel2.add(panel3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
+        tabbedPane0.addTab("Tab", null, panel2);
 
-        JFrame frame0 = new JFrame();
-
-        JPanel panel9 = (JPanel) frame0.getContentPane();
+        JPanel panel9 = new JPanel();
 
         GridBagLayout gridBagLayout9 = new GridBagLayout();
-        gridBagLayout9.columnWidths = new int[]{12, 0, 6, 0, 0, 6, 0, 6, 0, 20, 21};
-        gridBagLayout9.rowHeights = new int[]{12, 0, 6, 20, 14};
-        gridBagLayout9.columnWeights = new double[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0};
-        gridBagLayout9.rowWeights = new double[]{0, 0, 0, 1, 0};
+        gridBagLayout9.columnWidths = new int[]{20};
+        gridBagLayout9.rowHeights = new int[]{20};
+        gridBagLayout9.columnWeights = new double[]{1};
+        gridBagLayout9.rowWeights = new double[]{1};
         panel9.setLayout(gridBagLayout9);
-
-        JButton button0 = new JButton();
-        button0.setText("Reverse hold queue");
-        button0.addActionListener(EventHandler.create(ActionListener.class, debugController, "reversHoldMessages"));
-        panel9.add(button0, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
-
-        JButton button1 = new JButton();
-        button1.setText("Shuffle holdqueue");
-        button1.addActionListener(EventHandler.create(ActionListener.class, debugController, "shuffleHoldMessages"));
-        panel9.add(button1, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
-        panel9.add(toggleButton0, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, 16, 0, new Insets(0, 0, 0, 0), 0, 0));
-
-        JButton button2 = new JButton();
-        button2.setText("Loose message");
-        panel9.add(button2, new GridBagConstraints(6, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
-
-        JButton button3 = new JButton();
-        button3.setText("CrashClient");
-        button3.addActionListener(EventHandler.create(ActionListener.class, debugController, "crashMessage"));
-        button3.addActionListener(EventHandler.create(ActionListener.class, debugController, "crash"));
-        panel9.add(button3, new GridBagConstraints(8, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
-        panel9.add(tabbedPane0, new GridBagConstraints(1, 3, 9, 1, 0.0, 0.0, 17, 1, new Insets(0, 0, 0, 0), 0, 0));
+        panel9.setBorder(new TitledBorder("OrderType"));
+        panel9.setPreferredSize(new Dimension(100, 100));
+        panel9.setVisible(false);
+        tabbedPane0.addTab("Tab 1", null, panel9);
+        panel1.add(tabbedPane0, new GridBagConstraints(1, 3, 9, 1, 0.0, 0.0, 17, 1, new Insets(0, 0, 0, 0), 0, 0));
         frame0.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame0.setTitle("Debugger");
         frame0.setBounds(new Rectangle(500, 0, 1026, 474));
+        currentContact.setMainFrame(frame0);
+        currentContact.setMessageInfo("<html>\n  <head>\n    \n  </head>\n  <body>\n    Message info\n  </body>\n</html>\n");
+        currentContact.setReceivedTable(defaultTableModel5);
+
+        JToggleButton toggleButton1 = new JToggleButton();
+        toggleButton1.setBounds(new Rectangle(158, 12, 148, 29));
+        toggleButton1.setText("Release & Resort");
+        currentContact.setReleaseAndResortButton(toggleButton1);
+        currentContact.setTabs(tabbedPane0);
+        currentContact.setVectorclock(defaultTableModel4);
+        currentContact.init();
 
         return frame0;
     }

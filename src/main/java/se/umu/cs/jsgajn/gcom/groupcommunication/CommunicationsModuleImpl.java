@@ -47,7 +47,7 @@ public class CommunicationsModuleImpl implements CommunicationModule {
     }
         
     public CommunicationsModuleImpl(GroupModule groupModule, final int port)
-        throws RemoteException, AlreadyBoundException, NotBoundException {
+        throws RemoteException, AlreadyBoundException, NotBoundException,IllegalArgumentException {
         this.groupModule = groupModule;
 
         // TODO: make port optional

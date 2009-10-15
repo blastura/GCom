@@ -8,6 +8,7 @@ import javax.swing.table.DefaultTableModel;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 
 import java.util.Collections;
@@ -231,6 +232,10 @@ public class DebugController implements DebugHandler {
 	}
 
 	public void groupChange(GroupView group) {
+		currentContact.updateGroupViewPanelTitle(
+				getUserNameForUID(group.getGroupLeaderGroupMember().getPID()));
+		currentContact.updateMainFrameTitle(
+				"Debugger - " + getUserNameForUID(GroupModule.PID));
 		currentContact.clearGroup();
 		for(GroupMember gm : group) {
 			currentContact.addGroupMember(new Object[]{getUserNameForUID(gm.getPID())});

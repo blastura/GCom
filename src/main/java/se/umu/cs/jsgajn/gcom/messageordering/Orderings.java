@@ -14,6 +14,8 @@ public class Orderings {
         switch (type) {
         case FIFO:
             return new FIFO();
+        case TOTAL_ORDER:
+            return new Total();
         default:
             throw new UnsupportedOperationException("OrderingType: " + type 
                     + " is not supported, yet."); 
