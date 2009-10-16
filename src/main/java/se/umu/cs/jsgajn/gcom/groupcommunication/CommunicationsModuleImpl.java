@@ -100,8 +100,7 @@ public class CommunicationsModuleImpl implements CommunicationModule {
         try {
             mMethod.multicast(m, g);
         } catch (MemberCrashException e) {
-            logger.warn("MemberCrashException", e.getMessage());
-
+            //logger.warn("MemberCrashException", e.getCrashedMembers().toString());
             groupModule.handleMemberCrashException(e);
         }
     }
@@ -118,6 +117,7 @@ public class CommunicationsModuleImpl implements CommunicationModule {
         }
 
         public void handleMessage(Message m) {
+        	logger.debug("Gotcha?: {}",m.getMessage());
             debugger.messageReceived(m);
             
             if (debugger.holdMessage(m, getReceiver())) {
@@ -135,7 +135,7 @@ public class CommunicationsModuleImpl implements CommunicationModule {
     }
 
     public void deliver(Message m) {
-        logger.debug("Message delivered");
+        logger.debug("Message delivered: {}",m.getMessage());
         orderingModule.deliver(m);
     }
 }

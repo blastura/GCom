@@ -3,6 +3,7 @@ package se.umu.cs.jsgajn.gcom.groupmanagement;
 import java.io.Serializable;
 import java.rmi.server.UID;
 import java.util.Collection;
+import java.util.List;
 
 public interface GroupView extends Iterable<GroupMember>, Serializable {
     public UID getID();
@@ -10,6 +11,9 @@ public interface GroupView extends Iterable<GroupMember>, Serializable {
     public GroupMember getGroupLeaderGroupMember();
     public boolean add(GroupMember r);
     public boolean remove(GroupMember r);
+    public boolean remove(int id);
     public boolean removeAll(Collection<GroupMember> gm);
     public int size();
+    public boolean isEmpty();
+    public List<GroupMember> getAll();
 }

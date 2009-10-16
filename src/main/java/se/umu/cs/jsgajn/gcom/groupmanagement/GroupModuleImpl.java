@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -26,6 +29,7 @@ import se.umu.cs.jsgajn.gcom.messageordering.Orderings;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -197,17 +201,20 @@ public class GroupModuleImpl implements GroupModule {
     }
     
     public void handleMemberCrashException(MemberCrashException e) {
-            Map<GroupMember, RemoteException> crashedMembers =
-                e.getCrashedMembers();
+            CrashList crashedMembers =
+                (CrashList) e.getCrashedMembers();
+            logger.debug("Handle first: {}",crashedMembers.getAll());
             //Set<GroupMember> mSet = Collections.unmodifiableSet(crashedMembers.keySet());
             Message crashMessage =
                 new MessageImpl(crashedMembers, MessageType.MEMBERCRASH,
                                 GroupModule.PID, groupView.getID());
             // TODO: sync or copy ?
-            boolean changed = groupView.removeAll(crashedMembers.keySet());
+            boolean changed = groupView.removeAll(crashedMembers.getAll());
+            logger.debug("After remove all: {}",crashedMembers.getAll());
             if (!changed) {
                 logger.warn("Tried to remove crashed members, but none were removed");
             }
+            
             send(crashMessage, groupView);
     }
     
@@ -262,7 +269,7 @@ public class GroupModuleImpl implements GroupModule {
                 break;
             case MEMBERCRASH:
                 logger.info("MEMBERCRASH");
-                handelCrash(m.getMessage());
+                handelCrash(m);
                 break;
             case JOIN:
                 if (gl == null) {
@@ -277,9 +284,26 @@ public class GroupModuleImpl implements GroupModule {
             }
         }
 
-        private void handelCrash(Object o) {
-            logger.warn("Handle crasch, obj received: " + o + " TODO: not implemented");
-            // TODO: Election om de e ledaren annars groupchange
+        private void handelCrash(Message m) {
+            logger.warn("Handle crasch, obj received: " + m + " TODO: not implemented");
+            
+            CrashList crashedMembers = 
+            	(CrashList) m.getMessage();
+            
+            UID groupLeaderUID = groupView.getGroupLeaderGroupMember().getPID();
+            
+            // If leader, remove member from groupview then send groupchange
+            // message
+            if(groupLeaderUID.equals(GroupModule.PID)) {
+            	logger.debug("Im leader, send groupchangemessage");
+            	logger.debug("Map: {}", crashedMembers.getAll());
+            	
+            	groupView.removeAll(crashedMembers.getAll());
+            	
+            	Message groupChangeMessage = new MessageImpl(groupView,
+                                            MessageType.GROUPCHANGE, PID, groupView.getID());
+                send(groupChangeMessage, groupView);
+            }
         }
     }
 

@@ -53,6 +53,7 @@ public class OrderingModuleImpl implements OrderingModule {
     }
 
     public void send(Message m, GroupView g) {
+    	logger.debug("Still here?: {}",m.getMessage());
         communicationsModule.send(ordering.prepareOutgoingMessage(m, g), g);
     }
 

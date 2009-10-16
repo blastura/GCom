@@ -1,13 +1,20 @@
 package se.umu.cs.jsgajn.gcom.groupcommunication;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.umu.cs.jsgajn.gcom.groupmanagement.CrashList;
+import se.umu.cs.jsgajn.gcom.groupmanagement.CrashListImpl;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupViewImpl;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -17,8 +24,7 @@ public class BasicMulticast implements Multicast {
     private static final Logger logger = LoggerFactory.getLogger(BasicMulticast.class);
     //private static final Debugger debugger = Debugger.getDebugger();
 
-    private Map<GroupMember, RemoteException> crashed =
-        new HashMap<GroupMember, RemoteException>();
+    private CrashList crashed = new CrashListImpl();
 
     /**
      * Send message to all members of the group.
@@ -28,7 +34,7 @@ public class BasicMulticast implements Multicast {
     public void multicast(Message m, GroupView g) throws MemberCrashException {
         // Add this PID to the current path the message has traveled
         m.addToPath(GroupModule.PID);
-        crashed.clear();
+        crashed =  new CrashListImpl();
         for (GroupMember member : g) {
             try {
                 member.getReceiver().receive(m);
@@ -40,7 +46,7 @@ public class BasicMulticast implements Multicast {
                 }
                 
                 logger.info("Receiver exception: " + member.getPID());
-                crashed.put(member, re);
+                crashed.add(member);
             }
         }
         

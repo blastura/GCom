@@ -78,7 +78,6 @@ public class Total implements Ordering {
 
 
 	private class MessageHandler implements Runnable {
-		//private Queue<Message> holdBackQueue = new LinkedList<Message>();
 
         private SortedSet<Message> holdBackSortedSet = new TreeSet<Message>(new Comparator<Message>() {
             public int compare(Message m1, Message m2) {
