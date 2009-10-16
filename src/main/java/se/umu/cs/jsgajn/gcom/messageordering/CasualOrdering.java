@@ -1,12 +1,10 @@
 package se.umu.cs.jsgajn.gcom.messageordering;
 
-import java.util.Comparator;
 import java.util.TreeSet;
 import java.util.SortedSet;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 import java.util.concurrent.LinkedBlockingQueue;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
-import java.util.concurrent.atomic.AtomicInteger;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import java.util.concurrent.BlockingQueue;
 import se.umu.cs.jsgajn.gcom.debug.Debugger;
@@ -15,6 +13,7 @@ import java.rmi.server.UID;
 
 import org.slf4j.Logger;
 import java.util.Iterator;
+import java.util.Collections;
 
 /**
  * Implementation of Casual ordering. "If multicast(g, m) -> multicast(g, m'),
@@ -86,6 +85,7 @@ public class CasualOrdering implements Ordering {
                 // Add new process with init value from message - 1 since we
                 // have not confirmed this message should be delivered yet.
                 vc.newProcess(m.getOriginUID(), (m.getVectorClock().get() - 1));
+                // TODO: Anton: Add this process to m.getVectorClock ???
             }
 
             receiveQueue.put(m);
@@ -97,11 +97,8 @@ public class CasualOrdering implements Ordering {
     }
 
     private class MessageHandler implements Runnable {
-        private SortedSet<Message> holdBackSortedSet = new TreeSet<Message>(new Comparator<Message>() {
-                public int compare(Message m1, Message m2) {
-                    return m1.getVectorClock().get() - m2.getVectorClock().get();
-                }
-            });
+        private SortedSet<Message> holdBackSortedSet =
+            new TreeSet<Message>(Collections.reverseOrder());
 
         public void run() {
             while (running) {
@@ -142,7 +139,8 @@ public class CasualOrdering implements Ordering {
             int otherHasSent = m.getVectorClock().get();
             int hasReceived = vc.get(m.getOriginUID());
             // If this message is the next in order for sending process
-            if (otherHasSent == (hasReceived + 1)) {
+            if (otherHasSent == (hasReceived + 1)
+                && vc.compareTo(m.getVectorClock()) < 1) {
                 logger.debug("otherHasSent: {}, hasReceived: {}, from: {}",
                              new Object[] {otherHasSent,
                                            hasReceived,
@@ -154,8 +152,8 @@ public class CasualOrdering implements Ordering {
                 return true;
             } else { // TODO: what if message are before the ones we already
                      // received, how do we get rid of them?
-                logger.info("Message lost, will hold it diff {}, message = {}",
-                            (otherHasSent - hasReceived), m);
+                logger.info("Message lost, vcOwn.compareTo(vcMessage): {}, m: {}",
+                            vc.compareTo(m.getVectorClock()), m);
                 return false;
             }
         }

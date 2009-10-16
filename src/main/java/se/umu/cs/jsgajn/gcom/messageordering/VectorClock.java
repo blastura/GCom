@@ -5,8 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class VectorClock<T extends Serializable> implements Comparable<VectorClock<T>>, Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
+    private static final Logger logger = LoggerFactory.getLogger(VectorClock.class);
+    
     private Map<T, Integer> map = new HashMap<T, Integer>();
     private T id;
 
@@ -100,20 +105,24 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
      * TODO: ignore different lenghts
      */
     public int compareTo(final VectorClock<T> o) {
-        checkEqualKeySets(o);
+        //checkEqualKeySets(o);
         Map<T, Integer> oMap = o.getMap();
         int nrEqual = 0;
         int larger = 0;
         int smaller = 0;
         for (T id : map.keySet()) {
-            // TODO: Possible error for large or small values
-            int diff = map.get(id) - oMap.get(id);
-            if (diff < 0) {
-                smaller =+ diff;
-            } else if (diff > 0) {
-                larger =+ diff;
+            if (oMap.containsKey(id)) {
+                // TODO: Possible error for large or small values
+                int diff = map.get(id) - oMap.get(id);
+                if (diff < 0) {
+                    smaller =+ diff;
+                } else if (diff > 0) {
+                    larger =+ diff;
+                } else {
+                    nrEqual++;
+                }
             } else {
-                nrEqual++;
+                logger.debug("================= Diff in keyset comparing VectorClocks");
             }
         }
 
