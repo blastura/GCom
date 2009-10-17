@@ -1,6 +1,6 @@
 package se.umu.cs.jsgajn.gcom.groupmanagement;
 
-import java.rmi.server.UID;
+import java.util.UUID;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MemberCrashException;
 import se.umu.cs.jsgajn.gcom.Module;
 
@@ -9,7 +9,7 @@ public interface GroupModule extends Module {
     public static final String STUB_NAME = "ballen";
 
     /** Unique identifier for every groupmember/process */
-    public static final UID PID = new UID();
+    public static final UUID PID = UUID.randomUUID();
     
     /** Used by clients to send messages to group */
     public void send(Object m);

@@ -1,7 +1,7 @@
 package se.umu.cs.jsgajn.gcom.debug;
 
 import java.beans.PropertyChangeSupport;
-import java.rmi.server.UID;
+import java.util.UUID;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -27,7 +27,7 @@ public class ContactModel {
 	private JFrame mainFrame;
 	
     private JTabbedPane tabs;
-    private UID pid;
+    private UUID pid;
     private DefaultTableModel receivedTable;
     private DefaultTableModel deliveredTable;
     private DefaultTableModel holdTable;

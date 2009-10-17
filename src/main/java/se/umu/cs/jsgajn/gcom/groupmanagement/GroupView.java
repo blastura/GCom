@@ -1,12 +1,12 @@
 package se.umu.cs.jsgajn.gcom.groupmanagement;
 
 import java.io.Serializable;
-import java.rmi.server.UID;
+import java.util.UUID;
 import java.util.Collection;
 import java.util.List;
 
 public interface GroupView extends Iterable<GroupMember>, Serializable {
-    public UID getID();
+    public UUID getID();
     public String getName();
     public GroupMember getGroupLeaderGroupMember();
     public boolean add(GroupMember r);

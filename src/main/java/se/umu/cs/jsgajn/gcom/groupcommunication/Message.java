@@ -1,24 +1,24 @@
 package se.umu.cs.jsgajn.gcom.groupcommunication;
 
 import java.io.Serializable;
-import java.rmi.server.UID;
+import java.util.UUID;
 import java.util.List;
 
 import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
 
 public interface Message extends Serializable, Comparable<Message> {
     public MessageType getMessageType();
-    public UID getOriginUID();
-    public UID getGroupViewUID();
+    public UUID getOriginUID();
+    public UUID getGroupViewUID();
     public Object getMessage();
-    public UID getUID();
+    public UUID getUID();
     
     /**
      * Sets the vector clock of this message, should probably only be set once.
      *
      * @param vc The VectorClock of this Message.
      */
-    public void setVectorClock(VectorClock<UID> vc);
+    public void setVectorClock(VectorClock<UUID> vc);
     
     /**
      * Gets the vector clock of this message, should probably only be set by
@@ -26,7 +26,7 @@ public interface Message extends Serializable, Comparable<Message> {
      *
      * @return The VectorClock of this Message.
      */
-    public VectorClock<UID> getVectorClock();
+    public VectorClock<UUID> getVectorClock();
     
     
     /**
@@ -35,7 +35,7 @@ public interface Message extends Serializable, Comparable<Message> {
      * 
      * @param pid The process id of the current group member.
      */
-    public void addToPath(UID pid);
+    public void addToPath(UUID pid);
     
     /**
      * Get the path this message has traveled. First message in list should be 
@@ -44,5 +44,5 @@ public interface Message extends Serializable, Comparable<Message> {
      * 
      * @return The path this message has traveled.
      */
-    public List<UID>getPath();
+    public List<UUID>getPath();
 }

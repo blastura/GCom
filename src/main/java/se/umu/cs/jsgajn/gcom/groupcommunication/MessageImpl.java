@@ -1,6 +1,6 @@
 package se.umu.cs.jsgajn.gcom.groupcommunication;
 
-import java.rmi.server.UID;
+import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
 import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
@@ -14,34 +14,34 @@ import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
  */
 public class MessageImpl implements Message {
     private static final long serialVersionUID = 1L;
-    private final UID ID;
+    private final UUID ID;
     private MessageType messageType;
-    private List<UID> path;
-    private final UID originID;
-    private final UID groupViewUID;
+    private List<UUID> path;
+    private final UUID originID;
+    private final UUID groupViewUID;
     private Object m;
-    private VectorClock<UID> vc;
+    private VectorClock<UUID> vc;
 
     public MessageImpl(Object m, MessageType messageType,
-                       final UID originID, final UID groupViewUID) {
+                       final UUID originID, final UUID groupViewUID) {
         this.m = m;
         this.messageType = messageType;
         this.originID = originID;
         this.groupViewUID = groupViewUID;
-        this.ID = new UID();
-        this.path = new ArrayList<UID>();
+        this.ID = UUID.randomUUID();
+        this.path = new ArrayList<UUID>();
 
         //path.add(originID);
         // This is done first time message is sent
         // TODO: test
     }
 
-    public VectorClock<UID> getVectorClock() {
+    public VectorClock<UUID> getVectorClock() {
         return this.vc;
     }
 
 
-    public void setVectorClock(VectorClock<UID> vc) {
+    public void setVectorClock(VectorClock<UUID> vc) {
         if (!getOriginUID().equals(vc.getID())) {
             throw new IllegalArgumentException("Vector clock origin should be the same as Message origin");
         }
@@ -55,25 +55,25 @@ public class MessageImpl implements Message {
     public MessageType getMessageType() {
         return this.messageType;
     }
-    public UID getOriginUID() {
+    public UUID getOriginUID() {
         return originID;
     }
 
-    public UID getGroupViewUID() {
+    public UUID getGroupViewUID() {
         return this.groupViewUID;
     }
 
-    public UID getUID() {
+    public UUID getUID() {
         return ID;
     }
 
-    public void addToPath(UID pid) {
+    public void addToPath(UUID pid) {
         this.path.add(pid);
     }
 
-    public List<UID> getPath() {
+    public List<UUID> getPath() {
         // Shallow copy
-        return new ArrayList<UID>(this.path);
+        return new ArrayList<UUID>(this.path);
     }
 
     @Override

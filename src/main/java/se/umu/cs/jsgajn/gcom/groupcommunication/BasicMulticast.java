@@ -1,7 +1,7 @@
 package se.umu.cs.jsgajn.gcom.groupcommunication;
 
 import java.rmi.RemoteException;
-import java.rmi.server.UID;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

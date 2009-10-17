@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -29,11 +26,10 @@ import se.umu.cs.jsgajn.gcom.messageordering.Orderings;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.UID;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.Map;
 
 /**
  * author dit06ajn, dit06jsg
@@ -290,7 +286,7 @@ public class GroupModuleImpl implements GroupModule {
             CrashList crashedMembers = 
             	(CrashList) m.getMessage();
             
-            UID groupLeaderUID = groupView.getGroupLeaderGroupMember().getPID();
+            UUID groupLeaderUID = groupView.getGroupLeaderGroupMember().getPID();
             
             // If leader, remove member from groupview then send groupchange
             // message

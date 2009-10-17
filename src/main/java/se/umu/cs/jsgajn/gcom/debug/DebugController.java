@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.rmi.RemoteException;
-import java.rmi.server.UID;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
 import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
@@ -39,10 +39,10 @@ public class DebugController implements DebugHandler {
 	private Queue<Message> holdQueue = new LinkedBlockingQueue<Message>();
 
 	// For tmp usernames / Anton
-	private Map<UID, String> userNames = new HashMap<UID, String>();
+	private Map<UUID, String> userNames = new HashMap<UUID, String>();
 	private Stack<String> tmpUID;
 	private AtomicInteger mIDcounter = new AtomicInteger(0);
-	private Map<UID, Integer> messageIDs = new HashMap<UID, Integer>();
+	private Map<UUID, Integer> messageIDs = new HashMap<UUID, Integer>();
 
 
 	public DebugController() {
@@ -122,9 +122,9 @@ public class DebugController implements DebugHandler {
 				m.getMessage(), getUserNameForUID(m.getOriginUID())});
 	}
 	
-	public void updateVectorClock(VectorClock<UID> vc) {
+	public void updateVectorClock(VectorClock<UUID> vc) {
 		currentContact.clearVectorClock();
-		for(UID vcid : vc.keySet()) {
+		for(UUID vcid : vc.keySet()) {
 			currentContact.addToClock(new String[]{
 					getUserNameForUID(vcid).toString(),
 					Integer.toString(vc.get(vcid))
@@ -200,7 +200,7 @@ public class DebugController implements DebugHandler {
 	}
 
 	// Not tested but should work / Anton
-	private String getUserNameForUID(UID uid) {
+	private String getUserNameForUID(UUID uid) {
 		if (tmpUID == null) {
 			Stack<String> tmp = new Stack<String>();
 			tmp.addAll(Arrays.asList("B.L.Ä.B", "B.Ä.R.S", "backpacker", "Baconballe", "Baconrosrekyl", "Bajsamera", "Bajsbergsbyggare", "Bajsbröder", "Bajsbröder", "Bajsdildo", "Bajsfest", "Bajsförnedring", "Bajsfötter", "Bajshatt", "Bajskork", "Bajspackare", "Bajspassare", "Bajspärla", "baka kladdkaka", "Bakmus", "Baktanke", "bakterie-runk", "Bakteriebög", "Bakteriedopp", "Ballhojta", "Ballongen", "Ballongknut", "Banankontakt", "Bandtraktor", "Bangbros", "Barbagay", "Barkbåt", "Barmhärtighetsknull", "Barra", "bastuballe", "Bastukorv", "Basturace", "Batongluder", "beer googles", "Bergsslyna", "Berlinsk Gasmask", "Bert Karlsson", "Bertofili", "Bibelcitat", "Big sausage pizza", "Bingo-Hora", "Bjud-fitta", "Björn Borg runk", "Björnfitta", "Björnkuk", "Blattehora", "BlindDate", "Blinga", "Blixten", "Blockmongo", "Blodig kuk", "Blodkanoten", "Blodpudding", "Blodrunka", "Blomsterfitta", "Blueballs", "Blåbärsmutta", "Blåsjobb", "Blöjbärare", "Blöjgång", "BOB", "Bolibompa", "Boll-lek", "Bolljude", "Bomben", "bombmatta", "Bomullsplockare", "Bondlurken", "Bosniensnygg", "Boston Tea Party", "Boulla", "Boven", "Bowling-greppet", "Bracka", "Bronka", "Broskfitta", "Brown Brown", "Brunkch", "Brutalrunkare", "BrytSkryt", "Buddha-Effekten", "Budgetrunkare", "Bukbröder", "Buktrumma", "Bulldogs-Fitta", "Bullfitta", "Bulls-eye", "bumbibjörn", "Burkosexuell", "Bussbög", "Bussrunkare", "bygga teddy björn", "Byhora", "Byta-filter", "Bäverdräparn", "Bäverjakt", "Bävernäve", "Bögbajsa", "böghandtag", "Böghandtag", "Böghora", "Böglyft", "bögnylle", "Bögporr-maraton", "Bögpölsa", "Bögslunga", "Bögsmälla", "Bögsmör", "Bögsnara", "Bögulv", "Bögvinkel"));
@@ -220,14 +220,14 @@ public class DebugController implements DebugHandler {
       }
 	}
 
-	private int getShortUIDForMessage(UID uid) {
+	private int getShortUIDForMessage(UUID uid) {
 		if (!messageIDs.containsKey(uid)) {
 			messageIDs.put(uid, mIDcounter.incrementAndGet());
 		}
 		return messageIDs.get(uid);
 	}
 
-	private String getShorterUIDForMessage(UID uid) {
+	private String getShorterUIDForMessage(UUID uid) {
 		return uid.toString().substring(12);
 	}
 

@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.server.UID;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -12,10 +12,10 @@ public class ReceiverImpl implements Receiver, Serializable {
     private static final long serialVersionUID = 1L;
     // This will not be sent when object is serialized
     private transient BlockingQueue<Message> q;
-    private final UID PID;
+    private final UUID PID;
     private AtomicInteger sequenceNumber;
     
-    public ReceiverImpl(BlockingQueue<Message> q, final UID processID) 
+    public ReceiverImpl(BlockingQueue<Message> q, final UUID processID) 
     throws RemoteException, AlreadyBoundException, NotBoundException,IllegalArgumentException {
         this.q = q;
         this.PID = processID;
@@ -33,7 +33,7 @@ public class ReceiverImpl implements Receiver, Serializable {
         }
     }
     
-    public UID getPID() throws RemoteException {
+    public UUID getPID() throws RemoteException {
         return this.PID;
     }
     

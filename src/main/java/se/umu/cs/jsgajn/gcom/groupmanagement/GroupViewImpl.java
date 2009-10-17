@@ -1,6 +1,6 @@
 package se.umu.cs.jsgajn.gcom.groupmanagement;
 
-import java.rmi.server.UID;
+import java.util.UUID;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -11,13 +11,13 @@ public class GroupViewImpl implements GroupView {
 	private List<GroupMember> members;
 	private String name;
 	private GroupMember groupLeader;
-	private UID id;
+	private UUID id;
 
 	public GroupViewImpl(String name, GroupMember groupLeader) {
 		this.members = new ArrayList<GroupMember>();
 		this.name = name;
 		this.groupLeader = groupLeader;
-		this.id = new UID();
+		this.id = UUID.randomUUID();
 		add(groupLeader);
 	}
 
@@ -29,7 +29,7 @@ public class GroupViewImpl implements GroupView {
 		return groupLeader;
 	}
 
-	public UID getID() {
+	public UUID getID() {
 		return id;
 	}
 
@@ -60,9 +60,9 @@ public class GroupViewImpl implements GroupView {
 	 * Should be called by all methods that change the state of this group.
 	 */
 	 private void groupChanged() {
-		this.id = new UID();
-	}
-
+        this.id = UUID.randomUUID();
+    }
+    
 	public boolean isEmpty() {
 	return members.isEmpty();
 	}

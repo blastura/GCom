@@ -12,7 +12,7 @@ import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 
-import java.rmi.server.UID;
+import java.util.UUID;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -40,7 +40,7 @@ public class FIFO implements Ordering {
 
     /** Should contain information about the number of messages this module has
      * received from other GroupMembers */
-    private VectorClock<UID> vc  = new VectorClock<UID>(GroupModule.PID);
+    private VectorClock<UUID> vc  = new VectorClock<UUID>(GroupModule.PID);
 
     public FIFO() {
         this.receiveQueue = new LinkedBlockingQueue<Message>();
@@ -93,7 +93,7 @@ public class FIFO implements Ordering {
     public Message prepareOutgoingMessage(Message m, GroupView g) {
         // Tick counter for sent messages
         msgCounter.incrementAndGet();
-        VectorClock<UID> vc = new VectorClock<UID>(GroupModule.PID,
+        VectorClock<UUID> vc = new VectorClock<UUID>(GroupModule.PID,
                                                    msgCounter.get());
         m.setVectorClock(vc);
         logger.debug("OUT: Prepared outgoing message: " + m);

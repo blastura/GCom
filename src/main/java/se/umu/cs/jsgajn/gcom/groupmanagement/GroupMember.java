@@ -2,14 +2,14 @@ package se.umu.cs.jsgajn.gcom.groupmanagement;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.rmi.server.UID;
+import java.util.UUID;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
 
 public class GroupMember implements Serializable {
     private static final long serialVersionUID = 1L;
     private final Receiver receiver;
-    private final UID PID;
+    private final UUID PID;
 
     /**
      * Creates a new GroupMember to use for communication, will get PID from
@@ -28,7 +28,7 @@ public class GroupMember implements Serializable {
         return this.receiver;
     }
     
-    public UID getPID() {
+    public UUID getPID() {
         return this.PID;
     }
 

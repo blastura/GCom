@@ -1,7 +1,7 @@
 package se.umu.cs.jsgajn.gcom.messageordering;
 
 import java.rmi.RemoteException;
-import java.rmi.server.UID;
+import java.util.UUID;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -43,7 +43,7 @@ public class Total implements Ordering {
 			sequenceNumber = 
 				g.getGroupLeaderGroupMember().getReceiver().getSequenceNumber();
 
-			VectorClock<UID> vc = new VectorClock<UID>(GroupModule.PID,
+			VectorClock<UUID> vc = new VectorClock<UUID>(GroupModule.PID,
 					sequenceNumber);
 			m.setVectorClock(vc);
 			logger.debug("OUT: Prepared outgoing message: " + m);

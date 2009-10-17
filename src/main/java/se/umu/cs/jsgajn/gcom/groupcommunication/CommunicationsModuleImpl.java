@@ -117,7 +117,7 @@ public class CommunicationsModuleImpl implements CommunicationModule {
         }
 
         public void handleMessage(Message m) {
-        	logger.debug("Gotcha?: {}",m.getMessage());
+            logger.debug("Gotcha?: {}",m.getMessage());
             debugger.messageReceived(m);
             
             if (debugger.holdMessage(m, getReceiver())) {

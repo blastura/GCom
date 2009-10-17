@@ -2,7 +2,7 @@ package se.umu.cs.jsgajn.gcom.groupcommunication;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.rmi.server.UID;
+import java.util.UUID;
 
 
 public interface Receiver extends Remote {
@@ -22,7 +22,7 @@ public interface Receiver extends Remote {
      * @return A unique process identifier for this receiver.
      * @throws RemoteException
      */
-    public UID getPID() throws RemoteException;
+    public UUID getPID() throws RemoteException;
     
     
     /**

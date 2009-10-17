@@ -9,7 +9,7 @@ import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import java.util.concurrent.BlockingQueue;
 import se.umu.cs.jsgajn.gcom.debug.Debugger;
 import org.slf4j.LoggerFactory;
-import java.rmi.server.UID;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import java.util.Iterator;
@@ -36,7 +36,7 @@ public class CasualOrdering implements Ordering {
 
     /** Should contain information about the number of messages this module has
      * received from other GroupMembers */
-    private VectorClock<UID> vc  = new VectorClock<UID>(GroupModule.PID);
+    private VectorClock<UUID> vc  = new VectorClock<UUID>(GroupModule.PID);
 
     public CasualOrdering() {
         this.receiveQueue = new LinkedBlockingQueue<Message>();
