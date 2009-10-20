@@ -1,19 +1,19 @@
 package se.umu.cs.jsgajn.gcom.messageordering;
 
-import java.util.TreeSet;
-import java.util.SortedSet;
-import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
-import java.util.concurrent.LinkedBlockingQueue;
-import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
-import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
-import java.util.concurrent.BlockingQueue;
-import se.umu.cs.jsgajn.gcom.debug.Debugger;
-import org.slf4j.LoggerFactory;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
-import java.util.Iterator;
-import java.util.Collections;
+import org.slf4j.LoggerFactory;
+
+import se.umu.cs.jsgajn.gcom.debug.Debugger;
+import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 
 /**
  * Implementation of Casual ordering. "If multicast(g, m) -> multicast(g, m'),
@@ -49,8 +49,9 @@ public class CasualOrdering implements Ordering {
         // Tick counter for sent messages
         vc.tick(); // Increment own counter
         // Add a copy of the current vc to message
-        m.setVectorClock(vc.clone());
-        logger.debug("OUT: Prepared outgoing message: {}, with vc: {}", m, vc);
+        VectorClock<UUID> vcCopy = vc.clone();
+        m.setVectorClock(vcCopy);
+        logger.debug("OUT: Prepared outgoing vc: {}, in message: {}", vcCopy, m);
         return m;
     }
 
@@ -85,7 +86,6 @@ public class CasualOrdering implements Ordering {
                 // Add new process with init value from message - 1 since we
                 // have not confirmed this message should be delivered yet.
                 vc.newProcess(m.getOriginUID(), (m.getVectorClock().get() - 1));
-                // TODO: Anton: Add this process to m.getVectorClock ???
             }
 
             receiveQueue.put(m);
@@ -97,8 +97,8 @@ public class CasualOrdering implements Ordering {
     }
 
     private class MessageHandler implements Runnable {
-        private SortedSet<Message> holdBackSortedSet =
-            new TreeSet<Message>(Collections.reverseOrder());
+        private Queue<Message> holdBackQueue =
+            new LinkedList<Message>();
 
         public void run() {
             while (running) {
@@ -107,19 +107,25 @@ public class CasualOrdering implements Ordering {
 
                     if (deliverCheck(m)) {
                         deliverQueue.put(m);
-                        // Check every message in holdBackSortedSet and deliver if
-                        // possible
-                        //for (Message holdMessage : holdBackSortedSet) {
-                        for (Iterator<Message> i = holdBackSortedSet.iterator(); i.hasNext();) {
-                            Message holdMessage = i.next();
-                            logger.debug("Looping holdback m.vc.get: {}", holdMessage.getVectorClock().get());
-                            if (deliverCheck(holdMessage)) {
-                                deliverQueue.put(holdMessage);
-                                i.remove();
-                            }
-                        }
                     } else {
-                        holdBackSortedSet.add(m);
+                        if (!holdBackQueue.add(m)) {
+                            logger.error("Message already in holdback! {}\n holdBackQueue: {}",
+                                         m, holdBackQueue);
+                        }
+                    }
+
+                    // Check if we can release any messages from holdBackQueue
+                    for (Iterator<Message> i = holdBackQueue.iterator(); i.hasNext();) {
+                        Message holdMessage = i.next();
+                        logger.debug("Looping holdback({}) \nm.vc: {}",
+                                     holdBackQueue.size(),
+                                     holdMessage.getVectorClock());
+                        if (deliverCheck(holdMessage)) {
+                            deliverQueue.put(holdMessage);
+                            // TODO: , optimize
+                            i.remove(); // remove element from holdBackQueue
+                            i = holdBackQueue.iterator(); // restart for-loop
+                        }
                     }
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
@@ -136,15 +142,24 @@ public class CasualOrdering implements Ordering {
          *         otherwise.
          */
         private boolean deliverCheck(final Message m) {
+            // Instant delivery of messages sent by own process
+            if (m.getOriginUID().equals(GroupModule.PID)) {
+                debugger.updateVectorClock(vc);
+                return true;
+            }
+
             int otherHasSent = m.getVectorClock().get();
             int hasReceived = vc.get(m.getOriginUID());
+
             // If this message is the next in order for sending process
             if (otherHasSent == (hasReceived + 1)
-                && vc.compareTo(m.getVectorClock()) < 1) {
-                logger.debug("otherHasSent: {}, hasReceived: {}, from: {}",
-                             new Object[] {otherHasSent,
-                                           hasReceived,
-                                           m.getOriginUID().equals(GroupModule.PID) ? "ME" : m.getOriginUID().toString()});
+                && m.getVectorClock().compareToAllButOwnID(vc) < 1) {
+                logger.debug("INORDER: firstCheck: {}, m.cv.comp(vc): {}, from: {}, \n vcMess:  {} \n vcOwn:   {} \n message: {}",
+                             new Object[] {otherHasSent  == (hasReceived + 1),
+                                           m.getVectorClock().compareToAllButOwnID(vc),
+                                           m.getOriginUID().equals(GroupModule.PID) ? "ME" : m.getOriginUID().toString(),
+                                           m.getVectorClock(), vc,
+                                           m.getMessage()});
 
                 // Tick counter for receiving message process
                 vc.tick(m.getOriginUID());
@@ -152,8 +167,12 @@ public class CasualOrdering implements Ordering {
                 return true;
             } else { // TODO: what if message are before the ones we already
                      // received, how do we get rid of them?
-                logger.info("Message lost, vcOwn.compareTo(vcMessage): {}, m: {}",
-                            vc.compareTo(m.getVectorClock()), m);
+                logger.debug("LOST: firstCheck: {}, m.cv.comp(vc): {}, from: {}, \n vcMess:  {} \n vcOwn:   {} \n message: {}",
+                             new Object[] {otherHasSent  == (hasReceived + 1),
+                                           m.getVectorClock().compareToAllButOwnID(vc),
+                                           m.getOriginUID().equals(GroupModule.PID) ? "ME" : m.getOriginUID().toString(),
+                                           m.getVectorClock(), vc,
+                                           m.getMessage()});
                 return false;
             }
         }

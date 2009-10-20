@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 public class VectorClock<T extends Serializable> implements Comparable<VectorClock<T>>, Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(VectorClock.class);
-    
+
     private Map<T, Integer> map = new HashMap<T, Integer>();
     private T id;
 
@@ -79,7 +79,7 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
     public T getID() {
         return this.id;
     }
-    
+
     public int get() {
         return map.get(this.id);
     }
@@ -102,22 +102,36 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
      * @return negative numbers if clock is smaller than every value in
      *         parameter, 0 if it's smaller or equal, possitive numbers if it is
      *         greater than the parameter clock.
-     * TODO: ignore different lenghts
      */
     public int compareTo(final VectorClock<T> o) {
+        return compareTo(o, true);
+    }
+
+    public int compareToAllButOwnID(final VectorClock<T> o) {
+        return compareTo(o, false);
+    }
+
+    // TODO: not consistent with equals() or anything? Can't be used in sets...
+    private int compareTo(final VectorClock<T> o, final boolean compareOwnID) {
         //checkEqualKeySets(o);
         Map<T, Integer> oMap = o.getMap();
         int nrEqual = 0;
         int larger = 0;
         int smaller = 0;
         for (T id : map.keySet()) {
+            // Skip own ID, used by causal-order
+            if (!compareOwnID && id.equals(getID())) {
+                logger.debug("Don't compare own id");
+                continue;
+            }
+
             if (oMap.containsKey(id)) {
                 // TODO: Possible error for large or small values
                 int diff = map.get(id) - oMap.get(id);
                 if (diff < 0) {
-                    smaller =+ diff;
+                    smaller += diff;
                 } else if (diff > 0) {
-                    larger =+ diff;
+                    larger += diff;
                 } else {
                     nrEqual++;
                 }
@@ -163,12 +177,12 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
     public String toString() {
         return this.map.toString();
     }
-    
+
     @Override
     public VectorClock<T> clone() {
         try {
             VectorClock<T> newVC = (VectorClock<T>) super.clone();
-            newVC.setMap(new HashMap(this.map));
+            newVC.setMap(new HashMap<T, Integer>(this.map));
             return newVC;
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
@@ -180,7 +194,7 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
     private void setMap(Map<T, Integer> map) {
         this.map = map;
     }
-    
+
     private void checkEqualKeySets(final VectorClock<T> o) {
         if ((map.size() != o.getMap().size())
             && !(map.keySet().equals(o.getMap().keySet()))) {
