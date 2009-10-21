@@ -19,6 +19,7 @@ import se.umu.cs.jsgajn.gcom.debug.Debugger;
 import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationModule;
 import se.umu.cs.jsgajn.gcom.groupcommunication.CommunicationsModuleImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MemberCrashException;
+import se.umu.cs.jsgajn.gcom.groupcommunication.MessageCouldNotBeSentException;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
@@ -280,15 +281,17 @@ public class GroupModuleImpl implements GroupModule {
         public void run() {
             try {
                 Message m = sendQueue.take();
-
                 // TODO: Clone groupView
                 orderingModule.send(m, groupView);
             } catch (InterruptedException e) {
                 // TODO - fix error message
                 e.printStackTrace();
             } catch (MemberCrashException e) {
-                // One member could not receive message, crash,
-                // connectionexception...
+                // TODO: One member could not receive message, crash,
+                //       connectionexception...
+                e.printStackTrace();
+            } catch (MessageCouldNotBeSentException e) {
+                // TODO - sequencer crash
                 e.printStackTrace();
             }
         }
