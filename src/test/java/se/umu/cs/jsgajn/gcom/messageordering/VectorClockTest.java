@@ -52,6 +52,9 @@ public class VectorClockTest {
         sortSet.add(v1);
         sortSet.add(v2);
         sortSet.add(v3);
+        // Can thes coo-exist in a set?
+        // vcMess:  {8eb21a8d-17a3-46dd-babd-f79f9045699d=1, 6548599c-b900-495e-8d7a-ca6d3a03a52c=4, 10b53d44-0f26-4f4f-9252-0e0ff884063f=4} 
+        // vcOwn:   {8eb21a8d-17a3-46dd-babd-f79f9045699d=1, 6548599c-b900-495e-8d7a-ca6d3a03a52c=3, 10b53d44-0f26-4f4f-9252-0e0ff884063f=3} 
         for (VectorClock<String> v : sortSet) {
             System.out.println(v);
         }

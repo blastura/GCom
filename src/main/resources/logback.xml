@@ -11,18 +11,18 @@
    
    
    
-   <!--    <logger name="se.umu.cs.jsgajn.gcom.messageordering"> -->
-   <!--       <level value="DEBUG" /> -->
-   <!--    </logger> -->
+   <logger name="se.umu.cs.jsgajn.gcom.messageordering">
+      <level value="DEBUG" />
+   </logger>
 
-   <!--    <logger name="se.umu.cs.jsgajn.gcom.groupmanagement.GNSImpl"> -->
-   <!--       <level value="DEBUG" /> -->
-   <!--    </logger> -->
+   <logger name="se.umu.cs.jsgajn.gcom.groupmanagement.GNSImpl">
+      <level value="DEBUG" />
+   </logger>
 
    <!-- if system property logback.root.level is set use that otherwise use supplied -->
    
    <root>
-      <level value="${logback.root.level:-DEBUG}"/>
+      <level value="${logback.root.level:-OFF}"/>
       <appender-ref ref="STDOUT" />
    </root>
 </configuration>
