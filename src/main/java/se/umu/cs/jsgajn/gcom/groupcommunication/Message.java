@@ -58,4 +58,10 @@ public interface Message extends Serializable, Comparable<Message> {
      * Returns the message sequence number
      */
     public int getSequnceNumber();
+
+    /**
+     * Returns who set the message sequence number
+     */
+    public UUID getSequncerUID();
+    public void setSequncerUID(UUID sequencerUID);
 }

@@ -20,6 +20,7 @@ public class MessageImpl implements Message {
     private List<UUID> path;
     private final UUID originID;
     private final UUID groupViewUID;
+    private UUID sequencerUID;
     private Object m;
     private VectorClock<UUID> vc;
 
@@ -111,5 +112,13 @@ public class MessageImpl implements Message {
 
 	public int getSequnceNumber() {
 		return this.sequenceNumber;
+	}
+
+	public void setSequncerUID(UUID sequencerUID) {
+		this.sequencerUID = sequencerUID;
+	}
+	
+	public UUID getSequncerUID() {
+		return sequencerUID;
 	}
 }

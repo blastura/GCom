@@ -29,27 +29,32 @@ public class Total implements Ordering {
 
 	private BlockingQueue<Message> receiveQueue;
 	private BlockingQueue<Message> deliverQueue;
-	
-    private CrashList crashed = new CrashListImpl();
+
+	private CrashList crashed = new CrashListImpl();
 
 	private boolean running = false;
 	private int latestReceivedSequenceNumber = 0;
 	private GroupView g;
-	
+
+	private UUID leaderUUID = null;
+
 	public Total() {
 		this.receiveQueue = new LinkedBlockingQueue<Message>();
 		this.deliverQueue = new LinkedBlockingQueue<Message>();
-		
+
 		this.running = true;
 		new Thread(new MessageHandler(), "Total order thread").start();
 	}
 
 	public Message prepareOutgoingMessage(Message m, GroupView g) throws MemberCrashException {
 		int sequenceNumber;
+		UUID sequencerUID;
 		try {
 			sequenceNumber = 
 				g.getGroupLeaderGroupMember().getReceiver().getSequenceNumber(m);
+			sequencerUID = g.getGroupLeaderGroupMember().getReceiver().getPID();
 
+			m.setSequncerUID(sequencerUID);
 			m.setSequnceNumber(sequenceNumber);
 			logger.debug("OUT: Prepared outgoing message: " + m);
 		} catch (RemoteException e) {
@@ -63,10 +68,18 @@ public class Total implements Ordering {
 
 	public void put(Message m) {
 		try {
-			int sequenceNumber = m.getSequnceNumber();
-			if(this.latestReceivedSequenceNumber == 0) {
-				this.latestReceivedSequenceNumber = (sequenceNumber-1);
-				logger.debug("No sequencenumber, got " + latestReceivedSequenceNumber);
+			if (this.leaderUUID == null) {
+				this.leaderUUID = m.getSequncerUID();
+			}
+			if (!this.leaderUUID.equals(m.getSequncerUID())) {
+				this.latestReceivedSequenceNumber = m.getSequnceNumber();
+				this.leaderUUID = m.getSequncerUID();
+			} else {
+				int sequenceNumber = m.getSequnceNumber();
+				if(this.latestReceivedSequenceNumber == 0) {
+					this.latestReceivedSequenceNumber = (sequenceNumber-1);
+					logger.debug("No sequencenumber, got " + latestReceivedSequenceNumber);
+				}
 			}
 			receiveQueue.put(m);
 		} catch (InterruptedException e) {
@@ -87,12 +100,12 @@ public class Total implements Ordering {
 
 	private class MessageHandler implements Runnable {
 
-        private SortedSet<Message> holdBackSortedSet = new TreeSet<Message>(new Comparator<Message>() {
-            public int compare(Message m1, Message m2) {
-                return m1.getSequnceNumber() - m2.getSequnceNumber();
-            }
-        });
-		
+		private SortedSet<Message> holdBackSortedSet = new TreeSet<Message>(new Comparator<Message>() {
+			public int compare(Message m1, Message m2) {
+				return m1.getSequnceNumber() - m2.getSequnceNumber();
+			}
+		});
+
 		public void run() {
 			while (running) {
 				try {
@@ -100,18 +113,18 @@ public class Total implements Ordering {
 
 					if (deliverCheck(m)) {
 						deliverQueue.put(m);
-	                    
+
 						// Check every message in holdBackSortedSet and deliver if
-                        // possible
-                        //for (Message holdMessage : holdBackSortedSet) {
-                        for (Iterator<Message> i = holdBackSortedSet.iterator(); i.hasNext();) {
-                            Message holdMessage = i.next();
-                            logger.debug("Looping holdback m.getSeq: {}", holdMessage.getSequnceNumber());
-                            if (deliverCheck(holdMessage)) {
-                                deliverQueue.put(holdMessage);
-                                i.remove();
-                            }
-                        }
+						// possible
+						//for (Message holdMessage : holdBackSortedSet) {
+						for (Iterator<Message> i = holdBackSortedSet.iterator(); i.hasNext();) {
+							Message holdMessage = i.next();
+							logger.debug("Looping holdback m.getSeq: {}", holdMessage.getSequnceNumber());
+							if (deliverCheck(holdMessage)) {
+								deliverQueue.put(holdMessage);
+								i.remove();
+							}
+						}
 					} else {
 						holdBackSortedSet.add(m);
 					}
