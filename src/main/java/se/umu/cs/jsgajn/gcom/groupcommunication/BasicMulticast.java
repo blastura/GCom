@@ -24,7 +24,7 @@ public class BasicMulticast implements Multicast {
     private static final Logger logger = LoggerFactory.getLogger(BasicMulticast.class);
     //private static final Debugger debugger = Debugger.getDebugger();
 
-    private CrashList crashed = new CrashListImpl();
+    private CrashList crashed;
 
     /**
      * Send message to all members of the group.

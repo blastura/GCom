@@ -45,4 +45,17 @@ public interface Message extends Serializable, Comparable<Message> {
      * @return The path this message has traveled.
      */
     public List<UUID>getPath();
+
+    /**
+     * Gives the message a sequence number. Gets this from the group leader.
+     * 
+     * @param number
+     */
+    public void setSequnceNumber(int number);
+    
+
+    /**
+     * Returns the message sequence number
+     */
+    public int getSequnceNumber();
 }

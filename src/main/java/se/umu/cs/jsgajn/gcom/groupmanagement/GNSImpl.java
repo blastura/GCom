@@ -17,6 +17,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,6 +139,16 @@ public class GNSImpl implements GNS {
         return groups;
     }
 
+    public void setNewLeader(GroupMember gm, String groupName)
+	throws RemoteException {
+    	UUID uuid = groups.get(groupName).getLeader().getPID();
+    	if(!gm.getPID().equals(uuid)) {
+    		groups.get(groupName).setLeader(gm);
+    		logger.debug("Got new leader, coool! {}", gm.getPID());
+    	}
+    			
+
+    }
 
     public static void main(String args[]) {
         try {
@@ -157,4 +168,5 @@ public class GNSImpl implements GNS {
             e.printStackTrace();
         }
     }
+
 }

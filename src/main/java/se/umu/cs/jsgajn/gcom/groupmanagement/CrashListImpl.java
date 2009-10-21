@@ -30,4 +30,13 @@ public class CrashListImpl implements CrashList {
 		return crashedMembers.iterator();
 	}
 
+	public boolean contains(GroupMember gm) {
+		for(GroupMember gm2 : crashedMembers) {
+			if(gm2.getPID().equals(gm.getPID())){
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

@@ -8,18 +8,22 @@ import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import se.umu.cs.jsgajn.gcom.messageordering.CasualTotal;
+
 public class ReceiverImpl implements Receiver, Serializable {
     private static final long serialVersionUID = 1L;
     // This will not be sent when object is serialized
     private transient BlockingQueue<Message> q;
     private final UUID PID;
     private AtomicInteger sequenceNumber;
+    private CasualTotal ordering;
     
     public ReceiverImpl(BlockingQueue<Message> q, final UUID processID) 
     throws RemoteException, AlreadyBoundException, NotBoundException,IllegalArgumentException {
         this.q = q;
         this.PID = processID;
         this.sequenceNumber = new AtomicInteger(0);
+        this.ordering = null;
     } 
     
     public void receive(Message m) throws RemoteException {
@@ -37,7 +41,23 @@ public class ReceiverImpl implements Receiver, Serializable {
         return this.PID;
     }
     
-    public int getSequenceNumber() {
+    public int getSequenceNumber(Message m) {
+    	if(ordering != null) {
+    		ordering.askForSequenceNumber(m);
+    		ordering.getSequenceNumber(m);
+    	}
     	return sequenceNumber.incrementAndGet();
+	}
+
+	public void createOrdering() {
+		this.ordering = new CasualTotal();
+	}
+	
+	public boolean orderingExist() {
+		if(ordering == null) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 }

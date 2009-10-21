@@ -16,4 +16,5 @@ public interface GroupView extends Iterable<GroupMember>, Serializable {
     public int size();
     public boolean isEmpty();
     public List<GroupMember> getAll();
+    public UUID getHighestUUID();
 }

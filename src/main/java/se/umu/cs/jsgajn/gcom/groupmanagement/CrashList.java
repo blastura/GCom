@@ -8,5 +8,6 @@ public interface CrashList extends Iterable<GroupMember>, Serializable {
     public boolean add(GroupMember r);
     public boolean isEmpty();
     public List<GroupMember> getAll();
+    public boolean contains(GroupMember gm);
     
 }

@@ -23,14 +23,4 @@ public class MemberCrashException extends Exception implements Serializable{
     public CrashList getCrashedMembers() {
         return this.crashedMembers;
     }
-
-    //     @Override
-    //     public Throwable getCause() {
-    //         return this.re;
-    //     }
-
-    //     @Override
-    //     public String getMessage() {
-    //         return re.getMessage();
-    //     }
 }

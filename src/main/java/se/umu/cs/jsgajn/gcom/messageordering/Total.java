@@ -16,7 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.umu.cs.jsgajn.gcom.debug.Debugger;
+import se.umu.cs.jsgajn.gcom.groupcommunication.MemberCrashException;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
+import se.umu.cs.jsgajn.gcom.groupmanagement.CrashList;
+import se.umu.cs.jsgajn.gcom.groupmanagement.CrashListImpl;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 
@@ -26,36 +29,41 @@ public class Total implements Ordering {
 
 	private BlockingQueue<Message> receiveQueue;
 	private BlockingQueue<Message> deliverQueue;
+	
+    private CrashList crashed = new CrashListImpl();
 
 	private boolean running = false;
 	private int latestReceivedSequenceNumber = 0;
+	private GroupView g;
 	
 	public Total() {
 		this.receiveQueue = new LinkedBlockingQueue<Message>();
 		this.deliverQueue = new LinkedBlockingQueue<Message>();
+		
 		this.running = true;
 		new Thread(new MessageHandler(), "Total order thread").start();
 	}
 
-	public Message prepareOutgoingMessage(Message m, GroupView g) {
+	public Message prepareOutgoingMessage(Message m, GroupView g) throws MemberCrashException {
 		int sequenceNumber;
 		try {
 			sequenceNumber = 
-				g.getGroupLeaderGroupMember().getReceiver().getSequenceNumber();
+				g.getGroupLeaderGroupMember().getReceiver().getSequenceNumber(m);
 
-			VectorClock<UUID> vc = new VectorClock<UUID>(GroupModule.PID,
-					sequenceNumber);
-			m.setVectorClock(vc);
+			m.setSequnceNumber(sequenceNumber);
 			logger.debug("OUT: Prepared outgoing message: " + m);
 		} catch (RemoteException e) {
 			logger.debug("Error, problem with getSequenceNumber in prepOutMess.");
+			crashed =  new CrashListImpl();
+			crashed.add(g.getGroupLeaderGroupMember());
+			throw new MemberCrashException(crashed);
 		}
 		return m;
 	}
 
 	public void put(Message m) {
 		try {
-			int sequenceNumber = m.getVectorClock().get();
+			int sequenceNumber = m.getSequnceNumber();
 			if(this.latestReceivedSequenceNumber == 0) {
 				this.latestReceivedSequenceNumber = (sequenceNumber-1);
 				logger.debug("No sequencenumber, got " + latestReceivedSequenceNumber);
@@ -81,7 +89,7 @@ public class Total implements Ordering {
 
         private SortedSet<Message> holdBackSortedSet = new TreeSet<Message>(new Comparator<Message>() {
             public int compare(Message m1, Message m2) {
-                return m1.getVectorClock().get() - m2.getVectorClock().get();
+                return m1.getSequnceNumber() - m2.getSequnceNumber();
             }
         });
 		
@@ -98,7 +106,7 @@ public class Total implements Ordering {
                         //for (Message holdMessage : holdBackSortedSet) {
                         for (Iterator<Message> i = holdBackSortedSet.iterator(); i.hasNext();) {
                             Message holdMessage = i.next();
-                            logger.debug("Looping holdback m.vc.get: {}", holdMessage.getVectorClock().get());
+                            logger.debug("Looping holdback m.getSeq: {}", holdMessage.getSequnceNumber());
                             if (deliverCheck(holdMessage)) {
                                 deliverQueue.put(holdMessage);
                                 i.remove();
@@ -123,7 +131,7 @@ public class Total implements Ordering {
 		 *         otherwise.
 		 */
 		private boolean deliverCheck(final Message m) {
-			int sequenceNumber = m.getVectorClock().get();
+			int sequenceNumber = m.getSequnceNumber();
 			logger.debug("Delivercheck: Message got " + sequenceNumber + " compare with " + (latestReceivedSequenceNumber+1));
 			if(sequenceNumber == (Total.this.latestReceivedSequenceNumber + 1)) {
 				Total.this.latestReceivedSequenceNumber++;

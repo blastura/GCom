@@ -52,4 +52,8 @@ public class GroupSettings implements Serializable {
             + this.getMulticastType() + ", "
             + this.getOrderingType() + "]";
     }
+
+	public void setLeader(GroupMember gm) {
+		this.leader = gm;
+	}
 }

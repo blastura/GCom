@@ -4,6 +4,9 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.UUID;
 
+import se.umu.cs.jsgajn.gcom.messageordering.CasualTotal;
+import se.umu.cs.jsgajn.gcom.messageordering.Ordering;
+
 
 public interface Receiver extends Remote {
     public static final String STUB_NAME = "snoppen";
@@ -30,5 +33,18 @@ public interface Receiver extends Remote {
      * 
      * @return
      */
-    public int getSequenceNumber() throws RemoteException;
+    public int getSequenceNumber(Message m) throws RemoteException;
+    
+    /**
+     * Sets orderingmodule. Is used in Casual-Total ordering.
+     * @throws RemoteException 
+     */
+    public void createOrdering() throws RemoteException;
+    
+
+    /**
+     * Get orderingmodule. Is used in Casual-Total ordering.
+     * @throws RemoteException
+     */
+    public boolean orderingExist() throws RemoteException;
 }

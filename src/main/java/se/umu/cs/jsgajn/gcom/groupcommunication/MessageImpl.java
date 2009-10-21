@@ -15,6 +15,7 @@ import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 public class MessageImpl implements Message {
     private static final long serialVersionUID = 1L;
     private final UUID ID;
+    private int sequenceNumber;
     private MessageType messageType;
     private List<UUID> path;
     private final UUID originID;
@@ -100,8 +101,15 @@ public class MessageImpl implements Message {
             + "', messageID: " + this.ID + "]";
     }
 
-    @Override
     public int compareTo(final Message other) {
         return this.vc.compareTo(other.getVectorClock());
     }
+
+	public void setSequnceNumber(int number) {
+		this.sequenceNumber = number;
+	}
+
+	public int getSequnceNumber() {
+		return this.sequenceNumber;
+	}
 }

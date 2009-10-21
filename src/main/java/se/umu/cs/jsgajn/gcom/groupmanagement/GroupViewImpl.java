@@ -76,4 +76,14 @@ public class GroupViewImpl implements GroupView {
 		return true;
 	}
 
+	public UUID getHighestUUID() {
+		UUID highestUUID = members.get(0).getPID();
+		for(GroupMember gm : members) {
+			if(highestUUID.compareTo(gm.getPID()) == -1) {
+				highestUUID = gm.getPID();
+			}
+		}
+		return highestUUID;
+	}
+
 }
