@@ -109,8 +109,9 @@ public class CasualOrdering implements Ordering {
                         deliverQueue.put(m);
                     } else {
                         if (!holdBackQueue.add(m)) {
-                            logger.error("Message already in holdback! {}\n holdBackQueue: {}",
-                                         m, holdBackQueue);
+                            logger.error("================ ERROR ================ message not added to sorted Set {}", m);
+                            System.err.println("FIFO: Message not added to sorted set");
+                            System.exit(1);
                         }
                     }
 

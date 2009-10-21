@@ -1,5 +1,9 @@
 package se.umu.cs.jsgajn.gcom.messageordering;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -11,13 +15,6 @@ import se.umu.cs.jsgajn.gcom.debug.Debugger;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
-
-import java.util.UUID;
-
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.Comparator;
-import java.util.Iterator;
 
 /**
  * Implementation of FIFO ordering. "If a correct process issues multicast(g, m)
@@ -101,11 +98,14 @@ public class FIFO implements Ordering {
     }
 
     private class MessageHandler implements Runnable {
-        private SortedSet<Message> holdBackSortedSet = new TreeSet<Message>(new Comparator<Message>() {
-                public int compare(Message m1, Message m2) {
-                    return m1.getVectorClock().get() - m2.getVectorClock().get();
-                }
-            });
+        //         private SortedSet<Message> holdBackSortedSet = new TreeSet<Message>(new Comparator<Message>() {
+        //                 public int compare(Message m1, Message m2) {
+        //                     return m1.getVectorClock().get() - m2.getVectorClock().get();
+        //                 }
+        //             });
+        private Queue<Message> holdBackQueue =
+            new LinkedList<Message>();
+
         
         public void run() {
             while (running) {
@@ -114,19 +114,26 @@ public class FIFO implements Ordering {
 
                     if (deliverCheck(m)) {
                         deliverQueue.put(m);
-                        // Check every message in holdBackSortedSet and deliver if
-                        // possible
-                        //for (Message holdMessage : holdBackSortedSet) {
-                        for (Iterator<Message> i = holdBackSortedSet.iterator(); i.hasNext();) {
+                        // Check every message in holdBackQueue and
+                        // deliver if possible
+                        for (Iterator<Message> i = holdBackQueue.iterator(); i.hasNext();) {
                             Message holdMessage = i.next();
-                            logger.debug("Looping holdback m.vc.get: {}", holdMessage.getVectorClock().get());
+                            logger.debug("Looping holdback({}) \nm.vc: {}",
+                                         holdBackQueue.size(),
+                                         holdMessage.getVectorClock());
                             if (deliverCheck(holdMessage)) {
                                 deliverQueue.put(holdMessage);
-                                i.remove();
+                                // TODO: , optimize
+                                i.remove(); // remove element from holdBackQueue
+                                i = holdBackQueue.iterator(); // restart for-loop
                             }
                         }
                     } else {
-                        holdBackSortedSet.add(m);
+                        if (!holdBackQueue.add(m)) {
+                            logger.error("================ ERROR ================ message not added to sorted Set {}", m);
+                            System.err.println("FIFO: Message not added to sorted set");
+                            System.exit(1);
+                        }
                     }
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
