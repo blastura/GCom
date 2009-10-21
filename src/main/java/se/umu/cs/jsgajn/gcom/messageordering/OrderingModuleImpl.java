@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import se.umu.cs.jsgajn.gcom.Module;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MemberCrashException;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
+import se.umu.cs.jsgajn.gcom.groupcommunication.MessageCouldNotBeSentException;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModuleImpl;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
@@ -32,7 +33,7 @@ public class OrderingModuleImpl implements OrderingModule {
 		this.groupManagementModule = groupManagementModule;
 		this.deliverHandlerThread =
 			new Thread(new DeliverHandler(),
-					"OrderingModule thread");
+			"OrderingModule thread");
 	}
 
 	public void start() {
@@ -60,37 +61,21 @@ public class OrderingModuleImpl implements OrderingModule {
 		this.ordering = ordering; 
 	}
 
-	public void send(Message m, GroupView g) throws MemberCrashException {
+	public void send(Message m, GroupView g) throws MemberCrashException, 
+	MessageCouldNotBeSentException {
 		if (m.getMessageType().equals(MessageType.GROUPCHANGE)) {
 			communicationsModule.send(m, g);
 			return;
 		}
-		try {
-			for (Message m2 : holdQueue) {
-				ordering.prepareOutgoingMessage(m2, g);
-			}
-			
-			m = ordering.prepareOutgoingMessage(m, g);
-			
-		} catch (MemberCrashException e) {
-			if(!holdQueue.contains(m)) {
-				holdQueue.add(m);
-			}
-			((GroupModuleImpl)groupManagementModule).handleMemberCrashException(e);
-		}
-		
-		while(!holdQueue.isEmpty()){
-			communicationsModule.send(holdQueue.poll(), g);
-		}
-		communicationsModule.send(m, g);
+		communicationsModule.send(ordering.prepareOutgoingMessage(m, g), g);
 	}
 
 	public void deliver(Message m) {
 		if (m.getMessageType().equals(MessageType.GROUPCHANGE)) {
-			groupManagementModule.deliver(m);			
-		} else {
-			ordering.put(m);
-		}
+			groupManagementModule.deliver(m);		
+			return;
+		} 
+		ordering.put(m);
 	}
 
 	private class DeliverHandler implements Runnable {

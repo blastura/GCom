@@ -2,6 +2,7 @@ package se.umu.cs.jsgajn.gcom;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.MemberCrashException;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
+import se.umu.cs.jsgajn.gcom.groupcommunication.MessageCouldNotBeSentException;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 
 /**
@@ -14,8 +15,9 @@ public interface Module {
      * 
      * @param m The Message to send.
      * @param g The GroupView to send to.
+     * @throws MessageCouldNotBeSentException 
      */
-    public void send(Message m, GroupView g) throws MemberCrashException;
+    public void send(Message m, GroupView g) throws MemberCrashException, MessageCouldNotBeSentException;
     
     /**
      * Called by a different Module to when message should be delivered to this
