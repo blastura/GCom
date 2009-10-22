@@ -1,5 +1,6 @@
 package se.umu.cs.jsgajn.gcom.groupmanagement;
 
+import java.rmi.RemoteException;
 import java.util.UUID;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,6 +20,14 @@ public class GroupViewImpl implements GroupView {
 		this.groupLeader = groupLeader;
 		this.id = UUID.randomUUID();
 		add(groupLeader);
+	}
+	
+	public GroupView copy() {
+		GroupViewImpl gv = new GroupViewImpl(name, groupLeader);
+		for (GroupMember gm : members) {
+			gv.add(gm);
+		}
+		return gv;
 	}
 
 	public String getName() {

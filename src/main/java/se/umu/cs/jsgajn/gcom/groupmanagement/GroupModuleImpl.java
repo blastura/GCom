@@ -324,9 +324,6 @@ public class GroupModuleImpl implements GroupModule {
                 logger.info("CLIENTMESSAGE");
                 client.deliver(m.getMessage());
                 break;
-            case MEMBERCRASH:
-                logger.info("MEMBERCRASH");
-                break;
             case JOIN:
                 if (gl == null) {
                     logger.error("Got join message but I'm not leader");
