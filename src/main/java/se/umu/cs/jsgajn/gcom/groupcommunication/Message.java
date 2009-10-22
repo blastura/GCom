@@ -14,6 +14,13 @@ public interface Message extends Serializable, Comparable<Message> {
     public UUID getUID();
     
     /**
+     * Returns true if this message is a system message, this will make it skip
+     * OrderingModule.
+     * @return true if this message is a system message, false otherwise.
+     */
+    public boolean isSystemMessage();
+    
+    /**
      * Sets the vector clock of this message, should probably only be set once.
      *
      * @param vc The VectorClock of this Message.

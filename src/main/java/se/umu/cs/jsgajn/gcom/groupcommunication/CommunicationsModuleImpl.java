@@ -42,12 +42,12 @@ public class CommunicationsModuleImpl implements CommunicationModule {
      * @exception NotBoundException if an error occurs
      */
     public CommunicationsModuleImpl(GroupModule groupModule)
-    throws RemoteException, AlreadyBoundException, NotBoundException {
+        throws RemoteException, AlreadyBoundException, NotBoundException {
         this(groupModule, Registry.REGISTRY_PORT);
     }
 
     public CommunicationsModuleImpl(GroupModule groupModule, final int port)
-    throws RemoteException, AlreadyBoundException, NotBoundException,IllegalArgumentException {
+        throws RemoteException, AlreadyBoundException, NotBoundException,IllegalArgumentException {
         this.groupModule = groupModule;
 
         // TODO: make port optional
@@ -61,7 +61,7 @@ public class CommunicationsModuleImpl implements CommunicationModule {
 
         // Create thread to handle messages
         this.messageReceiverThread = new Thread(new MessageReceiver(),
-        "CommunicationsModule thread");
+                                                "CommunicationsModule thread");
         logger.debug("CommunicationsModuleImpl receiveing messages at port: " + port);
     }
 
@@ -133,12 +133,10 @@ public class CommunicationsModuleImpl implements CommunicationModule {
         logger.debug("Message delivered: {} {}",m.getSequnceNumber(), m.getMessage());
 
 
-        if(m.getMessageType().equals(MessageType.GROUPCHANGE)){
+        if (m.isSystemMessage()) {
             groupModule.deliver(m);
         } else {
             orderingModule.deliver(m);
         }
-
-
     }
 }

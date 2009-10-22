@@ -38,9 +38,16 @@ public class MessageImpl implements Message {
         this.ID = UUID.randomUUID();
         this.path = new ArrayList<UUID>();
 
-        //path.add(originID);
+        // path.add(originID);
         // This is done first time message is sent
         // TODO: test
+    }
+    
+    public boolean isSystemMessage() {
+        if (this.messageType == MessageType.GROUPCHANGE) {
+            return true;
+        }
+        return false;
     }
 
     public VectorClock<UUID> getVectorClock() {
@@ -107,11 +114,20 @@ public class MessageImpl implements Message {
             + "', messageID: " + this.ID + "]";
     }
 
+    
+    /**
+     * Compares this Message to other Message, SystemMessages compared to other
+     * message types return -1 and will be first in an ascending ordering.
+     *
+     * @param other The Message to compare with this Message.
+     * @return -1 if this is a systemMessage, 0 if both are of equal
+     * MessageTypes and 1 if other message is a system message.
+     */
     public int compareTo(final Message other) {
         logger.debug("Comparing messages");
         if (messageType.equals(other.getMessageType())) { return 0; }
-        if (messageType.equals(MessageType.GROUPCHANGE)) { return -1; }
-        if ( other.getMessageType().equals(MessageType.GROUPCHANGE)) { return 1; }
+        if (isSystemMessage()) { return -1; }
+        if (other.isSystemMessage()) { return 1; }
         return 0;     
     }
     
