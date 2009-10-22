@@ -188,11 +188,8 @@ public class GroupModuleImpl implements GroupModule {
      * @param clientMessage The Object to send.
      */
     public void send(Object clientMessage) {
-        Message m;
-        synchronized (groupView) {
-            m = new MessageImpl(clientMessage,
-                                MessageType.CLIENTMESSAGE, PID, groupView.getID());
-        }
+        Message m = new MessageImpl(clientMessage,
+                                    MessageType.CLIENTMESSAGE, PID, groupView.getID());
         send(m, this.groupView);
     }
 
@@ -206,7 +203,6 @@ public class GroupModuleImpl implements GroupModule {
      * @param m The Message to send.
      * @param g The GroupView Message should be sent to.
      */
-
     public void send(Message m, GroupView g) {
         sendQueue.put(new FIFOEntry<Message>(m));
     }
@@ -266,33 +262,38 @@ public class GroupModuleImpl implements GroupModule {
 
         public void addMemberToGroup(GroupMember member) {
             // TODO: fix this
+            GroupView groupViewCopy;
             synchronized (groupView) {
                 groupView.add(member);
-
-                // Multicast new groupView
-                send(new MessageImpl(groupView, MessageType.GROUPCHANGE, PID, groupView.getID()));
+                groupViewCopy = groupView.copy();
             }
+            // Multicast new groupView
+            send(new MessageImpl(groupViewCopy, MessageType.GROUPCHANGE, PID, groupView.getID()));
         }
     }
 
     private class MessageSender implements Runnable {
         public void run() {
-            try {
-                Message m = sendQueue.take().getEntry();
-                // TODO: Clone groupView
-                synchronized (groupView) {
-                    orderingModule.send(m, groupView);
+            while (running) {
+                try {
+                    Message m = sendQueue.take().getEntry();
+                    // TODO: Clone groupView
+                    GroupView groupViewCopy;
+                    synchronized (groupView) {
+                        groupViewCopy = groupView.copy();
+                    }
+                    orderingModule.send(m, groupViewCopy);
+                } catch (InterruptedException e) {
+                    // TODO - fix error message
+                    e.printStackTrace();
+                } catch (MemberCrashException e) {
+                    // TODO: One member could not receive message, crash,
+                    //       connectionexception...
+                    e.printStackTrace();
+                } catch (MessageCouldNotBeSentException e) {
+                    // TODO - sequencer crash
+                    e.printStackTrace();
                 }
-            } catch (InterruptedException e) {
-                // TODO - fix error message
-                e.printStackTrace();
-            } catch (MemberCrashException e) {
-                // TODO: One member could not receive message, crash,
-                //       connectionexception...
-                e.printStackTrace();
-            } catch (MessageCouldNotBeSentException e) {
-                // TODO - sequencer crash
-                e.printStackTrace();
             }
         }
     }
