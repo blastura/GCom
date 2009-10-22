@@ -213,21 +213,7 @@ public class GroupModuleImpl implements GroupModule {
 
             // Is it the leader?
             if (crashedMembers.contains(groupView.getGroupLeaderGroupMember())) {
-                groupView.remove(groupView.getGroupLeaderGroupMember());
-
-                // Am I the new leader?
-                if (GroupModule.PID.equals(groupView.getHighestUUID())) {
-                    try {
-                        gns.setNewLeader(this.groupMember, groupView.getName());
-                        Message groupChangeMessage =
-                            new MessageImpl(groupView, MessageType.GROUPCHANGE, GroupModule.PID,
-                                            groupView.getID());
-                        send(groupChangeMessage, groupView);
-                    } catch (RemoteException e1) {
-                        logger.debug("Error, GNS cant change groupleader");
-                        e1.printStackTrace();
-                    }
-                }
+            	leaderCrashHandler();
             } else {
                 // Am I leader
                 if (groupView.getGroupLeaderGroupMember().getPID().equals(GroupModule.PID)) {
@@ -247,6 +233,23 @@ public class GroupModuleImpl implements GroupModule {
         }
     }
 
+    public void leaderCrashHandler() {
+    	groupView.remove(groupView.getGroupLeaderGroupMember());
+
+        // Am I the new leader?
+        if (GroupModule.PID.equals(groupView.getHighestUUID())) {
+            try {
+                gns.setNewLeader(this.groupMember, groupView.getName());
+                Message groupChangeMessage =
+                    new MessageImpl(groupView, MessageType.GROUPCHANGE, GroupModule.PID,
+                                    groupView.getID());
+                send(groupChangeMessage, groupView);
+            } catch (RemoteException e1) {
+                logger.debug("Error, GNS cant change groupleader");
+                e1.printStackTrace();
+            }
+        }
+    }
 
     public GroupView getGroupView() {
         // Used in reliable multicast to resend all messages that are note yet
@@ -287,12 +290,11 @@ public class GroupModuleImpl implements GroupModule {
                     // TODO - fix error message
                     e.printStackTrace();
                 } catch (MemberCrashException e) {
-                    // TODO: One member could not receive message, crash,
-                    //       connectionexception...
-                    e.printStackTrace();
+                	logger.debug("Caught MemberCrashException");
+                	handleMemberCrashException(e);
                 } catch (MessageCouldNotBeSentException e) {
-                    // TODO - sequencer crash
-                    e.printStackTrace();
+                	logger.debug("Caught MessageCouldNotBeSentException");
+                    leaderCrashHandler();
                 }
             }
         }
