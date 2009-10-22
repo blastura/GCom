@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Collection;
+import java.util.Collections;
 
 public class GroupViewImpl implements GroupView {
     private static final long serialVersionUID = 1L;
@@ -86,13 +87,7 @@ public class GroupViewImpl implements GroupView {
     }
 
     public UUID getHighestUUID() {
-        UUID highestUUID = members.get(0).getPID();
-        for(GroupMember gm : members) {
-            if(highestUUID.compareTo(gm.getPID()) == -1) {
-                highestUUID = gm.getPID();
-            }
-        }
-        return highestUUID;
+        return Collections.max(members).getPID();
     }
 
     public void setNewLeader(GroupMember groupMember) {

@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
 
-public class GroupMember implements Serializable {
+public class GroupMember implements Serializable, Comparable<GroupMember> {
     private static final long serialVersionUID = 1L;
     private final Receiver receiver;
     private final UUID PID;
@@ -31,7 +31,11 @@ public class GroupMember implements Serializable {
     public UUID getPID() {
         return this.PID;
     }
-
+    
+    public int compareTo(GroupMember other) {
+        return getPID().compareTo(other.getPID());
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof GroupMember))
