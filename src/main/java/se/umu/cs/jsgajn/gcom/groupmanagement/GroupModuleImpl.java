@@ -275,7 +275,8 @@ public class GroupModuleImpl implements GroupModule {
                 groupViewCopy = new GroupViewImpl(groupView);
             }
             // Multicast new groupView
-            send(new MessageImpl(groupViewCopy, MessageType.GROUPCHANGE, PID, groupView.getID()));
+            send(new MessageImpl(groupViewCopy, MessageType.GROUPCHANGE, PID, groupViewCopy.getID()),
+                 groupView); // TODO: Important don't send with wrong send!!!!
         }
     }
 
