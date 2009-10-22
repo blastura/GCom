@@ -61,7 +61,7 @@ public class VectorClockTest {
     }
 
     @Test
-    public void testReference() {
+    public void testReferenceClone() {
         VectorClock<String> v1 = new VectorClock<String>("p1") {{
                 newProcess("p2");
                 newProcess("p3");
@@ -71,6 +71,26 @@ public class VectorClockTest {
         v1.tick();
         assertEquals(1, v1.get());
         VectorClock<String> vclone = v1.clone();
+        assertTrue(v1.equals(vclone));
+        assertEquals(0, v1.compareTo(vclone));
+        assertNotSame(v1, vclone);
+
+        changeVC(vclone);
+        assertFalse(v1.equals(vclone));
+        assertEquals(1, v1.get());
+    }
+
+        @Test
+    public void testReferenceNewInstance() {
+        VectorClock<String> v1 = new VectorClock<String>("p1") {{
+                newProcess("p2");
+                newProcess("p3");
+                newProcess("p4");
+                newProcess("p5");
+            }};
+        v1.tick();
+        assertEquals(1, v1.get());
+        VectorClock<String> vclone = new VectorClock<String>(v1);
         assertTrue(v1.equals(vclone));
         assertEquals(0, v1.compareTo(vclone));
         assertNotSame(v1, vclone);

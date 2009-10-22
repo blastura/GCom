@@ -12,8 +12,13 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(VectorClock.class);
 
-    private Map<T, Integer> map = new HashMap<T, Integer>();
+    private Map<T, Integer> map;
     private T id;
+
+    public VectorClock(VectorClock<T> v) {
+        this.id = v.getID();
+        this.map = new HashMap<T, Integer>(v.getMap());
+    }
 
     public VectorClock(T id) {
         this(id, 0);
@@ -21,6 +26,7 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
 
     public VectorClock(T id, int startValue) {
         this.id = id;
+        map = new HashMap<T, Integer>();
         map.put(id, startValue);
     }
 
@@ -153,7 +159,7 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
         return map.size();
     }
 
-    protected Map<T, Integer> getMap() {
+    private Map<T, Integer> getMap() {
         return this.map;
     }
 
@@ -181,7 +187,8 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
     @Override
     public VectorClock<T> clone() {
         try {
-            VectorClock<T> newVC = (VectorClock<T>) super.clone();
+            @SuppressWarnings("unchecked")
+                VectorClock<T> newVC = (VectorClock<T>) super.clone();
             newVC.setMap(new HashMap<T, Integer>(this.map));
             return newVC;
         } catch (CloneNotSupportedException e) {

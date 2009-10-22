@@ -59,7 +59,7 @@
       <!-- Compile source -->
       <javac srcdir="${src.main.dir}" destdir="${build.main.dir}" debug="on">
          <classpath refid="project.classpath" />
-         <!-- <compilerarg value="-Xlint:unchecked"/> -->
+         <compilerarg value="-Xlint:unchecked"/>
       </javac>
    </target>
 

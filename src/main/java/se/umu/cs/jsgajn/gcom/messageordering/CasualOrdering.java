@@ -49,7 +49,7 @@ public class CasualOrdering implements Ordering {
         // Tick counter for sent messages
         vc.tick(); // Increment own counter
         // Add a copy of the current vc to message
-        VectorClock<UUID> vcCopy = vc.clone();
+        VectorClock<UUID> vcCopy = new VectorClock<UUID>(vc);
         m.setVectorClock(vcCopy);
         logger.debug("OUT: Prepared outgoing vc: {}, in message: {}", vcCopy, m);
         return m;
