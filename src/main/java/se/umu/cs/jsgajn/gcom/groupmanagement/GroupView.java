@@ -18,4 +18,5 @@ public interface GroupView extends Iterable<GroupMember>, Serializable {
     public List<GroupMember> getAll();
     public UUID getHighestUUID();
     public GroupView copy();
+    public void setNewLeader(GroupMember groupMember);
 }

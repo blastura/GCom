@@ -63,7 +63,7 @@ public class GroupModuleImpl implements GroupModule {
     private boolean running;
 
     public GroupModuleImpl(Client client, String gnsHost, int gnsPort, String groupName)
-        throws RemoteException, AlreadyBoundException, NotBoundException {
+    throws RemoteException, AlreadyBoundException, NotBoundException {
         this(client, gnsHost, gnsPort, groupName, Registry.REGISTRY_PORT);
     }
 
@@ -80,8 +80,8 @@ public class GroupModuleImpl implements GroupModule {
      * @throws NotBoundException If GNS stub is not found in GNS register.
      */
     public GroupModuleImpl(final Client client, final String gnsHost, final int gnsPort,
-                           final String groupName, final int clientPort)
-        throws RemoteException, AlreadyBoundException, NotBoundException,IllegalArgumentException {
+            final String groupName, final int clientPort)
+    throws RemoteException, AlreadyBoundException, NotBoundException,IllegalArgumentException {
         this.client = client;
         this.receiveQueue = new LinkedBlockingQueue<Message>();
         this.sendQueue = new PriorityBlockingQueue<FIFOEntry<Message>>();
@@ -117,9 +117,9 @@ public class GroupModuleImpl implements GroupModule {
             logger.debug("Got existing group from GNS, sending join message");
             MessageImpl joinMessage =
                 new MessageImpl(this.groupMember,
-                                MessageType.JOIN,
-                                PID,
-                                groupView.getID());
+                        MessageType.JOIN,
+                        PID,
+                        groupView.getID());
             this.groupView = new GroupViewImpl(groupName, gs.getLeader());
             this.groupView.add(this.groupMember);
             //.getReceiver().receive(joinMessage);
@@ -189,7 +189,7 @@ public class GroupModuleImpl implements GroupModule {
      */
     public void send(Object clientMessage) {
         Message m = new MessageImpl(clientMessage,
-                                    MessageType.CLIENTMESSAGE, PID, groupView.getID());
+                MessageType.CLIENTMESSAGE, PID, groupView.getID());
         send(m, this.groupView);
     }
 
@@ -213,7 +213,7 @@ public class GroupModuleImpl implements GroupModule {
 
             // Is it the leader?
             if (crashedMembers.contains(groupView.getGroupLeaderGroupMember())) {
-            	leaderCrashHandler();
+                leaderCrashHandler();
             } else {
                 // Am I leader
                 if (groupView.getGroupLeaderGroupMember().getPID().equals(GroupModule.PID)) {
@@ -226,7 +226,7 @@ public class GroupModuleImpl implements GroupModule {
                     }
                     Message groupChangeMessage =
                         new MessageImpl(groupView, MessageType.GROUPCHANGE, GroupModule.PID,
-                                        groupView.getID());
+                                groupView.getID());
                     send(groupChangeMessage, groupView);
                 }
             }
@@ -234,19 +234,22 @@ public class GroupModuleImpl implements GroupModule {
     }
 
     public void leaderCrashHandler() {
-    	groupView.remove(groupView.getGroupLeaderGroupMember());
-
-        // Am I the new leader?
-        if (GroupModule.PID.equals(groupView.getHighestUUID())) {
-            try {
-                gns.setNewLeader(this.groupMember, groupView.getName());
-                Message groupChangeMessage =
-                    new MessageImpl(groupView, MessageType.GROUPCHANGE, GroupModule.PID,
-                                    groupView.getID());
-                send(groupChangeMessage, groupView);
-            } catch (RemoteException e1) {
-                logger.debug("Error, GNS cant change groupleader");
-                e1.printStackTrace();
+        synchronized (groupView) {
+            groupView.remove(groupView.getGroupLeaderGroupMember());
+            
+            // Am I the new leader?
+            if (GroupModule.PID.equals(groupView.getHighestUUID())) {
+                try {
+                    gns.setNewLeader(this.groupMember, groupView.getName());
+                    groupView.setNewLeader(this.groupMember);
+                    Message groupChangeMessage =
+                        new MessageImpl(groupView, MessageType.GROUPCHANGE, GroupModule.PID,
+                                groupView.getID());
+                    send(groupChangeMessage, groupView);
+                } catch (RemoteException e1) {
+                    logger.debug("Error, GNS cant change groupleader");
+                    e1.printStackTrace();
+                }
             }
         }
     }
@@ -290,10 +293,10 @@ public class GroupModuleImpl implements GroupModule {
                     // TODO - fix error message
                     e.printStackTrace();
                 } catch (MemberCrashException e) {
-                	logger.debug("Caught MemberCrashException");
-                	handleMemberCrashException(e);
+                    logger.debug("Caught MemberCrashException");
+                    handleMemberCrashException(e);
                 } catch (MessageCouldNotBeSentException e) {
-                	logger.debug("Caught MessageCouldNotBeSentException");
+                    logger.debug("Caught MessageCouldNotBeSentException");
                     leaderCrashHandler();
                 }
             }
@@ -359,13 +362,13 @@ public class GroupModuleImpl implements GroupModule {
      * @throws NotBoundException If GNS stub can't be found.
      */
     private GNS getGNS(String host, int port) throws RemoteException,
-                                                     NotBoundException {
+    NotBoundException {
         Registry gnsReg = LocateRegistry.getRegistry(host, port);
         return (GNS) gnsReg.lookup(GNS.STUB_NAME);
     }
 
     protected static class FIFOEntry<E extends Comparable<? super E>>
-        implements Comparable<FIFOEntry<E>> {
+    implements Comparable<FIFOEntry<E>> {
         final static AtomicLong seq = new AtomicLong();
         final long seqNum;
         final E entry;
