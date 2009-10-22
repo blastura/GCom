@@ -51,6 +51,24 @@ public class MessageImplTest {
         Message m2 = new MessageImpl("hej", MessageType.CLIENTMESSAGE,
                                      m2id, UUID.randomUUID());
         
+        Message mGC = new MessageImpl("hej", MessageType.GROUPCHANGE,
+                                     UUID.randomUUID(), UUID.randomUUID());
+
+
+        Message mJoin = new MessageImpl("hej", MessageType.JOIN,
+                                      UUID.randomUUID(), UUID.randomUUID());
+        assertEquals(0, m2.compareTo(m1));
+        assertEquals(0, m1.compareTo(m2));
+        
+        // Test groupchange
+        assertEquals(1, m1.compareTo(mGC));
+        assertEquals(-1, mGC.compareTo(m1));
+        
+        // Test join
+        assertEquals(0, m1.compareTo(mJoin));
+        assertEquals(0, mJoin.compareTo(m1));
+        
+        assertEquals(1, mJoin.compareTo(mGC));
+        assertEquals(-1, mGC.compareTo(mJoin));
     }
-    
 }

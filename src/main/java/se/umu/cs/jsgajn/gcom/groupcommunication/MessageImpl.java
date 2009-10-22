@@ -3,6 +3,10 @@ package se.umu.cs.jsgajn.gcom.groupcommunication;
 import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 
@@ -13,6 +17,7 @@ import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
  * @version 1.0
  */
 public class MessageImpl implements Message {
+    private static final Logger logger = LoggerFactory.getLogger(MessageImpl.class);
     private static final long serialVersionUID = 1L;
     private final UUID ID;
     private int sequenceNumber;
@@ -103,10 +108,14 @@ public class MessageImpl implements Message {
     }
 
     public int compareTo(final Message other) {
-        return this.vc.compareTo(other.getVectorClock());
+        logger.debug("Comparing messages");
+        if (messageType.equals(other.getMessageType())) { return 0; }
+        if (messageType.equals(MessageType.GROUPCHANGE)) { return -1; }
+        if ( other.getMessageType().equals(MessageType.GROUPCHANGE)) { return 1; }
+        return 0;     
     }
-
-	public void setSequnceNumber(int number) {
+    
+    public void setSequnceNumber(int number) {
 		this.sequenceNumber = number;
 	}
 

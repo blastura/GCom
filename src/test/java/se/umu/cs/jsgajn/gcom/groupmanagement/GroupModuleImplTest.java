@@ -11,6 +11,12 @@ import org.junit.Ignore;
 import static org.junit.Assert.*;
 
 import se.umu.cs.jsgajn.gcom.Client;
+import java.util.concurrent.PriorityBlockingQueue;
+import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
+import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
+import java.util.UUID;
+import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
+import java.util.Collections;
 
 public class GroupModuleImplTest {
 
@@ -78,6 +84,49 @@ public class GroupModuleImplTest {
         public void deliver(Object message) {
             // TODO Auto-generated method stub
 
+        }
+    }
+
+    @Test
+    public void testPrioQueue() {
+        PriorityBlockingQueue<GroupModuleImpl.FIFOEntry<Message>> sendQueue =
+            new PriorityBlockingQueue<GroupModuleImpl.FIFOEntry<Message>>();
+        
+        UUID m1id = UUID.randomUUID();
+        Message m1 = new MessageImpl("m1", MessageType.CLIENTMESSAGE,
+                                     m1id, UUID.randomUUID());
+
+        UUID m2id = UUID.randomUUID();
+        Message m2 = new MessageImpl("m2", MessageType.CLIENTMESSAGE,
+                                     m2id, UUID.randomUUID());
+        
+        Message mGC = new MessageImpl("mGC", MessageType.GROUPCHANGE,
+                                     UUID.randomUUID(), UUID.randomUUID());
+
+        Message mGC2 = new MessageImpl("mGC2", MessageType.GROUPCHANGE,
+                                     UUID.randomUUID(), UUID.randomUUID());
+
+
+        Message mJoin = new MessageImpl("mJoin", MessageType.JOIN,
+                                      UUID.randomUUID(), UUID.randomUUID());
+        
+        sendQueue.put(new GroupModuleImpl.FIFOEntry<Message>(m1));
+        sendQueue.put(new GroupModuleImpl.FIFOEntry<Message>(mGC));
+        sendQueue.put(new GroupModuleImpl.FIFOEntry<Message>(m2));
+        sendQueue.put(new GroupModuleImpl.FIFOEntry<Message>(mGC2));
+        sendQueue.put(new GroupModuleImpl.FIFOEntry<Message>(mJoin));
+        try {
+            //             while (!sendQueue.isEmpty()) {
+            //                 System.out.println(sendQueue.take().getEntry().getMessage());
+            //             }
+            assertSame(mGC, sendQueue.take().getEntry());
+            assertSame(mGC2, sendQueue.take().getEntry());
+            assertSame(m1, sendQueue.take().getEntry());
+            assertSame(m2, sendQueue.take().getEntry());
+            assertSame(mJoin, sendQueue.take().getEntry());
+        } catch (InterruptedException e) {
+            // TODO - fix error message
+            e.printStackTrace();
         }
     }
 }

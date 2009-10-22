@@ -31,6 +31,8 @@ import se.umu.cs.jsgajn.gcom.messageordering.OrderingModule;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingModuleImpl;
 import se.umu.cs.jsgajn.gcom.messageordering.OrderingType;
 import se.umu.cs.jsgajn.gcom.messageordering.Orderings;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.PriorityBlockingQueue;
 
 /**
  * author dit06ajn, dit06jsg
@@ -54,7 +56,7 @@ public class GroupModuleImpl implements GroupModule {
     private LinkedBlockingQueue<Message> receiveQueue;
 
     // Queue to contain messages that should be sent
-    private LinkedBlockingQueue<Message> sendQueue;
+    private PriorityBlockingQueue<FIFOEntry<Message>> sendQueue;
 
     private Thread messageReceiverThread;
     private Thread messageSenderThread;
@@ -82,7 +84,7 @@ public class GroupModuleImpl implements GroupModule {
         throws RemoteException, AlreadyBoundException, NotBoundException,IllegalArgumentException {
         this.client = client;
         this.receiveQueue = new LinkedBlockingQueue<Message>();
-        this.sendQueue = new LinkedBlockingQueue<Message>();
+        this.sendQueue = new PriorityBlockingQueue<FIFOEntry<Message>>();
 
         this.orderingModule = new OrderingModuleImpl(this);
         this.communicationModule = new CommunicationsModuleImpl(this, clientPort);
@@ -179,8 +181,6 @@ public class GroupModuleImpl implements GroupModule {
         return new GroupSettings(groupName, leader, mtype, otype);
     }
 
-
-
     /**
      * Will send package Object in appropriate Message and send it to every
      * group member.
@@ -188,8 +188,11 @@ public class GroupModuleImpl implements GroupModule {
      * @param clientMessage The Object to send.
      */
     public void send(Object clientMessage) {
-        Message m = new MessageImpl(clientMessage,
-                                    MessageType.CLIENTMESSAGE, PID, groupView.getID());
+        Message m;
+        synchronized (groupView) {
+            m = new MessageImpl(clientMessage,
+                                MessageType.CLIENTMESSAGE, PID, groupView.getID());
+        }
         send(m, this.groupView);
     }
 
@@ -205,60 +208,53 @@ public class GroupModuleImpl implements GroupModule {
      */
 
     public void send(Message m, GroupView g) {
-        try {
-            if(m.getMessageType().equals(MessageType.GROUPCHANGE)){
-                //communicationModule.send(m, this.groupView);
-                // TODO: put first in queue, prio
-                sendQueue.put(m);
-            } else {
-                sendQueue.put(m);
-            }
-        } catch (InterruptedException e) {
-            // TODO - fix error message
-            e.printStackTrace();
-        }
+        sendQueue.put(new FIFOEntry<Message>(m));
     }
 
     public void handleMemberCrashException(MemberCrashException e) {
-        CrashList crashedMembers = e.getCrashedMembers();
+        synchronized (groupView) {
+            CrashList crashedMembers = e.getCrashedMembers();
 
-        // Is it the leader?
-        if (crashedMembers.contains(groupView.getGroupLeaderGroupMember())) {
-            groupView.remove(groupView.getGroupLeaderGroupMember());
+            // Is it the leader?
+            if (crashedMembers.contains(groupView.getGroupLeaderGroupMember())) {
+                groupView.remove(groupView.getGroupLeaderGroupMember());
 
-            // Am I the new leader?
-            if(GroupModule.PID.equals(groupView.getHighestUUID())) {
-                try {
-                    gns.setNewLeader(this.groupMember, groupView.getName());
+                // Am I the new leader?
+                if (GroupModule.PID.equals(groupView.getHighestUUID())) {
+                    try {
+                        gns.setNewLeader(this.groupMember, groupView.getName());
+                        Message groupChangeMessage =
+                            new MessageImpl(groupView, MessageType.GROUPCHANGE, GroupModule.PID,
+                                            groupView.getID());
+                        send(groupChangeMessage, groupView);
+                    } catch (RemoteException e1) {
+                        logger.debug("Error, GNS cant change groupleader");
+                        e1.printStackTrace();
+                    }
+                }
+            } else {
+                // Am I leader
+                if (groupView.getGroupLeaderGroupMember().getPID().equals(GroupModule.PID)) {
+
+                    // TODO: sync or copy ?
+                    boolean changed = groupView.removeAll(crashedMembers.getAll());
+                    logger.debug("After remove all: {}",crashedMembers.getAll());
+                    if (!changed) {
+                        logger.warn("Tried to remove crashed members, but none were removed");
+                    }
                     Message groupChangeMessage =
                         new MessageImpl(groupView, MessageType.GROUPCHANGE, GroupModule.PID,
                                         groupView.getID());
                     send(groupChangeMessage, groupView);
-                } catch (RemoteException e1) {
-                    logger.debug("Error, GNS cant change groupleader");
-                    e1.printStackTrace();
                 }
-            }
-        } else {
-            // Am I leader
-            if (groupView.getGroupLeaderGroupMember().getPID().equals(GroupModule.PID)) {
-
-                // TODO: sync or copy ?
-                boolean changed = groupView.removeAll(crashedMembers.getAll());
-                logger.debug("After remove all: {}",crashedMembers.getAll());
-                if (!changed) {
-                    logger.warn("Tried to remove crashed members, but none were removed");
-                }
-                Message groupChangeMessage =
-                    new MessageImpl(groupView, MessageType.GROUPCHANGE, GroupModule.PID,
-                                    groupView.getID());
-                send(groupChangeMessage, groupView);
             }
         }
     }
 
 
     public GroupView getGroupView() {
+        // Used in reliable multicast to resend all messages that are note yet
+        // received
         return groupView;
     }
 
@@ -270,19 +266,23 @@ public class GroupModuleImpl implements GroupModule {
 
         public void addMemberToGroup(GroupMember member) {
             // TODO: fix this
-            groupView.add(member);
+            synchronized (groupView) {
+                groupView.add(member);
 
-            // Multicast new groupView
-            send(new MessageImpl(groupView, MessageType.GROUPCHANGE, PID, groupView.getID()));
+                // Multicast new groupView
+                send(new MessageImpl(groupView, MessageType.GROUPCHANGE, PID, groupView.getID()));
+            }
         }
     }
 
     private class MessageSender implements Runnable {
         public void run() {
             try {
-                Message m = sendQueue.take();
+                Message m = sendQueue.take().getEntry();
                 // TODO: Clone groupView
-                orderingModule.send(m, groupView);
+                synchronized (groupView) {
+                    orderingModule.send(m, groupView);
+                }
             } catch (InterruptedException e) {
                 // TODO - fix error message
                 e.printStackTrace();
@@ -315,7 +315,9 @@ public class GroupModuleImpl implements GroupModule {
             switch (type) {
             case GROUPCHANGE:
                 logger.info("GROUPCHANGE");
-                groupView = (GroupView) m.getMessage();
+                synchronized (groupView) {
+                    groupView = (GroupView) m.getMessage();
+                }
                 debugger.groupChange(groupView);
                 break;
             case CLIENTMESSAGE:
@@ -360,5 +362,25 @@ public class GroupModuleImpl implements GroupModule {
                                                      NotBoundException {
         Registry gnsReg = LocateRegistry.getRegistry(host, port);
         return (GNS) gnsReg.lookup(GNS.STUB_NAME);
+    }
+
+    protected static class FIFOEntry<E extends Comparable<? super E>>
+        implements Comparable<FIFOEntry<E>> {
+        final static AtomicLong seq = new AtomicLong();
+        final long seqNum;
+        final E entry;
+        public FIFOEntry(E entry) {
+            seqNum = seq.getAndIncrement();
+            this.entry = entry;
+        }
+
+        public E getEntry() { return entry; }
+
+        public int compareTo(FIFOEntry<E> other) {
+            int res = entry.compareTo(other.entry);
+            if (res == 0 && other.entry != this.entry)
+                res = (seqNum < other.seqNum ? -1 : 1);
+            return res;
+        }
     }
 }
