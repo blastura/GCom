@@ -271,7 +271,7 @@ public class GroupModuleImpl implements GroupModule {
             GroupView groupViewCopy;
             synchronized (groupView) {
                 groupView.add(member);
-                groupViewCopy = groupView.copy();
+                groupViewCopy = new GroupViewImpl(groupView);
             }
             // Multicast new groupView
             send(new MessageImpl(groupViewCopy, MessageType.GROUPCHANGE, PID, groupView.getID()));
@@ -286,7 +286,7 @@ public class GroupModuleImpl implements GroupModule {
                     // TODO: Clone groupView
                     GroupView groupViewCopy;
                     synchronized (groupView) {
-                        groupViewCopy = groupView.copy();
+                        groupViewCopy = new GroupViewImpl(groupView);
                     }
                     orderingModule.send(m, groupViewCopy);
                 } catch (InterruptedException e) {
