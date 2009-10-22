@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.umu.cs.jsgajn.gcom.Module;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 import se.umu.cs.jsgajn.gcom.debug.Debugger;
@@ -97,6 +98,9 @@ public class CommunicationsModuleImpl implements CommunicationModule {
     }
 
     public void send(Message m, GroupView g) throws MemberCrashException {
+        for (GroupMember gm : g) {
+            logger.debug("ARGGGH!: {}", gm.getPID());
+        }
         mMethod.multicast(m, g);
     }
 

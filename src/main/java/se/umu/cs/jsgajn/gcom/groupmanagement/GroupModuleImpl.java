@@ -213,7 +213,7 @@ public class GroupModuleImpl implements GroupModule {
 
             // Is it the leader?
             if (crashedMembers.contains(groupView.getGroupLeaderGroupMember())) {
-                leaderCrashHandler();
+                handelLeaderCrash();
             } else {
                 // Am I leader
                 if (groupView.getGroupLeaderGroupMember().getPID().equals(GroupModule.PID)) {
@@ -233,7 +233,7 @@ public class GroupModuleImpl implements GroupModule {
         }
     }
 
-    public void leaderCrashHandler() {
+    public void handelLeaderCrash() {
         synchronized (groupView) {
             groupView.remove(groupView.getGroupLeaderGroupMember());
             
@@ -242,6 +242,7 @@ public class GroupModuleImpl implements GroupModule {
                 try {
                     gns.setNewLeader(this.groupMember, groupView.getName());
                     groupView.setNewLeader(this.groupMember);
+                    this.gl = new GroupLeaderImpl();
                     Message groupChangeMessage =
                         new MessageImpl(groupView, MessageType.GROUPCHANGE, GroupModule.PID,
                                 groupView.getID());
@@ -297,7 +298,7 @@ public class GroupModuleImpl implements GroupModule {
                     handleMemberCrashException(e);
                 } catch (MessageCouldNotBeSentException e) {
                     logger.debug("Caught MessageCouldNotBeSentException");
-                    leaderCrashHandler();
+                    handelLeaderCrash();
                 }
             }
         }
