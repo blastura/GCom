@@ -63,7 +63,7 @@ public class CommunicationsModuleImpl implements CommunicationModule {
         // Create thread to handle messages
         this.messageReceiverThread = new Thread(new MessageReceiver(),
                                                 "CommunicationsModule thread");
-        logger.debug("CommunicationsModuleImpl receiveing messages at port: " + port);
+        logger.debug("CommunicationsModuleImpl receiveing messages at port: {}", port);
     }
 
     public void start() {

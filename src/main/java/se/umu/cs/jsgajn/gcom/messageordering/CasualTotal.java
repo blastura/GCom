@@ -190,4 +190,9 @@ public class CasualTotal implements Ordering {
 			}
 		}
 	}
+    
+    @Override
+    public String toString() {
+        return OrderingType.CASUALTOTAL_ORDERING.toString();
+    }
 }

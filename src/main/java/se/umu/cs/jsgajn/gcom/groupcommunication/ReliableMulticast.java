@@ -44,4 +44,9 @@ public class ReliableMulticast implements Multicast {
         }
         return false;
     }
+
+    @Override
+    public String toString() {
+        return MulticastType.RELIABLE_MULTICAST.toString();
+    }
 }

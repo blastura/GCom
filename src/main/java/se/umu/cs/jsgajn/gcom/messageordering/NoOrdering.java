@@ -34,4 +34,9 @@ public class NoOrdering implements Ordering {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public String toString() {
+        return OrderingType.NO_ORDERING.toString();
+    }
 }

@@ -171,4 +171,9 @@ public class FIFO implements Ordering {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return OrderingType.FIFO.toString();
+    }
 }

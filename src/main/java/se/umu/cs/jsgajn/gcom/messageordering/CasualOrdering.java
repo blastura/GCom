@@ -178,4 +178,9 @@ public class CasualOrdering implements Ordering {
             }
         }
     }
+    
+    @Override
+    public String toString() {
+        return OrderingType.CASUAL_ORDERING.toString();
+    }
 }
