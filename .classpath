@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="src" path="src/main/resources"/>
+	<classpathentry kind="src" path="src/test/resources"/>
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="src" path="src/main/java"/>
-	<classpathentry kind="src" path="src/main/resources"/>
-	<classpathentry kind="con" path="/private/var/automount/home/dit06/dit06ajn/edu/dist/GCom/bin/main/java"/>
-	<classpathentry kind="con" path="/private/var/automount/home/dit06/dit06ajn/edu/dist/GCom/bin/test/java"/>
-	<classpathentry kind="lib" path="lib/core.jar"/>
-	<classpathentry kind="lib" path="lib/junit-4.5.jar"/>
-	<classpathentry kind="lib" path="lib/logback-classic-0.9.17.jar"/>
-	<classpathentry kind="lib" path="lib/logback-core-0.9.17.jar"/>
+	<classpathentry kind="var" path="JRE_LIB" sourcepath="JRE_SRC"/>
+	<classpathentry kind="con" path="/Users/anton/Documents/skola/dist/gcom/bin/main/java"/>
+	<classpathentry kind="con" path="/Users/anton/Documents/skola/dist/gcom/bin/test/java"/>
+	<classpathentry kind="lib" path="/Users/anton/Documents/skola/dist/gcom/lib/junit-4.5.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.5.8.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="lib" path="lib/logback-core-0.9.17.jar"/>
+	<classpathentry kind="output" path="bin/main/java"/>
 </classpath>

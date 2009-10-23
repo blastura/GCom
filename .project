@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>GCOM</name>
+	<name>GCom</name>
 	<comment></comment>
 	<projects>
 	</projects>
 	<buildSpec>
 		<buildCommand>
 			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
-			<triggers>clean,full,incremental,</triggers>
 			<arguments>
 				<dictionary>
 					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/Ant_builder.launch</value>
+					<value>&lt;project&gt;/.externalToolBuilders/New_Builder.launch</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>
@@ -28,7 +27,7 @@
 		<link>
 			<name>java</name>
 			<type>2</type>
-			<location>/private/var/automount/home/dit06/dit06ajn/edu/dist/GCom/src/main/java</location>
+			<location>/Users/anton/Documents/skola/dist/gcom/src/main/java</location>
 		</link>
 	</linkedResources>
 </projectDescription>
