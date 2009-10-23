@@ -62,19 +62,25 @@ public class Total implements Ordering {
 
     public void put(Message m) {
         try {
+            // Körs första gången endast
             if (this.leaderUUID == null) {
                 this.leaderUUID = m.getSequncerUID();
+                logger.debug("No leader UUID, set new! " + this.leaderUUID);
             }
+
+            // Om det är en ny ledare
             if (!this.leaderUUID.equals(m.getSequncerUID())) {
-                this.latestReceivedSequenceNumber = (m.getSequnceNumber()-1);
+                this.latestReceivedSequenceNumber = m.getSequnceNumber();
                 this.leaderUUID = m.getSequncerUID();
-            } else {
-                int sequenceNumber = m.getSequnceNumber();
-                if(this.latestReceivedSequenceNumber == 0) {
-                    this.latestReceivedSequenceNumber = (sequenceNumber-1);
-                    logger.debug("No sequencenumber, got " + latestReceivedSequenceNumber);
-                }
+                logger.debug("We got new sequencer, m.getSequcen() = " + latestReceivedSequenceNumber);
             }
+            
+            // Om detta är första meddelandet den får
+            if(this.latestReceivedSequenceNumber == 0) {
+                this.latestReceivedSequenceNumber = (m.getSequnceNumber()-1);
+                logger.debug("No sequencenumber, got " + latestReceivedSequenceNumber);
+            }
+
             receiveQueue.put(m);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -117,7 +123,10 @@ public class Total implements Ordering {
                             }
                         }
                     } else {
-                        holdBackSortedSet.add(m);
+                        if (!holdBackSortedSet.add(m)) {
+                            logger.error("Fuck, error in totalorderholdback");
+                            System.exit(0);
+                        }
                     }
 
                 } catch (InterruptedException e) {
