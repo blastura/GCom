@@ -6,7 +6,12 @@ import java.util.Set;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ReliableMulticast implements Multicast {
+    private static final Logger logger = LoggerFactory.getLogger(ReliableMulticast.class);
+    
     private BasicMulticast bMulticast;
     private Set<Message> received;
 
@@ -36,8 +41,8 @@ public class ReliableMulticast implements Multicast {
                     }
                     multicast(m, g);
                 } catch (MemberCrashException e) {
-                    // TODO - fix error message
-                    e.printStackTrace();
+                    logger.info("Reliable multicast detect membercrash: {}, will be ignored",
+                                e.getMessage());
                 }
             }
             return true;
