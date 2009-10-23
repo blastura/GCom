@@ -44,7 +44,8 @@ public class MessageImpl implements Message {
     }
     
     public boolean isSystemMessage() {
-        if (this.messageType == MessageType.GROUPCHANGE) {
+        if ((this.messageType == MessageType.GROUPCHANGE) ||
+                (this.messageType == MessageType.LEADERCRASH)) {
             return true;
         }
         return false;

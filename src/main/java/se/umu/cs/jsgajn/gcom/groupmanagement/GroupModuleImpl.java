@@ -209,7 +209,7 @@ public class GroupModuleImpl implements GroupModule {
 
             // Is it the leader?
             if (crashedMembers.contains(groupView.getGroupLeaderGroupMember())) {
-                handelLeaderCrash();
+                handleLeaderCrash();
             } else {
                 // Am I leader
                 if (groupView.getGroupLeaderGroupMember().getPID().equals(GroupModule.PID)) {
@@ -229,9 +229,10 @@ public class GroupModuleImpl implements GroupModule {
         }
     }
 
-    public void handelLeaderCrash() {
+    public void handleLeaderCrash(GroupMember leader) {
         synchronized (groupView) {
-            groupView.remove(groupView.getGroupLeaderGroupMember());
+            //groupView.remove(groupView.getGroupLeaderGroupMember());
+            groupView.remove(leader);
             
             // Am I the new leader?
             if (GroupModule.PID.equals(groupView.getHighestUUID())) {
@@ -242,11 +243,17 @@ public class GroupModuleImpl implements GroupModule {
                     Message groupChangeMessage =
                         new MessageImpl(groupView, MessageType.GROUPCHANGE, GroupModule.PID,
                                 groupView.getID());
+                    logger.debug("Incredible! I am the new leader! ");
                     send(groupChangeMessage, groupView);
                 } catch (RemoteException e1) {
                     logger.debug("Error, GNS cant change groupleader");
                     e1.printStackTrace();
                 }
+            } else {
+                Message leaderCrashMessage = new MessageImpl(
+                        leader, MessageType.LEADERCRASH, 
+                        GroupModule.PID, groupView.getID());
+                send(leaderCrashMessage, groupView);
             }
         }
     }
@@ -295,7 +302,8 @@ public class GroupModuleImpl implements GroupModule {
                     handleMemberCrashException(e);
                 } catch (MessageCouldNotBeSentException e) {
                     logger.debug("Caught MessageCouldNotBeSentException");
-                    handelLeaderCrash();
+                    
+                    handleLeaderCrash(groupView.getGroupLeaderGroupMember());
                 }
             }
         }
@@ -327,6 +335,10 @@ public class GroupModuleImpl implements GroupModule {
             case CLIENTMESSAGE:
                 logger.info("CLIENTMESSAGE");
                 client.deliver(m.getMessage());
+                break;
+            case LEADERCRASH:
+                logger.info("LEADERCRASH");
+                handleLeaderCrash((GroupMember)m.getMessage());
                 break;
             case JOIN:
                 if (gl == null) {
