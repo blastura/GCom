@@ -305,7 +305,10 @@ public class GroupModuleImpl implements GroupModule {
                     } catch (MessageCouldNotBeSentException e) {
                         logger.debug("Caught MessageCouldNotBeSentException fifoEntry: {}",
                                      fifoEntry);
-                        handleLeaderCrash(groupView.getGroupLeaderGroupMember());
+                        handleMemberCrashException(new MemberCrashException(e.getCrashedMembers()));
+                        // Put message back in queue
+                        sendQueue.put(fifoEntry);
+                        logger.debug("FIFOEntry put back in queue, fifoEntry: [{}]", fifoEntry);
                     }
                 } catch (InterruptedException e) {
                     // TODO - fix error message

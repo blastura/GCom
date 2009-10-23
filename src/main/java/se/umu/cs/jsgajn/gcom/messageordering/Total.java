@@ -4,23 +4,18 @@ import java.rmi.RemoteException;
 import java.util.UUID;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.umu.cs.jsgajn.gcom.debug.Debugger;
-import se.umu.cs.jsgajn.gcom.groupcommunication.MemberCrashException;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupmanagement.CrashList;
 import se.umu.cs.jsgajn.gcom.groupmanagement.CrashListImpl;
-import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageCouldNotBeSentException;
 
@@ -35,7 +30,6 @@ public class Total implements Ordering {
 
     private boolean running = false;
     private int latestReceivedSequenceNumber = 0;
-    private GroupView g;
 
     private UUID leaderUUID = null;
 
@@ -51,7 +45,7 @@ public class Total implements Ordering {
         int sequenceNumber;
         UUID sequencerUID;
         try {
-            sequenceNumber = 
+            sequenceNumber =
                 g.getGroupLeaderGroupMember().getReceiver().getSequenceNumber(m);
             sequencerUID = g.getGroupLeaderGroupMember().getReceiver().getPID();
 
@@ -101,10 +95,10 @@ public class Total implements Ordering {
     private class MessageHandler implements Runnable {
 
         private SortedSet<Message> holdBackSortedSet = new TreeSet<Message>(new Comparator<Message>() {
-            public int compare(Message m1, Message m2) {
-                return m1.getSequnceNumber() - m2.getSequnceNumber();
-            }
-        });
+                public int compare(Message m1, Message m2) {
+                    return m1.getSequnceNumber() - m2.getSequnceNumber();
+                }
+            });
 
         public void run() {
             while (running) {
@@ -150,5 +144,10 @@ public class Total implements Ordering {
                 return false;
             }
         }
-    }	
+    }
+
+    @Override
+    public String toString() {
+        return OrderingType.TOTAL_ORDER.toString();
+    }
 }

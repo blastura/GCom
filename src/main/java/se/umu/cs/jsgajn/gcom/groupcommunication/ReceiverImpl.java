@@ -54,10 +54,6 @@ public class ReceiverImpl implements Receiver, Serializable {
     }
 
     public boolean orderingExist() {
-        if (ordering == null) {
-            return false;
-        } else {
-            return true;
-        }
+        return ordering != null;
     }
 }
