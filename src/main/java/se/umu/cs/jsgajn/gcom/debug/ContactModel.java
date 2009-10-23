@@ -15,8 +15,6 @@ import javax.swing.JToggleButton;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
-import ch.qos.logback.classic.Logger;
-
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;

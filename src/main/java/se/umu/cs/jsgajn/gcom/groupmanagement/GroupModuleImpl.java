@@ -209,7 +209,7 @@ public class GroupModuleImpl implements GroupModule {
 
             // Is it the leader?
             if (crashedMembers.contains(groupView.getGroupLeaderGroupMember())) {
-                handleLeaderCrash();
+                handleLeaderCrash(groupView.getGroupLeaderGroupMember());
             } else {
                 // Am I leader
                 if (groupView.getGroupLeaderGroupMember().getPID().equals(GroupModule.PID)) {
