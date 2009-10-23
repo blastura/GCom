@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import se.umu.cs.jsgajn.gcom.debug.Debugger;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MemberCrashException;
 import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
+import se.umu.cs.jsgajn.gcom.groupmanagement.CrashList;
+import se.umu.cs.jsgajn.gcom.groupmanagement.CrashListImpl;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageCouldNotBeSentException;
 
@@ -55,7 +57,9 @@ public class CasualTotal implements Ordering {
                 g.getGroupLeaderGroupMember().getReceiver().createOrdering();
             }
         } catch (RemoteException e) {
-            e.printStackTrace();
+            CrashList cl = new CrashListImpl();
+            cl.add(g.getGroupLeaderGroupMember());
+            throw new MessageCouldNotBeSentException(cl);
         }
         // TODO: Jonny kolla igenom, tog bort try catch MemberCrashException
         this.casual.prepareOutgoingMessage(m, g);

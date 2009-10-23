@@ -20,6 +20,13 @@ public class GroupViewImpl implements GroupView {
         this.groupLeader = gv.getGroupLeaderGroupMember();
         this.id = gv.getID();
     }
+
+    public GroupViewImpl(GroupView gv, List<GroupMember> members) {
+        this.members = members;
+        this.name = gv.getName();
+        this.groupLeader = gv.getGroupLeaderGroupMember();
+        this.id = gv.getID();
+    }
     
     public GroupViewImpl(String name, GroupMember groupLeader) {
         this.members = new ArrayList<GroupMember>();
@@ -91,5 +98,15 @@ public class GroupViewImpl implements GroupView {
 
     public void setNewLeader(GroupMember groupMember) {
         this.groupLeader = groupMember;
+    }
+
+    public List<GroupMember> getMembersWithHigherUUID(UUID uid) {
+        List<GroupMember> membersWithHigher = new ArrayList<GroupMember>();
+        for (GroupMember gm : members) {
+            if (gm.getPID().compareTo(uid) == -1) {
+                membersWithHigher.add(gm);
+            }
+        }
+        return membersWithHigher;
     }
 }

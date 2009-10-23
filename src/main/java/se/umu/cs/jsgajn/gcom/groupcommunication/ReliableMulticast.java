@@ -4,7 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModuleImpl;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
+import se.umu.cs.jsgajn.gcom.groupmanagement.GroupViewImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,9 @@ public class ReliableMulticast implements Multicast {
      * @param m The message to send.
      */
     public void multicast(Message m, GroupView g) throws MemberCrashException {
+        if(m.getMessageType().equals(MessageType.GROUPCHANGE)){
+            g = new GroupViewImpl(g, g.getMembersWithHigherUUID(GroupModule.PID));
+        }
         bMulticast.multicast(m, g);
     }
 
