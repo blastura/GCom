@@ -17,15 +17,15 @@ public class ReceiverImpl implements Receiver, Serializable {
     private final UUID PID;
     private AtomicInteger sequenceNumber;
     private CasualTotal ordering;
-    
-    public ReceiverImpl(BlockingQueue<Message> q, final UUID processID) 
-    throws RemoteException, AlreadyBoundException, NotBoundException,IllegalArgumentException {
+
+    public ReceiverImpl(BlockingQueue<Message> q, final UUID processID)
+        throws RemoteException, AlreadyBoundException, NotBoundException,IllegalArgumentException {
         this.q = q;
         this.PID = processID;
         this.sequenceNumber = new AtomicInteger(0);
         this.ordering = null;
-    } 
-    
+    }
+
     public void receive(Message m) throws RemoteException {
         // Simply add message to blockingQueue, if queue is busy, it will block.
         try {
@@ -36,28 +36,28 @@ public class ReceiverImpl implements Receiver, Serializable {
             e.printStackTrace();
         }
     }
-    
+
     public UUID getPID() throws RemoteException {
         return this.PID;
     }
-    
-    public int getSequenceNumber(Message m) {
-    	if(ordering != null) {
-    		ordering.askForSequenceNumber(m);
-    		ordering.getSequenceNumber(m);
-    	}
-    	return sequenceNumber.incrementAndGet();
-	}
 
-	public void createOrdering() {
-		this.ordering = new CasualTotal();
-	}
-	
-	public boolean orderingExist() {
-		if(ordering == null) {
-			return false;
-		} else {
-			return true;
-		}
-	}
+    public int getSequenceNumber(Message m) {
+        if (ordering != null) {
+            ordering.askForSequenceNumber(m);
+            ordering.getSequenceNumber(m);
+        }
+        return sequenceNumber.incrementAndGet();
+    }
+
+    public void createOrdering() {
+        this.ordering = new CasualTotal();
+    }
+
+    public boolean orderingExist() {
+        if (ordering == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }

@@ -111,12 +111,12 @@ public class CommunicationsModuleImpl implements CommunicationModule {
                     handleMessage(receiveQueue.take());
                 }
             } catch (InterruptedException e) {
-                System.out.println(e);
+                System.err.println(e);
             }
         }
 
         public void handleMessage(Message m) {
-            logger.debug("Gotcha?: {}",m.getMessage());
+            logger.debug("Gotcha?: {}", m.getMessage());
             debugger.messageReceived(m);
 
             if (debugger.holdMessage(m, getReceiver())) {
@@ -134,13 +134,7 @@ public class CommunicationsModuleImpl implements CommunicationModule {
     }
 
     public void deliver(Message m) {
-        logger.debug("Message delivered: {} {}",m.getSequnceNumber(), m.getMessage());
-
-
-        if (m.isSystemMessage()) {
-            groupModule.deliver(m);
-        } else {
-            orderingModule.deliver(m);
-        }
+        logger.debug("Message delivered: {} {}", m.getSequnceNumber(), m.getMessage());
+        orderingModule.deliver(m);
     }
 }

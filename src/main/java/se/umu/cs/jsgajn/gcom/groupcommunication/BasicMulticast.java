@@ -1,7 +1,6 @@
 package se.umu.cs.jsgajn.gcom.groupcommunication;
 
 import java.rmi.RemoteException;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,12 +10,6 @@ import se.umu.cs.jsgajn.gcom.groupmanagement.CrashListImpl;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
-import se.umu.cs.jsgajn.gcom.groupmanagement.GroupViewImpl;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 //import se.umu.cs.jsgajn.gcom.debug.Debugger;
 
