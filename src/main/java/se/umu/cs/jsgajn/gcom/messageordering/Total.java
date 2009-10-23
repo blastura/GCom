@@ -72,7 +72,7 @@ public class Total implements Ordering {
                 this.leaderUUID = m.getSequncerUID();
             }
             if (!this.leaderUUID.equals(m.getSequncerUID())) {
-                this.latestReceivedSequenceNumber = m.getSequnceNumber();
+                this.latestReceivedSequenceNumber = (m.getSequnceNumber()-1);
                 this.leaderUUID = m.getSequncerUID();
             } else {
                 int sequenceNumber = m.getSequnceNumber();

@@ -61,7 +61,6 @@ public class CasualTotal implements Ordering {
             cl.add(g.getGroupLeaderGroupMember());
             throw new MessageCouldNotBeSentException(cl);
         }
-        // TODO: Jonny kolla igenom, tog bort try catch MemberCrashException
         this.casual.prepareOutgoingMessage(m, g);
         this.total.prepareOutgoingMessage(m, g);
         return m;
