@@ -59,7 +59,7 @@ public class GroupModuleImpl implements GroupModule {
     private boolean running;
 
     public GroupModuleImpl(Client client, String gnsHost, int gnsPort, String groupName)
-    throws RemoteException, AlreadyBoundException, NotBoundException {
+        throws RemoteException, AlreadyBoundException, NotBoundException {
         this(client, gnsHost, gnsPort, groupName, Registry.REGISTRY_PORT);
     }
 
@@ -76,8 +76,8 @@ public class GroupModuleImpl implements GroupModule {
      * @throws NotBoundException If GNS stub is not found in GNS register.
      */
     public GroupModuleImpl(final Client client, final String gnsHost, final int gnsPort,
-            final String groupName, final int clientPort)
-    throws RemoteException, AlreadyBoundException, NotBoundException,IllegalArgumentException {
+                           final String groupName, final int clientPort)
+        throws RemoteException, AlreadyBoundException, NotBoundException,IllegalArgumentException {
         this.client = client;
         this.receiveQueue = new LinkedBlockingQueue<Message>();
         this.sendQueue = new PriorityBlockingQueue<FIFOEntry<Message>>();
@@ -113,9 +113,9 @@ public class GroupModuleImpl implements GroupModule {
             logger.debug("Got existing group from GNS, sending join message");
             MessageImpl joinMessage =
                 new MessageImpl(this.groupMember,
-                        MessageType.JOIN,
-                        PID,
-                        groupView.getID());
+                                MessageType.JOIN,
+                                PID,
+                                groupView.getID());
             this.groupView = new GroupViewImpl(groupName, gs.getLeader());
             this.groupView.add(this.groupMember);
             //.getReceiver().receive(joinMessage);
@@ -185,7 +185,7 @@ public class GroupModuleImpl implements GroupModule {
      */
     public void send(Object clientMessage) {
         Message m = new MessageImpl(clientMessage,
-                MessageType.CLIENTMESSAGE, PID, groupView.getID());
+                                    MessageType.CLIENTMESSAGE, PID, groupView.getID());
         send(m, this.groupView);
     }
 
@@ -201,61 +201,6 @@ public class GroupModuleImpl implements GroupModule {
      */
     public void send(Message m, GroupView g) {
         sendQueue.put(new FIFOEntry<Message>(m));
-    }
-
-    public void handleMemberCrashException(MemberCrashException e) {
-        synchronized (groupView) {
-            CrashList crashedMembers = e.getCrashedMembers();
-
-            // Is it the leader?
-            if (crashedMembers.contains(groupView.getGroupLeaderGroupMember())) {
-                handleLeaderCrash(groupView.getGroupLeaderGroupMember());
-            } else {
-                // Am I leader
-                if (groupView.getGroupLeaderGroupMember().getPID().equals(GroupModule.PID)) {
-
-                    // TODO: sync or copy ?
-                    boolean changed = groupView.removeAll(crashedMembers.getAll());
-                    logger.debug("After remove all: {}",crashedMembers.getAll());
-                    if (!changed) {
-                        logger.warn("Tried to remove crashed members, but none were removed");
-                    }
-                    Message groupChangeMessage =
-                        new MessageImpl(groupView, MessageType.GROUPCHANGE, GroupModule.PID,
-                                groupView.getID());
-                    send(groupChangeMessage, groupView);
-                }
-            }
-        }
-    }
-
-    public void handleLeaderCrash(GroupMember leader) {
-        synchronized (groupView) {
-            //groupView.remove(groupView.getGroupLeaderGroupMember());
-            groupView.remove(leader);
-            
-            // Am I the new leader?
-            if (GroupModule.PID.equals(groupView.getHighestUUID())) {
-                try {
-                    gns.setNewLeader(this.groupMember, groupView.getName());
-                    groupView.setNewLeader(this.groupMember);
-                    this.gl = new GroupLeaderImpl();
-                    Message groupChangeMessage =
-                        new MessageImpl(groupView, MessageType.GROUPCHANGE, GroupModule.PID,
-                                groupView.getID());
-                    logger.debug("Incredible! I am the new leader! ");
-                    send(groupChangeMessage, groupView);
-                } catch (RemoteException e1) {
-                    logger.debug("Error, GNS cant change groupleader");
-                    e1.printStackTrace();
-                }
-            } else {
-                Message leaderCrashMessage = new MessageImpl(
-                        leader, MessageType.LEADERCRASH, 
-                        GroupModule.PID, groupView.getID());
-                send(leaderCrashMessage, groupView);
-            }
-        }
     }
 
     public GroupView getGroupView() {
@@ -316,6 +261,61 @@ public class GroupModuleImpl implements GroupModule {
                 }
             }
         }
+
+        private void handleMemberCrashException(MemberCrashException e) {
+            synchronized (groupView) {
+                CrashList crashedMembers = e.getCrashedMembers();
+
+                // Is it the leader?
+                if (crashedMembers.contains(groupView.getGroupLeaderGroupMember())) {
+                    handleLeaderCrash(groupView.getGroupLeaderGroupMember());
+                } else {
+                    // Am I leader
+                    if (groupView.getGroupLeaderGroupMember().getPID().equals(GroupModule.PID)) {
+
+                        // TODO: sync or copy ?
+                        boolean changed = groupView.removeAll(crashedMembers.getAll());
+                        logger.debug("After remove all: {}",crashedMembers.getAll());
+                        if (!changed) {
+                            logger.warn("Tried to remove crashed members, but none were removed");
+                        }
+                        Message groupChangeMessage =
+                            new MessageImpl(groupView, MessageType.GROUPCHANGE, GroupModule.PID,
+                                            groupView.getID());
+                        send(groupChangeMessage, groupView);
+                    }
+                }
+            }
+        }
+
+        private void handleLeaderCrash(GroupMember leader) {
+            synchronized (groupView) {
+                //groupView.remove(groupView.getGroupLeaderGroupMember());
+                groupView.remove(leader);
+
+                // Am I the new leader?
+                if (GroupModule.PID.equals(groupView.getHighestUUID())) {
+                    try {
+                        gns.setNewLeader(GroupModuleImpl.this.groupMember, groupView.getName());
+                        groupView.setNewLeader(GroupModuleImpl.this.groupMember);
+                        GroupModuleImpl.this.gl = new GroupLeaderImpl(); // TODO: Sync erros?
+                        Message groupChangeMessage =
+                            new MessageImpl(groupView, MessageType.GROUPCHANGE, GroupModule.PID,
+                                            groupView.getID());
+                        logger.debug("Incredible! I am the new leader! ");
+                        send(groupChangeMessage, groupView);
+                    } catch (RemoteException e1) {
+                        logger.debug("Error, GNS cant change groupleader");
+                        e1.printStackTrace();
+                    }
+                } else {
+                    Message leaderCrashMessage = new MessageImpl(
+                                                                 leader, MessageType.LEADERCRASH,
+                                                                 GroupModule.PID, groupView.getID());
+                    send(leaderCrashMessage, groupView);
+                }
+            }
+        }
     }
 
     private class MessageReceiver implements Runnable {
@@ -347,7 +347,9 @@ public class GroupModuleImpl implements GroupModule {
                 break;
             case LEADERCRASH:
                 logger.info("LEADERCRASH");
+                // TODO: what now?
                 handleLeaderCrash((GroupMember)m.getMessage());
+
                 break;
             case JOIN:
                 if (gl == null) {
@@ -359,6 +361,26 @@ public class GroupModuleImpl implements GroupModule {
                 break;
             default:
                 logger.error("Unkwon MessageType in message: " + m);
+            }
+        }
+
+        private void handleLeaderCrash(GroupMember crashedLeader) {
+            // TODO: verify and test this!
+            // Am I the new leader?
+            if (GroupModule.PID.equals(groupView.getHighestUUID())) {
+                try {
+                    gns.setNewLeader(GroupModuleImpl.this.groupMember, groupView.getName());
+                    groupView.setNewLeader(GroupModuleImpl.this.groupMember);
+                    GroupModuleImpl.this.gl = new GroupLeaderImpl(); // TODO: Sync erros?
+                    Message groupChangeMessage =
+                        new MessageImpl(groupView, MessageType.GROUPCHANGE, GroupModule.PID,
+                                        groupView.getID());
+                    logger.debug("Incredible! I am the new leader! ");
+                    send(groupChangeMessage, groupView);
+                } catch (RemoteException e1) {
+                    logger.debug("Error, GNS cant change groupleader");
+                    e1.printStackTrace();
+                }
             }
         }
     }
@@ -381,13 +403,13 @@ public class GroupModuleImpl implements GroupModule {
      * @throws NotBoundException If GNS stub can't be found.
      */
     private GNS getGNS(String host, int port) throws RemoteException,
-    NotBoundException {
+                                                     NotBoundException {
         Registry gnsReg = LocateRegistry.getRegistry(host, port);
         return (GNS) gnsReg.lookup(GNS.STUB_NAME);
     }
 
     protected static class FIFOEntry<E extends Comparable<? super E>>
-    implements Comparable<FIFOEntry<E>> {
+        implements Comparable<FIFOEntry<E>> {
         final static AtomicLong seq = new AtomicLong();
         final long seqNum;
         final E entry;
@@ -404,7 +426,7 @@ public class GroupModuleImpl implements GroupModule {
                 res = (seqNum < other.seqNum ? -1 : 1);
             return res;
         }
-        
+
         @Override
         public String toString() {
             return "Seq: " + seqNum + ", entry: " + entry.toString();

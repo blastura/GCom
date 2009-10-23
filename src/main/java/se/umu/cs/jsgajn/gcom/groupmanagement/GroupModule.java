@@ -16,6 +16,4 @@ public interface GroupModule extends Module {
 
     /** Current groupview, used by communicationsmodel... */
     public GroupView getGroupView();
-
-    public void handleMemberCrashException(MemberCrashException e);
 }
