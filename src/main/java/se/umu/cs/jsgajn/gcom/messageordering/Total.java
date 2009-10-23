@@ -22,6 +22,7 @@ import se.umu.cs.jsgajn.gcom.groupmanagement.CrashList;
 import se.umu.cs.jsgajn.gcom.groupmanagement.CrashListImpl;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
 import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
+import se.umu.cs.jsgajn.gcom.groupcommunication.MessageCouldNotBeSentException;
 
 public class Total implements Ordering {
     private static final Logger logger = LoggerFactory.getLogger(Total.class);
@@ -46,7 +47,7 @@ public class Total implements Ordering {
         new Thread(new MessageHandler(), "Total order thread").start();
     }
 
-    public Message prepareOutgoingMessage(Message m, GroupView g) throws MemberCrashException {
+    public Message prepareOutgoingMessage(Message m, GroupView g) throws MessageCouldNotBeSentException {
         int sequenceNumber;
         UUID sequencerUID;
         try {
@@ -59,9 +60,8 @@ public class Total implements Ordering {
             logger.debug("OUT: Prepared outgoing message: " + m);
         } catch (RemoteException e) {
             logger.debug("Error, problem with getSequenceNumber in prepOutMess.");
-            crashed =  new CrashListImpl();
-            crashed.add(g.getGroupLeaderGroupMember());
-            throw new MemberCrashException(crashed);
+            crashed =  new CrashListImpl(g.getGroupLeaderGroupMember());
+            throw new MessageCouldNotBeSentException(crashed);
         }
         return m;
     }

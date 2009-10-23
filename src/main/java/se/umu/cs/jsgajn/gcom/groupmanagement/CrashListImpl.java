@@ -9,7 +9,11 @@ public class CrashListImpl implements CrashList {
 	private static final long serialVersionUID = 1L;
 	private List<GroupMember> crashedMembers;
 
-	public CrashListImpl() {
+    public CrashListImpl(GroupMember gm) {
+		this.crashedMembers = new ArrayList<GroupMember>();
+      crashedMembers.add(gm);
+	}
+    public CrashListImpl() {
 		this.crashedMembers = new ArrayList<GroupMember>();
 	}
 	
