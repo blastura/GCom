@@ -261,7 +261,11 @@ public class GroupModuleImpl implements GroupModule {
     public GroupView getGroupView() {
         // Used in reliable multicast to resend all messages that are note yet
         // received
-        return groupView;
+        GroupView gCopy;
+        synchronized (groupView) {
+            gCopy = new GroupViewImpl(groupView);
+        }
+        return gCopy;
     }
 
     /** GroupLeader ************/

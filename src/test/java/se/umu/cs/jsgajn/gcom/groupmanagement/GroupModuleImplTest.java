@@ -16,7 +16,6 @@ import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
 import java.util.UUID;
 import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
-import java.util.Collections;
 
 public class GroupModuleImplTest {
 
@@ -28,6 +27,14 @@ public class GroupModuleImplTest {
     public void tearDown() throws Exception {
     }
 
+    @Test
+    public void testNewInstance() {
+//         public ReceiverImpl(BlockingQueue<Message> q, final UUID processID);
+//         GroupView groupViewCopy = new GroupViewImpl();
+        
+    }
+    
+    
     @Test
     public void testInitWithPort() throws RemoteException, AlreadyBoundException, NotBoundException {
         try {
