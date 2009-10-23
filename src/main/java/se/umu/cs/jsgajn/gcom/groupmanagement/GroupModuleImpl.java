@@ -291,23 +291,25 @@ public class GroupModuleImpl implements GroupModule {
         public void run() {
             while (running) {
                 try {
-                    Message m = sendQueue.take().getEntry();
-                    // TODO: Clone groupView
+                    FIFOEntry<Message> fifoEntry = sendQueue.take();
+                    Message m = fifoEntry.getEntry();
                     GroupView groupViewCopy;
                     synchronized (groupView) {
                         groupViewCopy = new GroupViewImpl(groupView);
                     }
-                    orderingModule.send(m, groupViewCopy);
+                    try {
+                        orderingModule.send(m, groupViewCopy);
+                    } catch (MemberCrashException e) {
+                        logger.debug("Caught MemberCrashException");
+                        handleMemberCrashException(e);
+                    } catch (MessageCouldNotBeSentException e) {
+                        logger.debug("Caught MessageCouldNotBeSentException fifoEntry: {}",
+                                     fifoEntry);
+                        handleLeaderCrash(groupView.getGroupLeaderGroupMember());
+                    }
                 } catch (InterruptedException e) {
                     // TODO - fix error message
                     e.printStackTrace();
-                } catch (MemberCrashException e) {
-                    logger.debug("Caught MemberCrashException");
-                    handleMemberCrashException(e);
-                } catch (MessageCouldNotBeSentException e) {
-                    logger.debug("Caught MessageCouldNotBeSentException");
-                    
-                    handleLeaderCrash(groupView.getGroupLeaderGroupMember());
                 }
             }
         }
@@ -398,6 +400,11 @@ public class GroupModuleImpl implements GroupModule {
             if (res == 0 && other.entry != this.entry)
                 res = (seqNum < other.seqNum ? -1 : 1);
             return res;
+        }
+        
+        @Override
+        public String toString() {
+            return "Seq: " + seqNum + ", entry: " + entry.toString();
         }
     }
 }
