@@ -60,6 +60,7 @@ public class DebugController implements DebugHandler {
         System.exit(0);
     }
 
+    
     public void block() {
         // TODO: implement
         boolean blocking = true;
@@ -72,10 +73,21 @@ public class DebugController implements DebugHandler {
         }
     }
 
+    /**
+     * Adds a message to the crash-table in the GUI. Thou we don't
+     * use it.
+     */
     public void crashMessage() {
         currentContact.addCrashed(new String[]{"hej", "heja3"});
     }
 
+    /**
+     * Checks if the message already is in the received-table. If so, returns
+     * false. If it isn't in the table, return true.
+     * 
+     * @param m
+     * @return
+     */
     public boolean allreadyFoundCheck(Message m) {
         DefaultTableModel receivedTable = currentContact.getReceivedTable();
         for(int i = 0; i < receivedTable.getRowCount(); i++) {
@@ -88,6 +100,12 @@ public class DebugController implements DebugHandler {
         }
         return false;
     }
+    
+    /**
+     * Checks if the message is already in the holdQueue TODO: doesent work
+     * @param m
+     * @return
+     */
     public boolean allreadyHoldCheck(Message m) {
         DefaultTableModel holdTable = currentContact.getHoldTable();
         for(int i = 0; i < holdTable.getRowCount(); i++) {
@@ -98,6 +116,9 @@ public class DebugController implements DebugHandler {
         return false;
     }	
 
+    /**
+     * Adds a messate to the received-list, IF it hasn't been received already
+     */
     public void messageReceived(Message m) {
         boolean found = false;
         found = allreadyFoundCheck(m);
@@ -111,12 +132,20 @@ public class DebugController implements DebugHandler {
                             getUserNameForUID(m.getOriginUID())});
         }
     }
+    
+    /**
+     * Adds a message to the delivered-list
+     */
     public void messageDelivered(Message m) {
         currentContact.addDelivered(new Object[]{getShortUIDForMessage(m.getUID()),
                 getShorterUIDForMessage(m.getUID()), 
                 m.getMessage(), getUserNameForUID(m.getOriginUID())});
     }
 
+    /**
+     * Updates the GUI-vectorclock for the user that has started the
+     * debugger.
+     */
     public void updateVectorClock(VectorClock<UUID> vc) {
         currentContact.clearVectorClock();
         for(UUID vcid : vc.keySet()) {
@@ -127,6 +156,10 @@ public class DebugController implements DebugHandler {
         }
     }
 
+    /**
+     * If on hold. Stop hold and return all messages.
+     * If not, start holdning messages.
+     */
     public void hold()	{
         if(doHold) {
             doHold = false;
@@ -148,6 +181,10 @@ public class DebugController implements DebugHandler {
         }
     }
 
+
+    /**
+     * Shall the debugger hold incomming messages?
+     */
     public boolean doHold() {
         return doHold;
     }
@@ -159,18 +196,20 @@ public class DebugController implements DebugHandler {
         if (doHold) {
             logger.debug("Holding message {}", m);
             receiver = r; 
-            // 			boolean found = false;
-            // 			found = allreadyHoldCheck(m);
-            // 			if(found == false) {
             holdList.add(m);
             currentContact.addHold(new Object[]{m.getMessage(), m.getUID()});
-            //			}
             return doHold;
         } else {
             return doHold;
         }
     }
 
+    /**
+     * Shuffle messages that is on hold
+     * 1. Clear defaultTableModel (DTM)
+     * 2. Shuffle holdList
+     * 3. Put all messages back into DTM
+     */
     public void shuffleHoldMessages() {
         currentContact.clearHoldTable();
         Collections.shuffle(holdList);
@@ -179,6 +218,12 @@ public class DebugController implements DebugHandler {
         }
     }
 
+    /**
+     * Reverssort messages that is on hold
+     * 1. Clear defaultTableModel (DTM)
+     * 2. reverssort holdList
+     * 3. Put all messages back into DTM
+     */
     public void reversHoldMessages() {
         currentContact.clearHoldTable();
         Collections.reverse(holdList);
@@ -187,7 +232,12 @@ public class DebugController implements DebugHandler {
         }
     }
 
-    // Not tested but should work / Anton
+    /**
+     * Converts UUID to a immature nickname
+     * 
+     * @param uid
+     * @return
+     */
     private String getUserNameForUID(UUID uid) {
         if (tmpUID == null) {
             Stack<String> tmp = new Stack<String>();
@@ -208,6 +258,12 @@ public class DebugController implements DebugHandler {
         }
     }
 
+    /**
+     * Converts an UUID to an int instead. For easier reading.
+     * 
+     * @param uid
+     * @return
+     */
     private int getShortUIDForMessage(UUID uid) {
         if (!messageIDs.containsKey(uid)) {
             messageIDs.put(uid, mIDcounter.incrementAndGet());
@@ -215,10 +271,23 @@ public class DebugController implements DebugHandler {
         return messageIDs.get(uid);
     }
 
+    /**
+     * Ugly method for substring UUID to 12 letters.
+     * 
+     * @param uid
+     * @return
+     */
     private String getShorterUIDForMessage(UUID uid) {
         return uid.toString().substring(12);
     }
 
+    /**
+     * Updates the GUI-groupview.
+     * 1. Put the name of the leader at the top of the groupview-panel
+     * 2. Sets the name of the debugger to "Debugger - Username"
+     * 3. Clears the defaultTableModel for the groupview.
+     * 4. Fills the GTM again with the new info
+     */
     public void groupChange(GroupView group) {
         currentContact.updateGroupViewPanelTitle(
                 getUserNameForUID(group.getGroupLeaderGroupMember().getPID()));
@@ -230,9 +299,20 @@ public class DebugController implements DebugHandler {
         }
     }
 
+    /**
+     * Checks if the model is initialized. Is used in the beginning so
+     * the program doesnt start sending messages when the debugger is loading
+     */
     public boolean isModelInitialized(int hack) {
         return currentContact.isModelIsInit();
     }
+    
+    /**
+     * Releases one message from the holdList.
+     * Is called when you click on a message in the GUI-list
+     * 
+     * @param id
+     */
     public void releaseMessage(UUID id) {
         Message mSave = null;
         for (Message m : holdList) {
