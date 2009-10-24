@@ -70,7 +70,7 @@ public class TotalOrdering implements Ordering {
 
             // Om det är en ny ledare
             if (!this.leaderUUID.equals(m.getSequncerUID())) {
-                this.latestReceivedSequenceNumber = m.getSequnceNumber();
+                this.latestReceivedSequenceNumber = (m.getSequnceNumber()-1);
                 this.leaderUUID = m.getSequncerUID();
                 logger.debug("We got new sequencer, m.getSequcen() = " + latestReceivedSequenceNumber);
             }
