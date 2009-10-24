@@ -13,12 +13,13 @@ import org.junit.Test;
 
 import se.umu.cs.jsgajn.gcom.Client;
 import se.umu.cs.jsgajn.gcom.Message;
+import se.umu.cs.jsgajn.gcom.GNSImpl;
 import se.umu.cs.jsgajn.gcom.MessageImpl;
 import se.umu.cs.jsgajn.gcom.MessageType;
 
 import static org.junit.Assert.*;
 
-public class GroupModuleImplTest {
+public class ManagementModuleImplTest {
 
     @Before
     public void setUp() throws Exception {
@@ -42,7 +43,7 @@ public class GroupModuleImplTest {
             Client c = new ClientTest();
             int gnsport = 6555;
             new GNSImpl(gnsport);
-            GroupModule m = new GroupModuleImpl(c, "localhost", gnsport, "testgroup");
+            ManagementModule m = new ManagementModuleImpl(c, "localhost", gnsport, "testgroup");
             m.stop();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -55,7 +56,7 @@ public class GroupModuleImplTest {
         try {
             Client c = new ClientTest();
             new GNSImpl(); // Should use system prop 6554 as port
-            GroupModule m = new GroupModuleImpl(c, "localhost", 6554, "testgroup");
+            ManagementModule m = new ManagementModuleImpl(c, "localhost", 6554, "testgroup");
             m.stop();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -70,9 +71,9 @@ public class GroupModuleImplTest {
             Client c1 = new ClientTest();
             Client c2 = new ClientTest();
             Client c3 = new ClientTest();
-            GroupModule m1 = new GroupModuleImpl(c1, "localhost", gnsPort, "testgroup", 1099);
-            GroupModule m2 = new GroupModuleImpl(c2, "localhost", gnsPort, "testgroup", 1100);
-            GroupModule m3 = new GroupModuleImpl(c3, "localhost", gnsPort, "testgroup", 1101);
+            ManagementModule m1 = new ManagementModuleImpl(c1, "localhost", gnsPort, "testgroup", 1099);
+            ManagementModule m2 = new ManagementModuleImpl(c2, "localhost", gnsPort, "testgroup", 1100);
+            ManagementModule m3 = new ManagementModuleImpl(c3, "localhost", gnsPort, "testgroup", 1101);
             // TODO: Will this stop clients before they are created?
             m1.stop();
             m2.stop();
@@ -97,8 +98,8 @@ public class GroupModuleImplTest {
 
     @Test
     public void testPrioQueue() {
-        PriorityBlockingQueue<GroupModuleImpl.FIFOEntry<Message>> sendQueue =
-            new PriorityBlockingQueue<GroupModuleImpl.FIFOEntry<Message>>();
+        PriorityBlockingQueue<ManagementModuleImpl.FIFOEntry<Message>> sendQueue =
+            new PriorityBlockingQueue<ManagementModuleImpl.FIFOEntry<Message>>();
         
         UUID m1id = UUID.randomUUID();
         Message m1 = new MessageImpl("m1", MessageType.CLIENTMESSAGE,
@@ -118,11 +119,11 @@ public class GroupModuleImplTest {
         Message mJoin = new MessageImpl("mJoin", MessageType.JOIN,
                                       UUID.randomUUID(), UUID.randomUUID());
         
-        sendQueue.put(new GroupModuleImpl.FIFOEntry<Message>(m1));
-        sendQueue.put(new GroupModuleImpl.FIFOEntry<Message>(mGC));
-        sendQueue.put(new GroupModuleImpl.FIFOEntry<Message>(m2));
-        sendQueue.put(new GroupModuleImpl.FIFOEntry<Message>(mGC2));
-        sendQueue.put(new GroupModuleImpl.FIFOEntry<Message>(mJoin));
+        sendQueue.put(new ManagementModuleImpl.FIFOEntry<Message>(m1));
+        sendQueue.put(new ManagementModuleImpl.FIFOEntry<Message>(mGC));
+        sendQueue.put(new ManagementModuleImpl.FIFOEntry<Message>(m2));
+        sendQueue.put(new ManagementModuleImpl.FIFOEntry<Message>(mGC2));
+        sendQueue.put(new ManagementModuleImpl.FIFOEntry<Message>(mJoin));
         try {
             //             while (!sendQueue.isEmpty()) {
             //                 System.out.println(sendQueue.take().getEntry().getMessage());
