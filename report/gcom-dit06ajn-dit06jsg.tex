@@ -1,5 +1,5 @@
 % -*- coding: utf-8 -*-
-%\documentclass[journal]{IEEEtran}
+% \documentclass[journal]{IEEEtran}
 \documentclass[titlepage, twocolumn, a4paper, 10pt]{article}
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
@@ -69,7 +69,7 @@
       \texttt{\pathtocode}
     \end{large}
     \vfill
-    \large{\textbf{Handledare}}\\
+    \large{\textbf{Supervisors}}\\
     \mbox{\large{\handledareEtt}}\\
     \mbox{\large{\handledareTva}}
   \end{center}
@@ -79,7 +79,7 @@
 \mbox{}
 \vspace{70mm}
 \begin{center}
-% Dedication goes here
+  % Dedication goes here
 \end{center}
 \thispagestyle{empty}
 \newpage
@@ -156,6 +156,10 @@ All files needed to use this middleware are located at:\\
 This catalog contains the following sub directories:
 \begin{itemize}
 \item The directory \verb!src! contains the source code.
+\item The directory \verb!src/main/resources/! contains configuration
+  files for standard behaviour of the compiled system, see section
+  \ref{sec:configuration}
+\item The directory \verb!src! contains the source code.
 \item The directory \verb!bin! will, after a successful compilation,
   contain all the compiled sources as well as configuration files used
   by this middleware.
@@ -164,73 +168,103 @@ This catalog contains the following sub directories:
 \item The directory \verb!doc! contains the Javadoc API for \textit{GCom}.
 \end{itemize}
 
-The following sections describe how to compile and use \textit{GCom}.
+\subsection{Configuration}\label{sec:configuration}
+The compiled system uses two configuration-files to define its
+standard behaviour, these files are located in the directory
+\textit{src/main/resources/}.
 
-\subsection{Compiling}\label{sec:compiling}
+\subsubsection{application.properties}\label{sec:application.properties}
+The file \textit{application.properties} defines the standard
+multicast and ordering types to use when communication with a group.
+Notice though that these settings are only used for the creator of a
+group that did not exist from before. When connection to an existing
+group, the settings from that group will suppress the settings in
+\textit{application.properties}. CodeSnippet \ref{code:app-prop}
+shows the content of an example configuration that uses
+
+\begin{code}
+  \begin{footnotesize}
+\begin{verbatim}
+# Used by GNS
+gcom.gns.port=1078
+
+# FIFO, TOTAL_ORDER, NO_ORDERING,
+# CASUAL_ORDERING, CASUALTOTAL_ORDERING
+gcom.ordering=FIFO
+
+# BASIC_MULTICAST, RELIABLE_MULTICAST
+gcom.multicast=RELIABLE_MULTICAST
+\end{verbatim}
+  \end{footnotesize}
+  \caption{applications.properties}\label{code:app-prop}
+\end{code}
+
+
+\section{Compile}\label{sec:compile}
 The following commands will require the software tool \textit{Apache
   Ant}\footnote{http://ant.apache.org/}.
 
- To compile \textit{GCom} issue the following command:\\
- \begin{footnotesize}
- \verb!salt:~/edu/apjava/lab4> ant!
- \end{footnotesize}
+To compile \textit{GCom} issue the following command:\\
+\begin{footnotesize}
+  \verb!salt:~/edu/apjava/lab4> ant!
+\end{footnotesize}
 
- Det som händer vid anrop av kommandot ovan är att \textit{Ant} läser
- av filen \textit{build.xml} och letar efter standardkommandona att
- köra. I det här fallet är det operationerna som är definierade i
- XML-elementet \verb!<target />! med attributet
- \verb!name="compile"!. Oftast har taggarna i \textit{build.xml}
- relativt självförklarande namn, de motsvarar i många fall direkta
- kommandon som går att köra i en terminal. Nu ska programmet vara
- kompilerat och ligga i katalogen \verb!bin/main!.
+Det som händer vid anrop av kommandot ovan är att \textit{Ant} läser
+av filen \textit{build.xml} och letar efter standardkommandona att
+köra. I det här fallet är det operationerna som är definierade i
+XML-elementet \verb!<target />! med attributet
+\verb!name="compile"!. Oftast har taggarna i \textit{build.xml}
+relativt självförklarande namn, de motsvarar i många fall direkta
+kommandon som går att köra i en terminal. Nu ska programmet vara
+kompilerat och ligga i katalogen \verb!bin/main!.
 
- Spelet startas med kommandot:\\
- \begin{footnotesize}
- \verb!salt:~/edu/apjava/lab4> ant run!
- \end{footnotesize}
+Spelet startas med kommandot:\\
+\begin{footnotesize}
+  \verb!salt:~/edu/apjava/lab4> ant run!
+\end{footnotesize}
 
- En banredigerare kan startas med kommandot:\\
- \begin{footnotesize}
- \verb!salt:~/edu/apjava/lab4> ant run-editor!
- \end{footnotesize}
+En banredigerare kan startas med kommandot:\\
+\begin{footnotesize}
+  \verb!salt:~/edu/apjava/lab4> ant run-editor!
+\end{footnotesize}
 
- Spelet kan även kompileras till en jar-fil som kan köras utan att
- \textit{Ant} är installerat, detta görs med kommandot:\\
- \begin{footnotesize}
- \verb!salt:~/edu/apjava/lab4> ant jar!
- \end{footnotesize}
+Spelet kan även kompileras till en jar-fil som kan köras utan att
+\textit{Ant} är installerat, detta görs med kommandot:\\
+\begin{footnotesize}
+  \verb!salt:~/edu/apjava/lab4> ant jar!
+\end{footnotesize}
 
- Efter ovan kommando kommer det att skapas en fil \verb!AntiTD.jar! i
- samma katalog. För att starta spelet kan denna jar-fil köras med
- kommandot:\\
- \begin{footnotesize}
- \verb!salt:~/edu/apjava/lab4> java -jar AntiTD.jar!
- \end{footnotesize}
+Efter ovan kommando kommer det att skapas en fil \verb!AntiTD.jar! i
+samma katalog. För att starta spelet kan denna jar-fil köras med
+kommandot:\\
+\begin{footnotesize}
+  \verb!salt:~/edu/apjava/lab4> java -jar AntiTD.jar!
+\end{footnotesize}
 
- För att jar-filen ska kunna köras måste de bibliotek som behövs för
- körning finnas i en katalog \verb!lib! på samma sökväg som körningen
- görs från.
+För att jar-filen ska kunna köras måste de bibliotek som behövs för
+körning finnas i en katalog \verb!lib! på samma sökväg som körningen
+görs från.
 
- \section{System description}\label{sec:system}
- % Beskriv översiktligt hur programmet är uppbyggt och hur det löser
- % problemet.
+\section{System description}\label{sec:system}
+% Beskriv översiktligt hur programmet är uppbyggt och hur det löser
+% problemet.
 
- % The GCom middleware consists of three (logical) modules, the group
- % management module, the communication module and the message ordering
- % module. These are, respectively, responsible for handling group
- % membership issues, communication message exchange semantics and
- % message (re)ordering issues. All of these modules need to function
- % properly in order for your system to be able to ensure correct
- % message delivery semantics.
+% The GCom middleware consists of three (logical) modules, the group
+% management module, the communication module and the message ordering
+% module. These are, respectively, responsible for handling group
+% membership issues, communication message exchange semantics and
+% message (re)ordering issues. All of these modules need to function
+% properly in order for your system to be able to ensure correct
+% message delivery semantics.
 
-%  \begin{figure}[!t]
-%    \centering
-%    \includegraphics[width=2.5in]{images/Stack.pdf}
-%    % \centerline{\subfloat[Case I]\includegraphics[width=2.5in]{images/Stack.pdf}}
-%    \caption{GCom stack}
-%    \label{fig:images/Stack}
-%  \end{figure}
- 
+% \begin{figure}[!t]
+%   \centering
+%   \includegraphics[width=2.5in]{images/Stack.pdf}
+%    %   \centerline{\subfloat[Case I]\includegraphics[width=2.5in]{images/Stack.pdf}}
+%   \caption{GCom stack}
+%   \label{fig:images/Stack}
+% \end{figure}
+
 \begin{figure*}[!t]
   \centerline{\includegraphics[width=110mm]{images/Stack.pdf}}
   \caption{GCom stack}
@@ -241,9 +275,9 @@ You are free to use any tools you want for this project, in fact, selection of a
 
 More specifically:
 
-    * You may implement GCom in any programming language and middleware of your choice (as long as the rule about non-trivial solutions is not broken), however, the teachers cannot provide help for other systems than Java using Java RMI.
-    * Make use of any IDE and/or plugins you feel makes the job easier. You will write a quite substantial amount of code (in Java, approximately between 2000 to 7000 lines including the GUI). Use tools that facilitate this.
-    * Since your test and debug application(s) must feature graphical user interface(s), use a suitable tool for interface construction. There are IDE plugins for this task, and you will likely save at least half a day if not more by using these tools correctly.
+* You may implement GCom in any programming language and middleware of your choice (as long as the rule about non-trivial solutions is not broken), however, the teachers cannot provide help for other systems than Java using Java RMI.
+* Make use of any IDE and/or plugins you feel makes the job easier. You will write a quite substantial amount of code (in Java, approximately between 2000 to 7000 lines including the GUI). Use tools that facilitate this.
+* Since your test and debug application(s) must feature graphical user interface(s), use a suitable tool for interface construction. There are IDE plugins for this task, and you will likely save at least half a day if not more by using these tools correctly.
 
 
 \subsection{Group management module}\label{sec:group-management-module}
@@ -267,7 +301,7 @@ More specifically:
 % To notify changes in group membership: The module notifies all group
 % members about changes in group composition.
 
-    
+
 \subsection{Communications module}\label{sec:communications-module}
 \subsubsection{Basic multicast}\label{sec:basic-multicast}
 \subsubsection{Reliable multicast}\label{sec:reliable-multicast}
@@ -282,11 +316,28 @@ More specifically:
 % (messages are first sorted according to causal ordering, then according to total ordering)
 
 
-\section{Begränsningar}\label{Begransningar}
+\subsection{Debugger}\label{sec:debugger}
+% That messages are delivered according to the specified ordering
+
+% How messages are propagated in the network: Show both the path a
+% message takes and how many times a certain process has received a
+% certain message.
+
+% The content of hold-back queues and other buffers: Present all
+% messages waiting to be sent or delivered as well as values of vector
+% clocks and other counters.
+
+% Current system performance: As a measure of the system performance,
+% count the number of messages (including control messages) required
+% to perform an operation (send one message with certain ordering and
+% certain multicast).
+
+
+\section{Limitations}\label{sec:limitations}
 % Vilka problem och begränsningar har din lösning av uppgiften? Hur
 % skulle de kunna rättas till?
 
-\section{Reflektioner}\label{Reflektioner}
+% \section{Reflektioner}\label{Reflektioner}
 % % Reflektioner - Var det något som var speciellt krångligt? Vilka
 % % problem uppstod och hur löste ni dem? Vilka verktyg använde ni? Hur
 % % upplevde ni de verktygen? + Allmänna synpunkter. Om ni har upplevt
@@ -294,15 +345,22 @@ More specifically:
 % % liknande) så kan det även vara intressant att nämna det, samt motivera
 % % ert val av miljö.
 
-\section{Testkörningar}\label{Testkorningar}
+\section{Tests}\label{sec:tests}
 % Noggranna testkörningar där man ser att programmet fungerar som det
 % ska.
+
+% During your demo, you will need to convince the teachers that your
+% implementation works. Bring a test protocol, i.e., a series of tests
+% that clearly demonstrates that your GCom fulfills the requirements
+% and a test tool which can be used to apply it. The test protocol
+% should include, e.g., tests of all message orders and multicast
+% types. Bring a copy of the test protocol on paper, see page 491 in
+% [DS] for suggested notation. Your test protocol must clearly state
+% your names, user names, and which level you intend to demonstrate.
 
 % The fact that a system cannot be formally proven to work does not
 % make it impossible to implement - consider for example the Internet.
 % Read pages 498 and 508 in [DS].
-
-
 
 %%%%%%%%%%%%%%%% END APPENDIX AND STUFF %%%%%%%%%%%%%%%%
 \bibliographystyle{alpha}
