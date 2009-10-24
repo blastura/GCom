@@ -1,0 +1,320 @@
+% -*- coding: utf-8 -*-
+%\documentclass[journal]{IEEEtran}
+\documentclass[titlepage, twocolumn, a4paper, 10pt]{article}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{verbatim}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{parskip}
+\usepackage{url}
+
+\usepackage[pdfborder={0 0 0 0}]{hyperref}
+
+% Column spacing
+\setlength{\columnsep}{10mm}
+
+% Include pdf with multiple pages ex \includepdf[pages=-, nup=2x2]{filename.pdf}
+\usepackage[final]{pdfpages}
+
+% Place figures where they should be use [H]
+\usepackage{float}
+
+% Float for text
+\floatstyle{ruled}
+\newfloat{code}{H}{lop}
+\floatname{code}{CodeSnippet}
+
+% vars
+\def\title{GCom}
+\def\preTitle{Deliverable 2}
+\def\kurs{Distributed systems, HT-09}
+
+
+\def\namn{Anton Johansson}
+\def\mail{dit06ajn@cs.umu.se}
+
+\def\namnTva{Jonny Strömberg}
+\def\mailTva{dit06jsg@cs.umu.se}
+
+
+\def\pathtocode{\url{~/dit06ajn/edu/dist/GCom}}
+
+\def\handledareEtt{Lars Larsson, larsson+ds@cs.umu.se}
+\def\handledareTva{Daniel Henriksson, danielh+ds@cs.umu.se}
+
+\def\inst{Computer Science}
+\def\dokumentTyp{Report}
+
+\begin{document}
+\begin{titlepage}
+  \thispagestyle{empty}
+  \begin{small}
+    \begin{tabular}{@{}p{\textwidth}@{}}
+      UMEÅ UNIVERSITY \hfill \today \\
+      Department of \inst \\
+      \dokumentTyp \\
+    \end{tabular}
+  \end{small}
+  \vspace{10mm}
+  \begin{center}
+    \LARGE{\preTitle} \\
+    \huge{\textbf{\kurs}} \\
+    \vspace{10mm}
+    \LARGE{\title} \\
+    \vspace{15mm}
+    \begin{large}
+      \namn, \mail \\
+      \namnTva, \mailTva\\
+      \texttt{\pathtocode}
+    \end{large}
+    \vfill
+    \large{\textbf{Handledare}}\\
+    \mbox{\large{\handledareEtt}}\\
+    \mbox{\large{\handledareTva}}
+  \end{center}
+\end{titlepage}
+
+\newpage
+\mbox{}
+\vspace{70mm}
+\begin{center}
+% Dedication goes here
+\end{center}
+\thispagestyle{empty}
+\newpage
+
+\pagestyle{fancy}
+\rhead{\today}
+\lhead{\footnotesize{\namn, \mail\\\namnTva, \mailTva}}
+\chead{}
+\lfoot{}
+\cfoot{}
+\rfoot{}
+
+\cleardoublepage
+\newpage
+\onecolumn
+\tableofcontents
+\twocolumn
+\cleardoublepage
+
+\fancyfoot[LE,RO]{\thepage}
+\pagenumbering{arabic}
+
+\section{Introduction}\label{sec:intro}
+% Beskriv med egna ord vad uppgiften gick ut på. Är det någonting som
+% varit oklart och ni gjort egna tolkningar så beskriv dessa.
+This report explains a solution for implementing a distributed
+group communications middleware.
+
+A distributed system is composed of separated processes that
+coordinate activities by passing messages and a middleware is a
+software layers that enables rapid development of other software by
+supplying simple method-calls that hides the underlying implementation
+details off the middleware.
+
+The middleware described in this report is called \textit{GCom} and
+provides an API\footnote{Application programming interface} for group
+communication with different message sending/delivery rules. Two
+communication methods are implemented: \textit{Reliable multicast},
+\textit{Basic multicast}, described in greater detail in section
+\ref{sec:communications-module}.
+
+Four message-ordering types are implemented: \textit{Non-ordered},
+\textit{First in first out}, \textit{Casual}, \textit{Total} and
+\textit{Casual-Total}, described in greater detail in section
+\ref{sec:message-ordering-module}.
+
+The original specification of this practical assignment can be found at:\\
+\begin{footnotesize}
+  \url{http://www.cs.umu.se/kurser/5DV020/HT09/assignment.html}
+  \footnote{Fetched \today} % DONE check
+\end{footnotesize}
+
+\section{Problem analysis}\label{sec:problem-analysis}
+% As this project emphasizes analysis and investigation of a loosely
+% specified problem, include any assumptions you made during the
+% analysis phase in your report. Also discuss problems encountered and
+% alternative solutions considered in the analysis. The report should
+% also discuss to what extent the requirement list is fulfilled, as
+% well as to which extent you could adhere to the the project plan.
+
+\section{Usage}\label{sec:usage}
+% Förklara var programmet och källkoden ligger samt hur man kompilerar,
+% startar och använder det. Förklara även översiktligt vad som händer
+% när man använder de olika kommandona. Det räcker alltså inte att
+% skriva "man skriver 'ant' för att kompilera", utan det måste även ingå
+% en liten förklaring om vad som egentligen händer när man kör ant och
+% varför det fungerar. Använd Internet eller litteratur för att själva
+% ta reda på den information ni tycker känns relevant, dels för
+% rapportens skull och dels för er egen. Kom ihåg att skriva tydliga
+% (vetenskapliga) referenser!
+All files needed to use this middleware are located at:\\
+\texttt{\pathtocode}
+
+This catalog contains the following sub directories:
+\begin{itemize}
+\item The directory \verb!src! contains the source code.
+\item The directory \verb!bin! will, after a successful compilation,
+  contain all the compiled sources as well as configuration files used
+  by this middleware.
+\item The directory \verb!lib! contains all requires third-party libraries
+  needed by \textit{GCom}.
+\item The directory \verb!doc! contains the Javadoc API for \textit{GCom}.
+\end{itemize}
+
+The following sections describe how to compile and use \textit{GCom}.
+
+\subsection{Compiling}\label{sec:compiling}
+The following commands will require the software tool \textit{Apache
+  Ant}\footnote{http://ant.apache.org/}.
+
+ To compile \textit{GCom} issue the following command:\\
+ \begin{footnotesize}
+ \verb!salt:~/edu/apjava/lab4> ant!
+ \end{footnotesize}
+
+ Det som händer vid anrop av kommandot ovan är att \textit{Ant} läser
+ av filen \textit{build.xml} och letar efter standardkommandona att
+ köra. I det här fallet är det operationerna som är definierade i
+ XML-elementet \verb!<target />! med attributet
+ \verb!name="compile"!. Oftast har taggarna i \textit{build.xml}
+ relativt självförklarande namn, de motsvarar i många fall direkta
+ kommandon som går att köra i en terminal. Nu ska programmet vara
+ kompilerat och ligga i katalogen \verb!bin/main!.
+
+ Spelet startas med kommandot:\\
+ \begin{footnotesize}
+ \verb!salt:~/edu/apjava/lab4> ant run!
+ \end{footnotesize}
+
+ En banredigerare kan startas med kommandot:\\
+ \begin{footnotesize}
+ \verb!salt:~/edu/apjava/lab4> ant run-editor!
+ \end{footnotesize}
+
+ Spelet kan även kompileras till en jar-fil som kan köras utan att
+ \textit{Ant} är installerat, detta görs med kommandot:\\
+ \begin{footnotesize}
+ \verb!salt:~/edu/apjava/lab4> ant jar!
+ \end{footnotesize}
+
+ Efter ovan kommando kommer det att skapas en fil \verb!AntiTD.jar! i
+ samma katalog. För att starta spelet kan denna jar-fil köras med
+ kommandot:\\
+ \begin{footnotesize}
+ \verb!salt:~/edu/apjava/lab4> java -jar AntiTD.jar!
+ \end{footnotesize}
+
+ För att jar-filen ska kunna köras måste de bibliotek som behövs för
+ körning finnas i en katalog \verb!lib! på samma sökväg som körningen
+ görs från.
+
+ \section{System description}\label{sec:system}
+ % Beskriv översiktligt hur programmet är uppbyggt och hur det löser
+ % problemet.
+
+ % The GCom middleware consists of three (logical) modules, the group
+ % management module, the communication module and the message ordering
+ % module. These are, respectively, responsible for handling group
+ % membership issues, communication message exchange semantics and
+ % message (re)ordering issues. All of these modules need to function
+ % properly in order for your system to be able to ensure correct
+ % message delivery semantics.
+
+%  \begin{figure}[!t]
+%    \centering
+%    \includegraphics[width=2.5in]{images/Stack.pdf}
+%    % \centerline{\subfloat[Case I]\includegraphics[width=2.5in]{images/Stack.pdf}}
+%    \caption{GCom stack}
+%    \label{fig:images/Stack}
+%  \end{figure}
+ 
+\begin{figure*}[!t]
+  \centerline{\includegraphics[width=110mm]{images/Stack.pdf}}
+  \caption{GCom stack}
+  \label{fig:images/Stack}
+\end{figure*}
+
+You are free to use any tools you want for this project, in fact, selection of appropriate tools is considered part of the assignment. You will however have to motivate your choice of tools with respect to, and in terms of, what you expect to learn from this course and project. If you find a tool (there exists quite a few) that solves the assignment with little or no effort from your side, you are naturally not allowed to use it. (One such tool is for example JGroup) You are of course allowed to use documentation and research papers from existing solutions when designing GCom. As middleware-development is part of the course focus, you are not allowed to implement GCom using TCP/IP sockets.
+
+More specifically:
+
+    * You may implement GCom in any programming language and middleware of your choice (as long as the rule about non-trivial solutions is not broken), however, the teachers cannot provide help for other systems than Java using Java RMI.
+    * Make use of any IDE and/or plugins you feel makes the job easier. You will write a quite substantial amount of code (in Java, approximately between 2000 to 7000 lines including the GUI). Use tools that facilitate this.
+    * Since your test and debug application(s) must feature graphical user interface(s), use a suitable tool for interface construction. There are IDE plugins for this task, and you will likely save at least half a day if not more by using these tools correctly.
+
+
+\subsection{Group management module}\label{sec:group-management-module}
+
+\subsubsection{Group Naming System}\label{sec:group-naming-system}
+% To resolve group names: When a process sends a message to the group,
+% the group management module resolves the group name into a list of
+% group members.
+
+\subsubsection{Group leaders}\label{sec:group-leaders}
+% To provide an interface for group management: The group management
+% module provides operations to create and remove groups, as well as
+% add and remove members from a group.
+
+\subsubsection{Error handling}\label{sec:error-handling}
+% To detect errors: The module monitors a group and indicates when a
+% member of the group crashes (or for some other reason become
+% unreachable).
+
+\subsubsection{Group changes}\label{sec:group-changes}
+% To notify changes in group membership: The module notifies all group
+% members about changes in group composition.
+
+    
+\subsection{Communications module}\label{sec:communications-module}
+\subsubsection{Basic multicast}\label{sec:basic-multicast}
+\subsubsection{Reliable multicast}\label{sec:reliable-multicast}
+
+
+\subsection{Message ordering module}\label{sec:message-ordering-module}
+\subsubsection{Non-ordered}\label{sec:-non-ordered}
+\subsubsection{FIFO}\label{sec:fifo}
+\subsubsection{Causal}\label{sec:causal}
+\subsubsection{Total}\label{sec:total}
+\subsubsection{Causal-Total}\label{sec:causal-total}
+% (messages are first sorted according to causal ordering, then according to total ordering)
+
+
+\section{Begränsningar}\label{Begransningar}
+% Vilka problem och begränsningar har din lösning av uppgiften? Hur
+% skulle de kunna rättas till?
+
+\section{Reflektioner}\label{Reflektioner}
+% % Reflektioner - Var det något som var speciellt krångligt? Vilka
+% % problem uppstod och hur löste ni dem? Vilka verktyg använde ni? Hur
+% % upplevde ni de verktygen? + Allmänna synpunkter. Om ni har upplevt
+% % problem på grund av olika miljöer (i termer av operativsystem och
+% % liknande) så kan det även vara intressant att nämna det, samt motivera
+% % ert val av miljö.
+
+\section{Testkörningar}\label{Testkorningar}
+% Noggranna testkörningar där man ser att programmet fungerar som det
+% ska.
+
+% The fact that a system cannot be formally proven to work does not
+% make it impossible to implement - consider for example the Internet.
+% Read pages 498 and 508 in [DS].
+
+
+
+%%%%%%%%%%%%%%%% END APPENDIX AND STUFF %%%%%%%%%%%%%%%%
+\bibliographystyle{alpha}
+\bibliography{books.bib}
+
+\newpage
+\appendix
+\pagenumbering{roman}
+\section{Bilagor}\label{sec:kallkod}
+% Källkoden ska finnas tillgänglig i er hemkatalog
+% ~/edu/apjava/lab1/. Bifoga även utskriven källkod.
+Härefter följer utskrifter från källkoden och andra filer som hör till
+denna laboration
+
+\end{document}
