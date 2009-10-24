@@ -128,6 +128,7 @@ public class MessageImpl implements Message {
     public int compareTo(final Message other) {
         logger.debug("Comparing messages");
         if (messageType.equals(other.getMessageType())) { return 0; }
+        if (isSystemMessage() && other.isSystemMessage()) { return 0; }
         if (isSystemMessage()) { return -1; }
         if (other.isSystemMessage()) { return 1; }
         return 0;     

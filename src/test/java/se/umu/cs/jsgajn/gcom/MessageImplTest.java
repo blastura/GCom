@@ -1,4 +1,4 @@
-package se.umu.cs.jsgajn.gcom.groupcommunication;
+package se.umu.cs.jsgajn.gcom;
 
 import org.junit.After;
 import org.junit.Before;
@@ -65,10 +65,13 @@ public class MessageImplTest {
         assertEquals(-1, mGC.compareTo(m1));
         
         // Test join
-        assertEquals(0, m1.compareTo(mJoin));
-        assertEquals(0, mJoin.compareTo(m1));
+        assertEquals(1, m1.compareTo(mJoin));
+        assertEquals(-1, mJoin.compareTo(m1));
+
+        assertTrue(mJoin.isSystemMessage());
+        assertTrue(mGC.isSystemMessage());
         
-        assertEquals(1, mJoin.compareTo(mGC));
-        assertEquals(-1, mGC.compareTo(mJoin));
+        assertEquals(0, mJoin.compareTo(mGC));
+        assertEquals(0, mGC.compareTo(mJoin));
     }
 }

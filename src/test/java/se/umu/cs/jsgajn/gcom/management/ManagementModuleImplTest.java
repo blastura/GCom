@@ -130,9 +130,9 @@ public class ManagementModuleImplTest {
             //             }
             assertSame(mGC, sendQueue.take().getEntry());
             assertSame(mGC2, sendQueue.take().getEntry());
+            assertSame(mJoin, sendQueue.take().getEntry());
             assertSame(m1, sendQueue.take().getEntry());
             assertSame(m2, sendQueue.take().getEntry());
-            assertSame(mJoin, sendQueue.take().getEntry());
         } catch (InterruptedException e) {
             // TODO - fix error message
             e.printStackTrace();
