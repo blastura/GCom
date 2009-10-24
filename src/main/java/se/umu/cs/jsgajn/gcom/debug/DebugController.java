@@ -6,10 +6,8 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.table.DefaultTableModel;
 
-import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
-import se.umu.cs.jsgajn.gcom.groupmanagement.GroupMember;
-import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
-import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
+import se.umu.cs.jsgajn.gcom.Message;
+import se.umu.cs.jsgajn.gcom.communication.Receiver;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,8 +20,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.rmi.RemoteException;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
-import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
+
+import se.umu.cs.jsgajn.gcom.management.GroupMember;
+import se.umu.cs.jsgajn.gcom.management.ManagementModule;
+import se.umu.cs.jsgajn.gcom.management.GroupView;
+import se.umu.cs.jsgajn.gcom.ordering.VectorClock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -235,7 +236,7 @@ public class DebugController implements DebugHandler {
 		currentContact.updateGroupViewPanelTitle(
 				getUserNameForUID(group.getGroupLeaderGroupMember().getPID()));
 		currentContact.updateMainFrameTitle(
-				"Debugger - " + getUserNameForUID(GroupModule.PID));
+				"Debugger - " + getUserNameForUID(ManagementModule.PID));
 		currentContact.clearGroup();
 		for(GroupMember gm : group) {
 			currentContact.addGroupMember(new Object[]{getUserNameForUID(gm.getPID())});

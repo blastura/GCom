@@ -4,14 +4,14 @@ import java.util.UUID;
 import java.util.ArrayList;
 import java.util.Queue;
 
-import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
-import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
+import se.umu.cs.jsgajn.gcom.Message;
+import se.umu.cs.jsgajn.gcom.communication.Receiver;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import se.umu.cs.jsgajn.gcom.groupmanagement.GroupView;
-import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
-import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
+
+import se.umu.cs.jsgajn.gcom.management.GroupView;
+import se.umu.cs.jsgajn.gcom.ordering.VectorClock;
 
 public class Debugger implements DebugHandler {
     private static final Logger logger = LoggerFactory.getLogger(Debugger.class);

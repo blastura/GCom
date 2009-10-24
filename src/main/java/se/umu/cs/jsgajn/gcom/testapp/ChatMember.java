@@ -9,12 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.umu.cs.jsgajn.gcom.Client;
-import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
-import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModuleImpl;
+import se.umu.cs.jsgajn.gcom.management.ManagementModule;
+import se.umu.cs.jsgajn.gcom.management.ManagementModuleImpl;
 
 public class ChatMember implements Client {
     private static final Logger logger = LoggerFactory.getLogger(ChatMember.class);
-    private GroupModule groupMember;
+    private ManagementModule groupMember;
 
     public ChatMember(String gnsHost, int gnsPort, String groupName)
         throws RemoteException, AlreadyBoundException, NotBoundException {
@@ -24,15 +24,15 @@ public class ChatMember implements Client {
     public ChatMember(String gnsHost, int gnsPort, String groupName, int clientPort)
         throws RemoteException, AlreadyBoundException, NotBoundException {
         if (clientPort < 1) {
-            this.groupMember = new GroupModuleImpl(this, gnsHost, gnsPort, groupName);
+            this.groupMember = new ManagementModuleImpl(this, gnsHost, gnsPort, groupName);
         } else {
-            this.groupMember = new GroupModuleImpl(this, gnsHost, gnsPort, groupName, clientPort);
+            this.groupMember = new ManagementModuleImpl(this, gnsHost, gnsPort, groupName, clientPort);
         }
 
         new Thread (new Runnable() {
                 public void run() {
                     while (true) {
-                        logger.info(GroupModule.PID + " - message: ");
+                        logger.info(ManagementModule.PID + " - message: ");
                         Scanner sc = new Scanner(System.in);
                         String msg;
                         msg = sc.nextLine();

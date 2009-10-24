@@ -15,10 +15,10 @@ import javax.swing.JToggleButton;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
-import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
-import se.umu.cs.jsgajn.gcom.groupcommunication.Receiver;
-import se.umu.cs.jsgajn.gcom.groupmanagement.GroupModule;
-import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
+import se.umu.cs.jsgajn.gcom.Message;
+import se.umu.cs.jsgajn.gcom.communication.Receiver;
+import se.umu.cs.jsgajn.gcom.management.ManagementModule;
+import se.umu.cs.jsgajn.gcom.ordering.VectorClock;
 
 public class ContactModel {
 
