@@ -77,7 +77,7 @@ public class ManagementModuleImpl implements ManagementModule {
      * @throws NotBoundException If GNS stub is not found in GNS register.
      */
     public ManagementModuleImpl(final Client client, final String gnsHost, final int gnsPort,
-                           final String groupName, final int clientPort)
+                                final String groupName, final int clientPort)
         throws RemoteException, AlreadyBoundException, NotBoundException, IllegalArgumentException {
         this.client = client;
         this.receiveQueue = new LinkedBlockingQueue<Message>();
@@ -244,13 +244,21 @@ public class ManagementModuleImpl implements ManagementModule {
                     logger.debug("Sending message: [{}]", fifoEntry);
                     Message m = fifoEntry.getEntry();
                     GroupView groupViewCopy;
+
                     synchronized (groupView) {
                         groupViewCopy = new GroupViewImpl(groupView);
+
+                        // If memberCrash message, don't send it to the crashed members
+                        if (m.getMessageType().equals(MessageType.MEMBERCRASH)) {
+                            if (!groupViewCopy.removeAll(((CrashList ) m.getMessage()).getAll())) {
+                                logger.warn("Tried to send MEMBERCRASH but the member that crashed is not in my list");
+                            }
+                        }
                     }
                     try {
                         orderingModule.send(m, groupViewCopy);
                     } catch (MemberCrashException e) {
-                        logger.debug("Caught MemberCrashException");
+                        logger.debug("Caught MemberCrashException, trying to send fifoEntry: [{}]", fifoEntry);
                         handleMemberCrashException(e);
                     } catch (MessageCouldNotBeSentException e) {
                         logger.debug("Caught MessageCouldNotBeSentException fifoEntry: {}",
@@ -268,64 +276,12 @@ public class ManagementModuleImpl implements ManagementModule {
         }
 
         private void handleMemberCrashException(MemberCrashException e) {
-            
-                CrashList crashedMembers = e.getCrashedMembers();
-                Message memberCrashMessage = new MessageImpl(crashedMembers, 
-                        MessageType.MEMBERCRASH, ManagementModule.PID, 
-                        groupView.getID());
-                send(memberCrashMessage, groupView);
-                
-                /*
-                // Is it the leader?
-                if (crashedMembers.contains(groupView.getGroupLeaderGroupMember())) {
-                    handleLeaderCrash(groupView.getGroupLeaderGroupMember());
-                } else {
-                    // Am I leader
-                    if (groupView.getGroupLeaderGroupMember().getPID().equals(ManagementModule.PID)) {
 
-                        // TODO: sync or copy ?
-                        boolean changed = groupView.removeAll(crashedMembers.getAll());
-                        logger.debug("After remove all: {}",crashedMembers.getAll());
-                        if (!changed) {
-                            logger.warn("Tried to remove crashed members, but none were removed");
-                        }
-                        Message groupChangeMessage =
-                            new MessageImpl(groupView, MessageType.GROUPCHANGE, ManagementModule.PID,
-                                            groupView.getID());
-                        send(groupChangeMessage, groupView);
-                    }
-                }
-                */
-            
-        }
-
-        private void handleLeaderCrash(GroupMember leader) {
-            synchronized (groupView) {
-                //groupView.remove(groupView.getGroupLeaderGroupMember());
-                groupView.remove(leader);
-
-                // Am I the new leader?
-                if (ManagementModule.PID.equals(groupView.getHighestUUID())) {
-                    try {
-                        gns.setNewLeader(ManagementModuleImpl.this.groupMember, groupView.getName());
-                        groupView.setNewLeader(ManagementModuleImpl.this.groupMember);
-                        ManagementModuleImpl.this.gl = new GroupLeaderImpl(); // TODO: Sync erros?
-                        Message groupChangeMessage =
-                            new MessageImpl(groupView, MessageType.GROUPCHANGE, ManagementModule.PID,
-                                            groupView.getID());
-                        logger.debug("Incredible! I am the new leader! ");
-                        send(groupChangeMessage, groupView);
-                    } catch (RemoteException e1) {
-                        logger.debug("Error, GNS cant change groupleader");
-                        e1.printStackTrace();
-                    }
-                } else {
-                    Message leaderCrashMessage = new MessageImpl(
-                                                                 leader, MessageType.LEADERCRASH,
-                                                                 ManagementModule.PID, groupView.getID());
-                    send(leaderCrashMessage, groupView);
-                }
-            }
+            CrashList crashedMembers = e.getCrashedMembers();
+            Message memberCrashMessage = new MessageImpl(crashedMembers,
+                                                         MessageType.MEMBERCRASH, ManagementModule.PID,
+                                                         groupView.getID());
+            send(memberCrashMessage, groupView);
         }
     }
 
@@ -362,7 +318,7 @@ public class ManagementModuleImpl implements ManagementModule {
             case MEMBERCRASH:
                 logger.info("MEMBERCRASH");
                 // TODO: what now?
-                handleMemberCrash((CrashList)m.getMessage());
+                handleMemberCrash((CrashList) m.getMessage());
                 break;
             case JOIN:
                 logger.info("JOIN");
@@ -380,18 +336,21 @@ public class ManagementModuleImpl implements ManagementModule {
 
         private void handleMemberCrash(CrashList crashedMembers) {
             // TODO: verify and test this!
-            
             synchronized (groupView) {
-                
                 // Leader crash?
+                boolean newLeader = false;
                 if (crashedMembers.contains(groupView.getGroupLeaderGroupMember())) {
-                    groupView.removeAll(crashedMembers.getAll());
+                    logger.debug("Leader crashed");
+                    if (!groupView.removeAll(crashedMembers.getAll())) {
+                        logger.warn("Someone crashed, but is not in my list!");
+                    }
                     // Am I the new leader?
                     if (ManagementModule.PID.equals(groupView.getHighestUUID())) {
                         logger.info("I am new leader :)");
+                        newLeader = true;
                         try {
                             gns.setNewLeader(
-                                    ManagementModuleImpl.this.groupMember, groupView.getName());
+                                             ManagementModuleImpl.this.groupMember, groupView.getName());
                             groupView.setNewLeader(ManagementModuleImpl.this.groupMember);
                             ManagementModuleImpl.this.gl = new GroupLeaderImpl(); // TODO: Sync erros?
                         } catch (RemoteException e1) {
@@ -400,40 +359,19 @@ public class ManagementModuleImpl implements ManagementModule {
                         }
                     }
                 }
-                
+
                 // Am I leader
                 if (groupView.getGroupLeaderGroupMember().getPID().equals(ManagementModule.PID)) {
-                    logger.info("Leader: Remove all crashed members");
-                    groupView.removeAll(crashedMembers.getAll());
-
+                    logger.info("Leader: Remove all crashed members, send a GroupChange");
+                    if (!groupView.removeAll(crashedMembers.getAll())) {
+                        logger.warn("No members removed, newLeader: {}", newLeader);
+                    }
                     Message groupChangeMessage =
-                        new MessageImpl(groupView, MessageType.GROUPCHANGE, 
-                                ManagementModule.PID,
+                        new MessageImpl(groupView, MessageType.GROUPCHANGE,
+                                        ManagementModule.PID,
                                         groupView.getID());
                     send(groupChangeMessage, groupView);
                 }
-                
-                /*
-                if (true){
-                    // Am I leader
-                    if (groupView.getGroupLeaderGroupMember().getPID().equals(ManagementModule.PID)) {
-                
-                if (ManagementModule.PID.equals(groupView.getHighestUUID())) {
-                    try {
-                        gns.setNewLeader(ManagementModuleImpl.this.groupMember, groupView.getName());
-                        groupView.setNewLeader(ManagementModuleImpl.this.groupMember);
-                        ManagementModuleImpl.this.gl = new GroupLeaderImpl(); // TODO: Sync erros?
-                        Message groupChangeMessage =
-                            new MessageImpl(groupView, MessageType.GROUPCHANGE, ManagementModule.PID,
-                                            groupView.getID());
-                        logger.debug("Incredible! I am the new leader! ");
-                        send(groupChangeMessage, groupView);
-                    } catch (RemoteException e1) {
-                        logger.debug("Error, GNS cant change groupleader");
-                        e1.printStackTrace();
-                    }
-                }
-                */
             }
         }
     }
