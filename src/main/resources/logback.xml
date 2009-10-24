@@ -10,15 +10,15 @@
    </appender>
    
    
-   <logger name="se.umu.cs.jsgajn.gcom.messageordering">
+   <logger name="se.umu.cs.jsgajn.gcom.ordering">
       <level value="${logback.root.level:-DEBUG}" />
    </logger>
 
-   <logger name="se.umu.cs.jsgajn.gcom.groupmanagement.GNSImpl">
+   <logger name="se.umu.cs.jsgajn.gcom.GNSImpl">
       <level value="${logback.root.level:-DEBUG}" />
    </logger>
    
-   <logger name="se.umu.cs.jsgajn.gcom.groupmanagement">
+   <logger name="se.umu.cs.jsgajn.gcom.management">
       <level value="${logback.root.level:-DEBUG}" />
    </logger>
 
