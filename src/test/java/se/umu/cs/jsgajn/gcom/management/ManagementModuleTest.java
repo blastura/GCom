@@ -1,4 +1,4 @@
-package se.umu.cs.jsgajn.gcom.groupmanagement;
+package se.umu.cs.jsgajn.gcom.management;
 
 import static org.junit.Assert.*;
 
@@ -6,7 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class GroupModuleTest {
+public class ManagementModuleTest {
 
     @Before
     public void setUp() throws Exception {
@@ -18,6 +18,6 @@ public class GroupModuleTest {
     
     @Test
     public void testUID() {
-        assertEquals(GroupModule.PID, GroupModule.PID);
+        assertEquals(ManagementModule.PID, ManagementModule.PID);
     }
 }

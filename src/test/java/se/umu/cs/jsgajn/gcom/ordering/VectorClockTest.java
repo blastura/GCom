@@ -1,4 +1,4 @@
-package se.umu.cs.jsgajn.gcom.messageordering;
+package se.umu.cs.jsgajn.gcom.ordering;
 
 import org.junit.*;
 import java.util.SortedSet;

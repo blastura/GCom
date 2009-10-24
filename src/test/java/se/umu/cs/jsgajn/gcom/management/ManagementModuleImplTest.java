@@ -1,4 +1,4 @@
-package se.umu.cs.jsgajn.gcom.groupmanagement;
+package se.umu.cs.jsgajn.gcom.management;
 
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
