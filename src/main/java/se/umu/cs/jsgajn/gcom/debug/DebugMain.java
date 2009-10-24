@@ -23,7 +23,7 @@ public class DebugMain {
 
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    JFrame frame = DebugView.create(controller,
+                    JFrame frame = new DebugView(controller,
                                                     controller.getCurrentContact());
                     frame.setLocationRelativeTo(null);
                     frame.setVisible(true);

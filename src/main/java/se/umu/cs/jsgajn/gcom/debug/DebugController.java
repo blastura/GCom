@@ -1,34 +1,28 @@
 package se.umu.cs.jsgajn.gcom.debug;
 
-import java.util.ArrayList;
-
-import javax.swing.DefaultListModel;
-import javax.swing.JList;
-import javax.swing.table.DefaultTableModel;
-
-import se.umu.cs.jsgajn.gcom.Message;
-import se.umu.cs.jsgajn.gcom.communication.Receiver;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Queue;
-import java.util.Stack;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.io.UnsupportedEncodingException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import se.umu.cs.jsgajn.gcom.management.GroupMember;
-import se.umu.cs.jsgajn.gcom.management.ManagementModule;
-import se.umu.cs.jsgajn.gcom.management.GroupView;
-import se.umu.cs.jsgajn.gcom.ordering.VectorClock;
+import javax.swing.table.DefaultTableModel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.UnsupportedEncodingException;
+
+import se.umu.cs.jsgajn.gcom.Message;
+import se.umu.cs.jsgajn.gcom.communication.Receiver;
+import se.umu.cs.jsgajn.gcom.management.GroupMember;
+import se.umu.cs.jsgajn.gcom.management.GroupView;
+import se.umu.cs.jsgajn.gcom.management.ManagementModule;
+import se.umu.cs.jsgajn.gcom.ordering.VectorClock;
 
 public class DebugController implements DebugHandler {
     private static final Logger logger = LoggerFactory.getLogger(DebugController.class);
@@ -37,7 +31,7 @@ public class DebugController implements DebugHandler {
 
     private Receiver receiver;
     private boolean doHold = false;
-    private Queue<Message> holdQueue = new LinkedBlockingQueue<Message>();
+    private List<Message> holdList = new ArrayList<Message>();
 
     // For tmp usernames / Anton
     private Map<UUID, String> userNames = new HashMap<UUID, String>();
@@ -137,9 +131,9 @@ public class DebugController implements DebugHandler {
         if(doHold) {
             doHold = false;
 
-            while (!holdQueue.isEmpty()) {
+            //while (!holdList.isEmpty()) {
+            for(Message m : holdList){
                 try {
-                    Message m = holdQueue.poll();
                     logger.debug("Sending back message-with-text: {}", m.getMessage().toString());
                     receiver.receive(m);
                 } catch (RemoteException e) {
@@ -147,6 +141,7 @@ public class DebugController implements DebugHandler {
                     System.err.println("Debugger: Error while receiving.");
                 }
             }
+            holdList.clear();
             currentContact.clearHoldTable();
         } else {
             doHold = true;
@@ -167,8 +162,8 @@ public class DebugController implements DebugHandler {
             // 			boolean found = false;
             // 			found = allreadyHoldCheck(m);
             // 			if(found == false) {
-            holdQueue.add(m);
-            currentContact.addHold(new Object[]{m.getMessage(), getShorterUIDForMessage(m.getUID())});
+            holdList.add(m);
+            currentContact.addHold(new Object[]{m.getMessage(), m.getUID()});
             //			}
             return doHold;
         } else {
@@ -178,26 +173,18 @@ public class DebugController implements DebugHandler {
 
     public void shuffleHoldMessages() {
         currentContact.clearHoldTable();
-        List list = new ArrayList<Message>();
-        while(!holdQueue.isEmpty()){
-            Message m = holdQueue.poll();
-            currentContact.addHold(new Object[]{m.getMessage(), getShorterUIDForMessage(m.getUID())});
-            list.add(m);
+        Collections.shuffle(holdList);
+        for (Message m : holdList) {
+            currentContact.addHold(new Object[]{m.getMessage(), m.getUID()});
         }
-        Collections.shuffle(list);
-        holdQueue.addAll(list);
     }
 
     public void reversHoldMessages() {
         currentContact.clearHoldTable();
-        List list = new ArrayList<Message>();
-        while(!holdQueue.isEmpty()){
-            Message m = holdQueue.poll();
-            currentContact.addHold(new Object[]{m.getMessage(), getShorterUIDForMessage(m.getUID())});
-            list.add(m);
+        Collections.reverse(holdList);
+        for (Message m : holdList) {
+            currentContact.addHold(new Object[]{m.getMessage(), m.getUID()});
         }
-        Collections.reverse(list);
-        holdQueue.addAll(list);
     }
 
     // Not tested but should work / Anton
@@ -245,6 +232,26 @@ public class DebugController implements DebugHandler {
 
     public boolean isModelInitialized(int hack) {
         return currentContact.isModelIsInit();
+    }
+    public void releaseMessage(UUID id) {
+        Message mSave = null;
+        for (Message m : holdList) {
+            if (m.getUID().equals(id)){
+                mSave = m; 
+                break;
+            }
+        }
+        System.out.println("Mess: " + mSave.getMessage() +"UUID: " + id);
+        if (mSave != null) {
+            try {
+                receiver.receive(mSave);
+                holdList.remove(mSave);
+            } catch (RemoteException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
     }
 
 }

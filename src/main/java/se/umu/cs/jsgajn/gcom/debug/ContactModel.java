@@ -22,23 +22,24 @@ import se.umu.cs.jsgajn.gcom.ordering.VectorClock;
 
 public class ContactModel {
 
-	private JFrame mainFrame;
-	
+    private JFrame mainFrame;
+
     private JTabbedPane tabs;
     private UUID pid;
     private DefaultTableModel receivedTable;
     private DefaultTableModel deliveredTable;
     private DefaultTableModel holdTable;
+    private DefaultTableModel orderingHoldTable;
     private DefaultTableModel crashedTable;
     private DefaultTableModel clientInfo;
     private DefaultTableModel groupMembers;
-    
+
     private JToggleButton holdButton;
     private JToggleButton releaseAndResortButton;
-    
+
     private String messageInfo;
     private boolean modelIsInit = false;
-    
+
     private JPanel clientInfoPanel;
     private JPanel groupViewPanel;
 
@@ -64,9 +65,12 @@ public class ContactModel {
 
         deliveredTable.setNumRows(0);
         deliveredTable.setColumnCount(0);
-        
+
         holdTable.setNumRows(0);
         holdTable.setColumnCount(0);
+
+        orderingHoldTable.setNumRows(0);
+        orderingHoldTable.setColumnCount(0);
 
         crashedTable.setNumRows(0);
         crashedTable.setColumnCount(0);
@@ -79,7 +83,7 @@ public class ContactModel {
     }
 
     public void setupTables() {
-    	receivedTable.addColumn("Count");
+        receivedTable.addColumn("Count");
         receivedTable.addColumn("ID");
         receivedTable.addColumn("UID-short");
         receivedTable.addColumn("Message");
@@ -92,27 +96,33 @@ public class ContactModel {
 
         holdTable.addColumn("Name");
         holdTable.addColumn("UID-short");
-        
+
+        orderingHoldTable.addColumn("Name");
+        orderingHoldTable.addColumn("UID-short");
+
         crashedTable.addColumn("UID");
 
         vectorclock.addColumn("UID");
         vectorclock.addColumn("Ticks");
-        
+
         groupMembers.addColumn("Name");
     }
-    
+
     public boolean isModelIsInit(){
-    	return modelIsInit;
+        return modelIsInit;
     }
 
     public void addReceived(Object[] obj) {
-    	receivedTable.insertRow(0, obj);
+        receivedTable.insertRow(0, obj);
     }
     public void addDelivered(Object[] obj) {
         deliveredTable.insertRow(0, obj);
     }
     public void addHold(Object[] obj) {
         holdTable.insertRow(0, obj);
+    }
+    public void addOrderingHold(Object[] obj) {
+        orderingHoldTable.insertRow(0, obj);
     }
     public void addCrashed(Object[] obj) {
         crashedTable.insertRow(0,obj);
@@ -121,14 +131,14 @@ public class ContactModel {
         vectorclock.insertRow(0, rowData);
     }
     public void addGroupMember(Object[] rowData) {
-    	System.out.println("add: " + rowData[0]);
+        System.out.println("add: " + rowData[0]);
         groupMembers.insertRow(0, rowData);
     }
-    
-    
-    
-    
-    
+
+
+
+
+
 
     public DefaultTableModel getVectorclock() {
         return vectorclock;
@@ -196,61 +206,72 @@ public class ContactModel {
         this.tabs = tabs;
     }
 
-	public DefaultTableModel getGroupMembers() {
-		return groupMembers;
-	}
+    public DefaultTableModel getGroupMembers() {
+        return groupMembers;
+    }
 
-	public void setGroupMembers(DefaultTableModel groupMembers) {
-		this.groupMembers = groupMembers;
-	}
+    public void setGroupMembers(DefaultTableModel groupMembers) {
+        this.groupMembers = groupMembers;
+    }
 
-	public JToggleButton getHoldButton() {
-		return holdButton;
-	}
+    public JToggleButton getHoldButton() {
+        return holdButton;
+    }
 
-	public void setHoldButton(JToggleButton holdButton) {
-		this.holdButton = holdButton;
-	}
+    public void setHoldButton(JToggleButton holdButton) {
+        this.holdButton = holdButton;
+    }
 
-	public JToggleButton getReleaseAndResortButton() {
-		return releaseAndResortButton;
-	}
+    public JToggleButton getReleaseAndResortButton() {
+        return releaseAndResortButton;
+    }
 
-	public void setReleaseAndResortButton(JToggleButton releaseAndResortButton) {
-		this.releaseAndResortButton = releaseAndResortButton;
-	}
+    public void setReleaseAndResortButton(JToggleButton releaseAndResortButton) {
+        this.releaseAndResortButton = releaseAndResortButton;
+    }
 
-	public void clearGroup() {
+    public void clearGroup() {
         groupMembers.setNumRows(0);	
-	}
-	public void clearVectorClock() {
-		vectorclock.setNumRows(0);
-	}
-	public void clearHoldTable() {
-		holdTable.setNumRows(0);
-	}
+    }
+    public void clearVectorClock() {
+        vectorclock.setNumRows(0);
+    }
+    public void clearHoldTable() {
+        holdTable.setNumRows(0);
+    }
+    public void clearOrderingHoldTable() {
+        orderingHoldTable.setNumRows(0);
+    }
 
-	public DefaultTableModel getHoldTable() {
-		return holdTable;
-	}
+    public DefaultTableModel getHoldTable() {
+        return holdTable;
+    }
 
-	public void setHoldTable(DefaultTableModel holdTable) {
-		this.holdTable = holdTable;
-	}
+    public void setHoldTable(DefaultTableModel holdTable) {
+        this.holdTable = holdTable;
+    }
 
-	public void setMainFrame(JFrame mainFrame) {
-		this.mainFrame = mainFrame;
-	}
+    public void setMainFrame(JFrame mainFrame) {
+        this.mainFrame = mainFrame;
+    }
 
-	public JFrame getMainFrame() {
-		return mainFrame;
-	}
-	public void updateMainFrameTitle(String title) {
-		mainFrame.setTitle(title);
-	}
-	public void updateGroupViewPanelTitle(String title) {
+    public JFrame getMainFrame() {
+        return mainFrame;
+    }
+    public void updateMainFrameTitle(String title) {
+        mainFrame.setTitle(title);
+    }
+    public void updateGroupViewPanelTitle(String title) {
         TitledBorder groupViewBorderPanel;
         groupViewBorderPanel = BorderFactory.createTitledBorder(title);
         groupViewPanel.setBorder(groupViewBorderPanel);
-	}
+    }
+
+    public DefaultTableModel getOrderingHoldTable() {
+        return orderingHoldTable;
+    }
+
+    public void setOrderingHoldTable(DefaultTableModel orderingHoldTable) {
+        this.orderingHoldTable = orderingHoldTable;
+    }
 }

@@ -1,38 +1,47 @@
 
 package se.umu.cs.jsgajn.gcom.debug;
 
-import javax.swing.JFrame;
-import java.awt.GridBagLayout;
-import javax.swing.WindowConstants;
-import java.awt.Rectangle;
-import java.awt.Insets;
-import javax.swing.JScrollPane;
-import javax.swing.JPanel;
 import java.awt.Dimension;
-import javax.swing.DefaultListModel;
 import java.awt.GridBagConstraints;
-import javax.swing.JList;
-import javax.swing.JTextField;
-import java.awt.Color;
-import javax.swing.border.TitledBorder;
-import javax.swing.JButton;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.JTable;
-import javax.swing.border.EtchedBorder;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.JEditorPane;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.EventHandler;
-import java.beans.PropertyChangeListener;
+import java.util.UUID;
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JToggleButton;
+import javax.swing.ListSelectionModel;
+import javax.swing.WindowConstants;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 
 
-public class DebugView {
+public class DebugView extends JFrame{
 
-    public static JFrame create(DebugController debugController,
-    		ContactModel currentContact) {
+    ContactModel currentContact;
+    DebugController debugController;
+    private JTable table1;
+
+    public DebugView(DebugController debugController,
+            ContactModel currentContact) {
         debugController.init();
+
+        this.currentContact = currentContact;
+        this.debugController = debugController;
 
         DefaultTableModel defaultTableModel0 = new DefaultTableModel();
         defaultTableModel0.setColumnCount(3);
@@ -79,9 +88,8 @@ public class DebugView {
         defaultTableModel3.setRowCount(5);
         currentContact.setHoldTable(defaultTableModel3);
 
-        JFrame frame0 = new JFrame();
 
-        JPanel panel1 = (JPanel) frame0.getContentPane();
+        JPanel panel1 = (JPanel) this.getContentPane();
 
         GridBagLayout gridBagLayout1 = new GridBagLayout();
         gridBagLayout1.columnWidths = new int[]{12, 0, 6, 0, 0, 6, 0, 6, 0, 20, 21};
@@ -111,6 +119,12 @@ public class DebugView {
         button3.addActionListener(EventHandler.create(ActionListener.class, debugController, "crash"));
         panel1.add(button3, new GridBagConstraints(8, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
 
+
+        JButton button4 = new JButton();
+        button4.setText("Let one hold message go");
+        panel1.add(button4, new GridBagConstraints(9, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
+
+
         JTabbedPane tabbedPane0 = new JTabbedPane();
         tabbedPane0.setPreferredSize(new Dimension(100, 100));
 
@@ -133,25 +147,32 @@ public class DebugView {
         panel3.setLayout(gridBagLayout3);
         panel3.add(panel0, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0, 14, 1, new Insets(0, 0, 0, 0), 0, 0));
 
-        JPanel panel4 = new JPanel();
+        JPanel holdQueuePanel = new JPanel();
 
         GridBagLayout gridBagLayout4 = new GridBagLayout();
         gridBagLayout4.columnWidths = new int[]{20};
         gridBagLayout4.rowHeights = new int[]{20};
         gridBagLayout4.columnWeights = new double[]{1};
         gridBagLayout4.rowWeights = new double[]{1};
-        panel4.setLayout(gridBagLayout4);
+        holdQueuePanel.setLayout(gridBagLayout4);
 
-        JTable table1 = new JTable();
+        this.table1 = new JTable();
+
+        
+        table1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table1.getSelectionModel().addListSelectionListener(new HoldQueueSelectionListener());
+
+
+        //table1.setSelectionModel(newModel );
         table1.setModel(defaultTableModel3);
         table1.getTableHeader().setSize(new Dimension(225, 16));
 
         JScrollPane scrollPane1 = new JScrollPane(table1);
         scrollPane1.setPreferredSize(new Dimension(23, 27));
-        panel4.add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
-        panel4.setBorder(new TitledBorder("Hold queue"));
-        panel4.setPreferredSize(new Dimension(100, 100));
-        panel3.add(panel4, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, 14, 1, new Insets(0, 0, 0, 0), 0, 0));
+        holdQueuePanel.add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
+        holdQueuePanel.setBorder(new TitledBorder("Hold queue"));
+        holdQueuePanel.setPreferredSize(new Dimension(100, 100));
+        //panel3.add(panel4, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, 14, 1, new Insets(0, 0, 0, 0), 0, 0));
 
         JPanel panel5 = new JPanel();
 
@@ -241,34 +262,102 @@ public class DebugView {
         panel2.add(panel3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
         tabbedPane0.addTab("Tab", null, panel2);
 
-        JPanel panel9 = new JPanel();
+        JToggleButton toggleButton1 = new JToggleButton();
+        toggleButton1.setBounds(new Rectangle(158, 12, 148, 29));
+        toggleButton1.setText("Release & Resort");
+
+
+        JPanel orderMainPanel = new JPanel();
 
         GridBagLayout gridBagLayout9 = new GridBagLayout();
         gridBagLayout9.columnWidths = new int[]{20};
         gridBagLayout9.rowHeights = new int[]{20};
         gridBagLayout9.columnWeights = new double[]{1};
         gridBagLayout9.rowWeights = new double[]{1};
-        panel9.setLayout(gridBagLayout9);
-        panel9.setBorder(new TitledBorder("OrderType"));
-        panel9.setPreferredSize(new Dimension(100, 100));
-        panel9.setVisible(false);
-        tabbedPane0.addTab("Tab 1", null, panel9);
-        panel1.add(tabbedPane0, new GridBagConstraints(1, 3, 9, 1, 0.0, 0.0, 17, 1, new Insets(0, 0, 0, 0), 0, 0));
-        frame0.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        frame0.setTitle("Debugger");
-        frame0.setBounds(new Rectangle(500, 0, 1026, 474));
-        currentContact.setMainFrame(frame0);
-        currentContact.setMessageInfo("<html>\n  <head>\n    \n  </head>\n  <body>\n    Message info\n  </body>\n</html>\n");
-        currentContact.setReceivedTable(defaultTableModel5);
 
-        JToggleButton toggleButton1 = new JToggleButton();
-        toggleButton1.setBounds(new Rectangle(158, 12, 148, 29));
-        toggleButton1.setText("Release & Resort");
+
+        GridLayout orderingLayout = new GridLayout(0,2);
+
+
+        orderMainPanel.setLayout(orderingLayout);
+        orderMainPanel.setBorder(new TitledBorder("OrderType"));
+        orderMainPanel.setPreferredSize(new Dimension(100, 100));
+        orderMainPanel.setVisible(false);
+        tabbedPane0.addTab("Tab 1", null, orderMainPanel);
+        panel1.add(tabbedPane0, new GridBagConstraints(1, 3, 9, 1, 0.0, 0.0, 17, 1, new Insets(0, 0, 0, 0), 0, 0));
+        this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        this.setTitle("Debugger");
+        this.setBounds(new Rectangle(500, 0, 1026, 474));
+
+
+
+
+
+        orderMainPanel.add(holdQueuePanel);
+
+        JPanel orderingHoldPanel = new JPanel();
+        /*
+        GridBagLayout orderingGridBagLayout4 = new GridBagLayout();
+        orderingGridBagLayout4.columnWidths = new int[]{20};
+        orderingGridBagLayout4.rowHeights = new int[]{20};
+        orderingGridBagLayout4.columnWeights = new double[]{1};
+        orderingGridBagLayout4.rowWeights = new double[]{1};
+        orderingHoldPanel.setLayout(orderingGridBagLayout4);
+         */
+        BoxLayout boxlayout = new BoxLayout(orderingHoldPanel, 0);
+        orderingHoldPanel.setLayout(boxlayout);
+
+        DefaultTableModel orderingHoldDefaultTableMode = new DefaultTableModel();
+        orderingHoldDefaultTableMode.setColumnCount(3);
+        orderingHoldDefaultTableMode.setRowCount(5);
+        currentContact.setOrderingHoldTable(orderingHoldDefaultTableMode);
+
+        JTable orderingHoldTable = new JTable();
+        orderingHoldTable.setModel(orderingHoldDefaultTableMode);
+        orderingHoldTable.getTableHeader().setSize(new Dimension(225, 16));
+
+        JScrollPane orderingScrollPane = new JScrollPane(orderingHoldTable);
+        orderingScrollPane.setPreferredSize(new Dimension(23, 27));
+        //orderingHoldPanel.add(orderingScrollPane, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
+        orderingHoldPanel.add(orderingScrollPane);
+        orderingHoldPanel.setBorder(new TitledBorder("Ordering hold queue"));
+        orderingHoldPanel.setPreferredSize(new Dimension(100, 100));
+
+        orderMainPanel.add(orderingHoldPanel);
+
+
+        //panel9.add(new JTextField());
+
+
+
+
+        currentContact.setMainFrame(this);
+        currentContact.setMessageInfo("<html>\n  <head>\n    \n  </head>\n  <body>\n    Message info\n  </body>\n</html>\n");
+        currentContact.setReceivedTable(defaultTableModel5);        
+
         currentContact.setReleaseAndResortButton(toggleButton1);
         currentContact.setTabs(tabbedPane0);
         currentContact.setVectorclock(defaultTableModel4);
         currentContact.init();
 
-        return frame0;
+    }
+
+    private class HoldQueueSelectionListener implements ListSelectionListener {
+
+        public void valueChanged(ListSelectionEvent e) {
+            if (e.getValueIsAdjusting() == false) {
+                int index = e.getFirstIndex();
+                table1.getSelectionModel().removeListSelectionListener(this);
+                
+                UUID id = (UUID) currentContact.getHoldTable().getValueAt(index, 1);
+                    
+                System.out.println("Du klickade på index: " + index + ", där är UUID " + id);
+                ((DebugController) debugController).releaseMessage(id);
+                currentContact.getHoldTable().removeRow(index);
+                
+                table1.getSelectionModel().addListSelectionListener(new HoldQueueSelectionListener());
+            }
+        }
+
     }
 }
