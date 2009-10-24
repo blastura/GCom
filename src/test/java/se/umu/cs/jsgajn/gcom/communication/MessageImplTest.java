@@ -4,11 +4,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
-import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
-import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
+import se.umu.cs.jsgajn.gcom.Message;
+import se.umu.cs.jsgajn.gcom.MessageImpl;
+import se.umu.cs.jsgajn.gcom.MessageType;
 import java.util.UUID;
-import se.umu.cs.jsgajn.gcom.messageordering.VectorClock;
+import se.umu.cs.jsgajn.gcom.ordering.VectorClock;
 
 import static org.junit.Assert.*;
 

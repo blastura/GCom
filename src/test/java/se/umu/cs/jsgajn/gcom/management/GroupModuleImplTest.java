@@ -3,19 +3,20 @@ package se.umu.cs.jsgajn.gcom.groupmanagement;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.UUID;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.Ignore;
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 import se.umu.cs.jsgajn.gcom.Client;
-import java.util.concurrent.PriorityBlockingQueue;
-import se.umu.cs.jsgajn.gcom.groupcommunication.Message;
-import se.umu.cs.jsgajn.gcom.groupcommunication.MessageImpl;
-import java.util.UUID;
-import se.umu.cs.jsgajn.gcom.groupcommunication.MessageType;
+import se.umu.cs.jsgajn.gcom.Message;
+import se.umu.cs.jsgajn.gcom.MessageImpl;
+import se.umu.cs.jsgajn.gcom.MessageType;
+
+import static org.junit.Assert.*;
 
 public class GroupModuleImplTest {
 
