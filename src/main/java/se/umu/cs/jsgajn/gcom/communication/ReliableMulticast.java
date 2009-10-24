@@ -31,9 +31,11 @@ public class ReliableMulticast implements Multicast {
      * @param m The message to send.
      */
     public void multicast(Message m, GroupView g) throws MemberCrashException {
+        /*
         if(m.getMessageType().equals(MessageType.GROUPCHANGE)){
             g = new GroupViewImpl(g, g.getMembersWithHigherUUID(ManagementModule.PID));
         }
+        */
         bMulticast.multicast(m, g);
     }
 
