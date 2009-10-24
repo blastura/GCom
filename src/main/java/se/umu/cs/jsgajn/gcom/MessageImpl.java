@@ -110,7 +110,8 @@ public class MessageImpl implements Message {
     @Override
     public String toString() {
         String origin = this.originID.equals(ManagementModule.PID) ? "ME" : this.originID.toString();
-        return "[origin: " + origin
+        return "[Message: " + getMessageType()
+            + ", origin: " + origin
             + ", vc: " + getVectorClock()
             + ", object: '" + this.m.toString()
             + "', messageID: " + this.ID + "]";

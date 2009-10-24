@@ -241,6 +241,7 @@ public class ManagementModuleImpl implements ManagementModule {
             while (running) {
                 try {
                     FIFOEntry<Message> fifoEntry = sendQueue.take();
+                    logger.debug("Sending message: [{}]", fifoEntry);
                     Message m = fifoEntry.getEntry();
                     GroupView groupViewCopy;
                     synchronized (groupView) {

@@ -57,17 +57,21 @@ public class OrderingModuleImpl implements OrderingModule {
     public void send(Message m, GroupView g) throws MemberCrashException,
                                                     MessageCouldNotBeSentException {
         if (m.isSystemMessage()) {
+            logger.debug("SystemMessage bysass prepare: {}", m);
             communicationsModule.send(m, g);
             return;
         }
+        logger.debug("Not a systemMessage prepare: {}", m);
         communicationsModule.send(ordering.prepareOutgoingMessage(m, g), g);
     }
 
     public void deliver(Message m) {
         if (m.isSystemMessage()) {
+            logger.debug("SystemMessage don't order: {}", m);
             groupManagementModule.deliver(m);
             return;
         }
+        logger.debug("Not a SystemMessage order: {}", m);
         ordering.put(m);
     }
 
