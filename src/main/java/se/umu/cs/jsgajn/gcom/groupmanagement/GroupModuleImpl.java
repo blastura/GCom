@@ -77,7 +77,7 @@ public class GroupModuleImpl implements GroupModule {
      */
     public GroupModuleImpl(final Client client, final String gnsHost, final int gnsPort,
                            final String groupName, final int clientPort)
-        throws RemoteException, AlreadyBoundException, NotBoundException,IllegalArgumentException {
+        throws RemoteException, AlreadyBoundException, NotBoundException, IllegalArgumentException {
         this.client = client;
         this.receiveQueue = new LinkedBlockingQueue<Message>();
         this.sendQueue = new PriorityBlockingQueue<FIFOEntry<Message>>();
@@ -373,19 +373,21 @@ public class GroupModuleImpl implements GroupModule {
         private void handleLeaderCrash(GroupMember crashedLeader) {
             // TODO: verify and test this!
             // Am I the new leader?
-            if (GroupModule.PID.equals(groupView.getHighestUUID())) {
-                try {
-                    gns.setNewLeader(GroupModuleImpl.this.groupMember, groupView.getName());
-                    groupView.setNewLeader(GroupModuleImpl.this.groupMember);
-                    GroupModuleImpl.this.gl = new GroupLeaderImpl(); // TODO: Sync erros?
-                    Message groupChangeMessage =
-                        new MessageImpl(groupView, MessageType.GROUPCHANGE, GroupModule.PID,
-                                        groupView.getID());
-                    logger.debug("Incredible! I am the new leader! ");
-                    send(groupChangeMessage, groupView);
-                } catch (RemoteException e1) {
-                    logger.debug("Error, GNS cant change groupleader");
-                    e1.printStackTrace();
+            synchronized (groupView) {
+                if (GroupModule.PID.equals(groupView.getHighestUUID())) {
+                    try {
+                        gns.setNewLeader(GroupModuleImpl.this.groupMember, groupView.getName());
+                        groupView.setNewLeader(GroupModuleImpl.this.groupMember);
+                        GroupModuleImpl.this.gl = new GroupLeaderImpl(); // TODO: Sync erros?
+                        Message groupChangeMessage =
+                            new MessageImpl(groupView, MessageType.GROUPCHANGE, GroupModule.PID,
+                                            groupView.getID());
+                        logger.debug("Incredible! I am the new leader! ");
+                        send(groupChangeMessage, groupView);
+                    } catch (RemoteException e1) {
+                        logger.debug("Error, GNS cant change groupleader");
+                        e1.printStackTrace();
+                    }
                 }
             }
         }
