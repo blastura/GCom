@@ -232,6 +232,9 @@ public class GroupModuleImpl implements GroupModule {
         }
     }
 
+    /**
+     * Thread to handle message sending.
+     */
     private class MessageSender implements Runnable {
         public void run() {
             while (running) {
@@ -318,6 +321,9 @@ public class GroupModuleImpl implements GroupModule {
         }
     }
 
+    /**
+     * Thread to handle message receiving.
+     */
     private class MessageReceiver implements Runnable {
         public void run() {
             while (running) {

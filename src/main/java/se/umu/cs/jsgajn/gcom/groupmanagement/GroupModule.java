@@ -1,7 +1,6 @@
 package se.umu.cs.jsgajn.gcom.groupmanagement;
 
 import java.util.UUID;
-import se.umu.cs.jsgajn.gcom.groupcommunication.MemberCrashException;
 import se.umu.cs.jsgajn.gcom.Module;
 
 public interface GroupModule extends Module {
