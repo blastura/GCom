@@ -77,13 +77,15 @@ public class ContactModel {
         receivedTable.addColumn("Count");
         receivedTable.addColumn("ID");
         receivedTable.addColumn("UID-short");
-        receivedTable.addColumn("Message");
+        receivedTable.addColumn("Content");
         receivedTable.addColumn("Origin");	
+        receivedTable.addColumn("Message"); 
 
         deliveredTable.addColumn("ID");
         deliveredTable.addColumn("UID-short");
-        deliveredTable.addColumn("Message");
+        deliveredTable.addColumn("Content");
         deliveredTable.addColumn("Origin");
+        deliveredTable.addColumn("Message");
 
         holdTable.addColumn("Name");
         holdTable.addColumn("UID-short");

@@ -38,6 +38,8 @@ public class DebugView extends JFrame {
     ContactModel currentContact;
     DebugController debugController;
     private JTable tableHoldMsg;
+    private JTable receiveTable;
+    private JTable deliveredTable;
 
     public DebugView(DebugController debugController,
             ContactModel currentContact) {
@@ -50,10 +52,10 @@ public class DebugView extends JFrame {
         defaultTableModel0.setRowCount(5);
         currentContact.setCrashedTable(defaultTableModel0);
 
-        DefaultTableModel defaultTableModel1 = new DefaultTableModel();
-        defaultTableModel1.setColumnCount(3);
-        defaultTableModel1.setRowCount(5);
-        currentContact.setDeliveredTable(defaultTableModel1);
+        DefaultTableModel deliveredTableModel = new DefaultTableModel();
+        deliveredTableModel.setColumnCount(3);
+        deliveredTableModel.setRowCount(5);
+        currentContact.setDeliveredTable(deliveredTableModel);
 
         DefaultTableModel defaultTableModel2 = new DefaultTableModel();
         defaultTableModel2.setColumnCount(3);
@@ -166,10 +168,9 @@ public class DebugView extends JFrame {
             }
         }; 
         tableHoldMsg.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        //tableHoldMsg.removeEditor();
-        //table1.getSelectionModel().addListSelectionListener(new HoldQueueSelectionListener());
-        //table1.setSelectionModel(newModel );
         tableHoldMsg.setModel(defaultTableModel3);
+        
+        
         tableHoldMsg.getTableHeader().setSize(new Dimension(225, 16));
 
         JScrollPane scrollPane1 = new JScrollPane(tableHoldMsg);
@@ -222,25 +223,30 @@ public class DebugView extends JFrame {
         panel6.setPreferredSize(new Dimension(100, 100));
         panel3.add(panel6, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0, 14, 1, new Insets(0, 0, 0, 0), 0, 0));
 
-        JPanel panel7 = new JPanel();
+        JPanel deliveredPanel = new JPanel();
 
         GridBagLayout gridBagLayout7 = new GridBagLayout();
         gridBagLayout7.columnWidths = new int[]{20};
         gridBagLayout7.rowHeights = new int[]{20};
         gridBagLayout7.columnWeights = new double[]{1};
         gridBagLayout7.rowWeights = new double[]{1};
-        panel7.setLayout(gridBagLayout7);
+        deliveredPanel.setLayout(gridBagLayout7);
 
-        JTable table4 = new JTable();
-        table4.setModel(defaultTableModel1);
-        table4.getTableHeader().setSize(new Dimension(555, 16));
+        this.deliveredTable = new JTable() {
+            public boolean isCellEditable(int rowIndex, int vColIndex) {
+                return false;
+            }
+        }; 
+        deliveredTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        deliveredTable.setModel(deliveredTableModel);
+        deliveredTable.getTableHeader().setSize(new Dimension(555, 16));
 
-        JScrollPane scrollPane4 = new JScrollPane(table4);
+        JScrollPane scrollPane4 = new JScrollPane(deliveredTable);
         scrollPane4.setPreferredSize(new Dimension(23, 27));
-        panel7.add(scrollPane4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
-        panel7.setBorder(new TitledBorder("Delivered"));
-        panel7.setPreferredSize(new Dimension(100, 100));
-        panel3.add(panel7, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, 14, 1, new Insets(0, 0, 0, 0), 0, 0));
+        deliveredPanel.add(scrollPane4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
+        deliveredPanel.setBorder(new TitledBorder("Delivered"));
+        deliveredPanel.setPreferredSize(new Dimension(100, 100));
+        panel3.add(deliveredPanel, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, 14, 1, new Insets(0, 0, 0, 0), 0, 0));
 
         JPanel panel8 = new JPanel();
 
@@ -251,14 +257,23 @@ public class DebugView extends JFrame {
         gridBagLayout8.rowWeights = new double[]{1};
         panel8.setLayout(gridBagLayout8);
 
-        JTable table5 = new JTable();
+        //this.receiveTable = new JTable();
 
-        DefaultTableModel defaultTableModel5 = (DefaultTableModel) table5.getModel();
-        defaultTableModel5.setColumnCount(3);
-        defaultTableModel5.setRowCount(5);
-        table5.getTableHeader().setSize(new Dimension(555, 16));
+        
+        
+        
+        
+        this.receiveTable = new JTable() {
+            public boolean isCellEditable(int rowIndex, int vColIndex) {
+                return false;
+            }
+        }; 
+        receiveTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        DefaultTableModel defaultTableModel5 = (DefaultTableModel) receiveTable.getModel();
+        receiveTable.getTableHeader().setSize(new Dimension(555, 16));
 
-        JScrollPane scrollPane5 = new JScrollPane(table5);
+        JScrollPane scrollPane5 = new JScrollPane(receiveTable);
         scrollPane5.setPreferredSize(new Dimension(23, 27));
         panel8.add(scrollPane5, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
         panel8.setBorder(new TitledBorder("Received"));
@@ -348,12 +363,28 @@ public class DebugView extends JFrame {
         debugController.init(this);
     }
 
-    public int getIndexOfMessageToRelease() {
-        return tableHoldMsg.getSelectedRow();
+    public int getIndexOfMessageToRelease(int table) {
+        int selectedRow = -1;
+        switch(table) {
+        case 1:selectedRow = tableHoldMsg.getSelectedRow(); break;
+        case 2:selectedRow = receiveTable.getSelectedRow(); break;
+        case 3:selectedRow = deliveredTable.getSelectedRow(); break;
+        }
+        
+        return selectedRow;
+        
     }
     
     public void addReleaseMessageListener(MouseListener ml) {
         tableHoldMsg.addMouseListener(ml);
+    }
+
+    public void addShowReceivedMessageListener(MouseListener ml) {
+        receiveTable.addMouseListener(ml);
+    }
+   
+    public void addShowDeliveredMessageListener(MouseListener ml) {
+        deliveredTable.addMouseListener(ml);
     }
 
     //     private class HoldQueueSelectionListener implements ListSelectionListener {

@@ -1,5 +1,6 @@
 package se.umu.cs.jsgajn.gcom.debug;
 
+import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -15,6 +16,7 @@ import java.util.Stack;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 import org.slf4j.Logger;
@@ -26,6 +28,7 @@ import se.umu.cs.jsgajn.gcom.management.GroupMember;
 import se.umu.cs.jsgajn.gcom.management.GroupView;
 import se.umu.cs.jsgajn.gcom.management.ManagementModule;
 import se.umu.cs.jsgajn.gcom.ordering.VectorClock;
+import se.umu.cs.jsgajn.gcom.testapp.ConnectDialog;
 
 public class DebugController implements DebugHandler {
     private static final Logger logger = LoggerFactory.getLogger(DebugController.class);
@@ -56,12 +59,57 @@ public class DebugController implements DebugHandler {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) { // Doubleclick
-                    int index = view.getIndexOfMessageToRelease();
+                    int index = view.getIndexOfMessageToRelease(1);
                     if (index < 0) {return;}
                     UUID id = (UUID) currentContact.getHoldTable().getValueAt(index, 1);
                     logger.debug("Clicked index {} which has UUID {}", index, id);
                     releaseMessage(id);
                     currentContact.getHoldTable().removeRow(index);
+                }
+            }
+        });
+        
+
+        view.addShowReceivedMessageListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) { // Doubleclick
+                    
+                    int index = view.getIndexOfMessageToRelease(2);
+                    
+                    
+                    if (index < 0) {return;}
+                    
+                    Message m = (Message) currentContact.getReceivedTable().getValueAt(index, 5);
+                    
+                    MessageInfo messageInfo = new MessageInfo(m, DebugController.this);
+                    messageInfo.setLocationRelativeTo(null);
+                    messageInfo.setVisible(true);
+                    messageInfo.setPreferredSize(new Dimension(600, 300));
+                    messageInfo.pack();
+                    
+                }
+            }
+        });
+        
+        view.addShowDeliveredMessageListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) { // Doubleclick
+                    
+                    int index = view.getIndexOfMessageToRelease(3);
+                    
+                    
+                    if (index < 0) {return;}
+                    
+                    Message m = (Message) currentContact.getDeliveredTable().getValueAt(index, 4);
+                    
+                    MessageInfo messageInfo = new MessageInfo(m, DebugController.this);
+                    messageInfo.setLocationRelativeTo(null);
+                    messageInfo.setVisible(true);
+                    messageInfo.setPreferredSize(new Dimension(600, 300));
+                    messageInfo.pack();
+                    
                 }
             }
         });
@@ -128,7 +176,8 @@ public class DebugController implements DebugHandler {
                             getShortUIDForMessage(m.getUID()),
                             getShorterUIDForMessage(m.getUID()), 
                             m.getMessage(), 
-                            getUserNameForUID(m.getOriginUID())});
+                            getUserNameForUID(m.getOriginUID()),
+                            m});
         }
     }
 
@@ -136,9 +185,13 @@ public class DebugController implements DebugHandler {
      * Adds a message to the delivered-list
      */
     public void messageDelivered(Message m) {
-        currentContact.addDelivered(new Object[]{getShortUIDForMessage(m.getUID()),
-                getShorterUIDForMessage(m.getUID()), 
-                m.getMessage(), getUserNameForUID(m.getOriginUID())});
+        currentContact.addDelivered(
+                new Object[]{
+                        getShortUIDForMessage(m.getUID()),
+                        getShorterUIDForMessage(m.getUID()), 
+                        m.getMessage(), 
+                        getUserNameForUID(m.getOriginUID()),
+                        m});
     }
 
     /**
@@ -226,7 +279,7 @@ public class DebugController implements DebugHandler {
      * @param uid
      * @return
      */
-    private String getUserNameForUID(UUID uid) {
+    String getUserNameForUID(UUID uid) {
         if (tmpUID == null) {
             Stack<String> tmp = new Stack<String>();
             tmp.addAll(Arrays.asList("B.L.Ä.B", "B.Ä.R.S", "backpacker", "Baconballe", "Baconrosrekyl", "Bajsamera", "Bajsbergsbyggare", "Bajsbröder", "Bajsbröder", "Bajsdildo", "Bajsfest", "Bajsförnedring", "Bajsfötter", "Bajshatt", "Bajskork", "Bajspackare", "Bajspassare", "Bajspärla", "baka kladdkaka", "Bakmus", "Baktanke", "bakterie-runk", "Bakteriebög", "Bakteriedopp", "Ballhojta", "Ballongen", "Ballongknut", "Banankontakt", "Bandtraktor", "Bangbros", "Barbagay", "Barkbåt", "Barmhärtighetsknull", "Barra", "bastuballe", "Bastukorv", "Basturace", "Batongluder", "beer googles", "Bergsslyna", "Berlinsk Gasmask", "Bert Karlsson", "Bertofili", "Bibelcitat", "Big sausage pizza", "Bingo-Hora", "Bjud-fitta", "Björn Borg runk", "Björnfitta", "Björnkuk", "Blattehora", "BlindDate", "Blinga", "Blixten", "Blockmongo", "Blodig kuk", "Blodkanoten", "Blodpudding", "Blodrunka", "Blomsterfitta", "Blueballs", "Blåbärsmutta", "Blåsjobb", "Blöjbärare", "Blöjgång", "BOB", "Bolibompa", "Boll-lek", "Bolljude", "Bomben", "bombmatta", "Bomullsplockare", "Bondlurken", "Bosniensnygg", "Boston Tea Party", "Boulla", "Boven", "Bowling-greppet", "Bracka", "Bronka", "Broskfitta", "Brown Brown", "Brunkch", "Brutalrunkare", "BrytSkryt", "Buddha-Effekten", "Budgetrunkare", "Bukbröder", "Buktrumma", "Bulldogs-Fitta", "Bullfitta", "Bulls-eye", "bumbibjörn", "Burkosexuell", "Bussbög", "Bussrunkare", "bygga teddy björn", "Byhora", "Byta-filter", "Bäverdräparn", "Bäverjakt", "Bävernäve", "Bögbajsa", "böghandtag", "Böghandtag", "Böghora", "Böglyft", "bögnylle", "Bögporr-maraton", "Bögpölsa", "Bögslunga", "Bögsmälla", "Bögsmör", "Bögsnara", "Bögulv", "Bögvinkel"));
