@@ -139,6 +139,31 @@ The original specification of this practical assignment can be found at:\\
 % alternative solutions considered in the analysis. The report should
 % also discuss to what extent the requirement list is fulfilled, as
 % well as to which extent you could adhere to the the project plan.
+The group communication for \textit{GCom} is specified to be a
+distributed system, which means there can be no central server that
+coordinates all activities for individual group members. Four guidance
+on how to implement such a system the book \textit{Distributed
+  Systems: Concepts and Design}\cite{book:dist-syst} list three
+important consequences of a distributed system:
+
+\begin{itemize}
+\item \textbf{Concurrency: } Program execution are concurrent. In the
+  case of \textit{GCom}, message receiving and handling are concurrent
+  with other parts of the middleware such as message sending and ordering.
+\item \textbf{No global clock: } There is no global clock to
+  coordinate activities by. That is clock timestamps can not be used
+  to order messages received by \textit{GCom}.
+\item \textbf{Independent failures: } All individual parts of the
+  distributed system can fail at any time and place in execution. This
+  must be considered when implementing algorithms for coordinated
+  actions of \textit{GCom}.
+\end{itemize}
+
+
+\subsection{Group partitioning}\label{sec:group-partitioning}
+
+\subsection{Member failures}\label{sec:member-failures}
+
 
 \section{Usage}\label{sec:usage}
 % Förklara var programmet och källkoden ligger samt hur man kompilerar,
