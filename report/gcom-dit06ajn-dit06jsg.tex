@@ -414,6 +414,49 @@ Note hoverer that some tests require that some ports are note bound on
 \textit{localhost} by other processes, and therefore the tests can
 fail because of bind exceptions.
 
+\subsubsection{Implementing GCOM}\label{sec:implgcom}
+It is easy to implement GCOM into an application. After importing the
+classes necessary it is just to create a ManagementModuleImpl with
+requisite parameters. Two methods is included in the Client-interface,
+send() and deliver(Object message), these are the only thing that is
+used when communicating with the GCOM middleware.
+\begin{code}
+  \begin{footnotesize}
+\begin{verbatim}
+import se.umu.cs.jsgajn.gcom.Client;
+import se.umu.cs.jsgajn.gcom.management.ManagementModule;
+import se.umu.cs.jsgajn.gcom.management.ManagementModuleImpl;
+
+public class App implements Client {    
+    public App() {
+        String host = "hostname";
+        int hostPort = "1098";
+        int localPort = "33445"
+        String group = "YourGroupName";
+        try {
+            managementModule = new ManagementModuleImpl(
+                this, host, hostPort, group, localPort);
+        } catch (RemoteException e) {
+        } catch (IllegalArgumentException e) {
+        } catch (AlreadyBoundException e) {
+        } catch (NotBoundException e) {
+        }
+    }
+    
+    public void send(){
+        managementModule.send(Object message);
+    }
+
+    public void deliver(Object message) {
+        // Do whatever you want with message
+    }
+}
+\end{verbatim}
+  \end{footnotesize}
+  \caption{applications.properties}\label{code:app-prop}
+\end{code}
+
+
 \section{System description}\label{sec:system}
 % Beskriv översiktligt hur programmet är uppbyggt och hur det löser
 % problemet.
@@ -495,31 +538,56 @@ to receive messages. All messages to be sent are first paced in a
 priority queue where all messages are ordered according to the
 \textit{first in first out} principle, except some system messages
 that are prioritized before client messages. The system are those sent
-when a process wants to join a group, the message sent when a
-group constellation has changed and when a member has detected that
-another member has crashed.
+when a process wants to join a group, the message sent when a group
+constellation has changed and when a member has detected that another
+member has crashed.
 
 \subsubsection{Group leaders}\label{sec:group-leaders}
 % To provide an interface for group management: The group management
 % module provides operations to create and remove groups, as well as
 % add and remove members from a group.
+Since groups may contain large amounts of group members the
+\textit{GNS} only contains a reference to one of the group members.
+This member is called the group leader. A group leader is responsible
+for reciving and managing joining members. In the case of the total
+ordering of messages the group leader will act as a sequencer for the
+group, see section \ref{sec:total}.
 
 \subsubsection{Error handling}\label{sec:error-handling}
 % To detect errors: The module monitors a group and indicates when a
 % member of the group crashes (or for some other reason become
 % unreachable).
+When sending messages a group member may detect that one of the
+receiving members has crashed. If the detecting member is a group
+leader it will directly send a groupchange message, otherwise it will
+send a membercrash message which when received by the group leader
+will result in a groupchange message multicasted to the group. A
+groupchange message contains information about the complete new group
+composition whereas a membercrash message only contains information
+about the members that have crashed.
 
-\subsubsection{Group changes}\label{sec:group-changes}
+% TODO: this section maybe should have contained info about normal leave 
+% messages, which we have not implemented.
+%\subsubsection{Group changes}\label{sec:group-changes}
 % To notify changes in group membership: The module notifies all group
 % members about changes in group composition.
 
-
-\subsection{Communications module}\label{sec:communications-module}
-\subsubsection{Basic multicast}\label{sec:basic-multicast}
-\subsubsection{Reliable multicast}\label{sec:reliable-multicast}
-
-
 \subsection{Message ordering module}\label{sec:message-ordering-module}
+The \textit{Message ordering module} is responsible for message
+ordering. That is it will for different orderings guarante that all
+messages delivered from this module up to the group management module
+is order according to the current ordering. The group module will send
+all outgoing messages to this module, which will prepare the message
+with necessary information such as vectorclocks and pass the message
+along to the communications module.
+
+\begin{figure}[!thb]
+  \centering
+  \includegraphics[width=2.5in]{images/Ordering.pdf}
+  \caption{Ordering module}
+  \label{fig:images/ordering}
+\end{figure}
+
 \subsubsection{Non-ordered}\label{sec:-non-ordered}
 \subsubsection{FIFO}\label{sec:fifo}
 \subsubsection{Causal}\label{sec:causal}
@@ -527,6 +595,9 @@ another member has crashed.
 \subsubsection{Causal-Total}\label{sec:causal-total}
 % (messages are first sorted according to causal ordering, then according to total ordering)
 
+\subsection{Communications module}\label{sec:communications-module}
+\subsubsection{Basic multicast}\label{sec:basic-multicast}
+\subsubsection{Reliable multicast}\label{sec:reliable-multicast}
 
 \subsection{Debugger}\label{sec:debugger}
 % That messages are delivered according to the specified ordering
