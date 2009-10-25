@@ -1,5 +1,6 @@
 package se.umu.cs.jsgajn.gcom.ordering;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -135,6 +136,8 @@ public class FIFOOrdering implements Ordering {
                             System.exit(1);
                         }
                     }
+                    ArrayList<Message> holdBackList = new ArrayList<Message>(holdBackQueue);
+                    debugger.updateOrderingHoldList(holdBackList);
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();

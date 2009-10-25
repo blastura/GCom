@@ -321,4 +321,12 @@ public class DebugController implements DebugHandler {
             }
         }
     }
+
+    public void updateOrderingHoldList(ArrayList<Message> holdList) {
+        DefaultTableModel dtm = currentContact.getOrderingHoldTable();
+        dtm.setRowCount(0);
+        for (Message m : holdList) {
+           dtm.addRow(new Object[]{m.getMessage(), m.getUID()}); 
+        }
+    }
 }

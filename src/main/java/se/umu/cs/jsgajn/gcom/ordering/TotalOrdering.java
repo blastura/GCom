@@ -1,6 +1,7 @@
 package se.umu.cs.jsgajn.gcom.ordering;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -128,6 +129,8 @@ public class TotalOrdering implements Ordering {
                             System.exit(0);
                         }
                     }
+                    ArrayList<Message> holdBackList = new ArrayList<Message>(holdBackSortedSet);
+                    debugger.updateOrderingHoldList(holdBackList); 
 
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block

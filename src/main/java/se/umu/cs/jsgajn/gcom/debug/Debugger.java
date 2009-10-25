@@ -95,4 +95,12 @@ public class Debugger implements DebugHandler {
         }
         debugger.updateVectorClock(vc);
     }
+
+    public void updateOrderingHoldList(ArrayList<Message> holdList) {
+        if (debugger == null) {
+            return;
+        }
+        debugger.updateOrderingHoldList(holdList);
+        
+    }
 }
