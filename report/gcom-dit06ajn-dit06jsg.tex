@@ -8,6 +8,7 @@
 \usepackage{fancyhdr}
 \usepackage{graphicx}
 \usepackage{url}
+\usepackage{varioref}
 
 %%%%%%%%%%%%%%%%
 % Column spacing
@@ -69,7 +70,7 @@
 
 % Float for text
 \floatstyle{ruled}
-\newfloat{code}{H}{lop}
+\newfloat{code}{!htb}{lop}
 \floatname{code}{CodeSnippet}
 
 % vars
@@ -414,12 +415,14 @@ Note hoverer that some tests require that some ports are note bound on
 \textit{localhost} by other processes, and therefore the tests can
 fail because of bind exceptions.
 
-\subsubsection{Implementing GCOM}\label{sec:implgcom}
-It is easy to implement GCOM into an application. After importing the
-classes necessary it is just to create a ManagementModuleImpl with
-requisite parameters. Two methods is included in the Client-interface,
-send() and deliver(Object message), these are the only thing that is
-used when communicating with the GCOM middleware.
+\subsubsection{Implementing a GCom application}\label{sec:implgcom}
+It is easy to implement \textit{GCom} into an application. After
+importing the classes necessary it is just to create a
+ManagementModuleImpl with requisite parameters. Two methods is
+included in the Client interface, \textit{send(Object)} and
+\textit{deliver(Object)}, these are the only thing that is used when
+communicating with the GCom middleware, for minimal sample see
+CodeSnippet \ref{code:app-example}.
 \begin{code}
   \begin{footnotesize}
 \begin{verbatim}
@@ -453,7 +456,8 @@ public class App implements Client {
 }
 \end{verbatim}
   \end{footnotesize}
-  \caption{applications.properties}\label{code:app-prop}
+  \caption{GCom application}
+  \label{code:app-example}
 \end{code}
 
 
@@ -470,7 +474,7 @@ public class App implements Client {
 % message delivery semantics.
 
 The \textit{GCom} middleware is separated in three different modules
-to separate different behaviours, see figure \ref{fig:images/Stack}.
+to separate different behaviours, see figure \vref{fig:images/Stack}.
 The first module which will have the closest connection to
 implementing software is the \textit{management module}. This module
 handles group membership changes and actions. The second module
