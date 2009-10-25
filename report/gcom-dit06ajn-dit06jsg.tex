@@ -1,18 +1,65 @@
 % -*- coding: utf-8 -*-
 % \documentclass[journal]{IEEEtran}
 \documentclass[titlepage, twocolumn, a4paper, 10pt]{article}
+\usepackage{parskip}
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{verbatim}
 \usepackage{fancyhdr}
 \usepackage{graphicx}
-\usepackage{parskip}
 \usepackage{url}
 
-\usepackage[pdfborder={0 0 0 0}]{hyperref}
-
+%%%%%%%%%%%%%%%%
 % Column spacing
-\setlength{\columnsep}{7mm}
+%\setlength{\columnsep}{7mm}
+
+\hyphenpenalty=750
+% If we didn't adjust the interword spacing, 2200 might be better.
+% The TeX default is 1000
+\hbadness=1350
+% IEEE does not use extra spacing after punctuation
+\frenchspacing
+
+% V1.7 increase this a tad to discourage equation breaks
+\binoppenalty=1000 % default 700
+\relpenalty=800     % default 500
+
+
+% margin note stuff
+\marginparsep      10pt
+\marginparwidth    20pt
+\marginparpush     25pt
+
+
+% if things get too close, go ahead and let them touch
+\lineskip            0pt
+\normallineskip      0pt
+\lineskiplimit       0pt
+\normallineskiplimit 0pt
+
+\topmargin    -49.0pt
+\headheight   12pt
+\headsep      0.25in
+
+\textheight       58pc  % 9.63in, 696pt
+\columnsep         1pc
+\textwidth        42pc   % 2 x 21pc + 1pc = 43pc
+
+% the default side margins are equal
+\oddsidemargin        0.680in
+\evensidemargin       0.680in
+% compensate for LaTeX's 1in offset
+\addtolength{\oddsidemargin}{-1in}
+\addtolength{\evensidemargin}{-1in}
+ \topmargin        -0.25in
+ % we retain the reserved, but unused space for headers
+ \addtolength{\topmargin}{-\headheight}
+ \addtolength{\topmargin}{-\headsep}
+
+%%%%%%%%%%%%%%%% 
+
+
+\usepackage[pdfborder={0 0 0 0}]{hyperref}
 
 % Include pdf with multiple pages ex \includepdf[pages=-, nup=2x2]{filename.pdf}
 \usepackage[final]{pdfpages}
@@ -131,10 +178,10 @@ The system is implemented in the programming language
   RMI}\footnote{\url{http://java.sun.com/javase/technologies/core/basic/rmi/index.jsp}}
 for network communication.
 
-The original specification of this practical assignment can be found at:\\
+The original specification of this practical assignment can be found
+at (\textit{\today}):\\
 \begin{footnotesize}
   \url{http://www.cs.umu.se/kurser/5DV020/HT09/assignment.html}
-  \footnote{Fetched \today} % DONE check
 \end{footnotesize}
 
 \section{Problem analysis}\label{sec:problem-analysis}
@@ -300,6 +347,10 @@ gcom.multicast=RELIABLE_MULTICAST
   \caption{applications.properties}\label{code:app-prop}
 \end{code}
 
+\subsection{logback.xml}\label{sec:logback.xml}
+The file \textit{logback.xml} defines the behaviours of logging when
+using \textit{GCom}.
+
 \subsection{Required libraries}\label{sec:required-libraries}
 Basic functionality of \textit{GCom} requires no extra libraries other
 than the standard edition \textit{Java 6} platform. However for some
@@ -308,18 +359,21 @@ software located in the \textit{lib} directory and described in the
 following sections.
 
 \subsubsection{SLF4J and Logback}\label{sec:logback}
-For logging capacities \textit{GCom} uses \textit{Simple Logging
+For logging capability \textit{GCom} uses \textit{Simple Logging
   Facade for Java (SLF4J)}\footnote{\url{http://www.slf4j.org/}} which
 provides a facade for different implementations of logging frameworks.
 The logging back-end used by default is
-\textit{Logger}\footnote{\url{http://logback.qos.ch/}}. This combination
-provides logging capabilities to get information about \textit{GCom}s
-status at run-time.
+\textit{Logger}\footnote{\url{http://logback.qos.ch/}}. This
+combination provides logging capabilities to get information about
+\textit{GCom}s status at run-time.
 
 \subsubsection{JUnit}\label{sec:junit}
 For testing the individual parts of \textit{GCom}, tests are written
 using the \textit{JUnit testing
-  framework}\footnote{\url{http://www.junit.org/}}.
+  framework}\footnote{\url{http://www.junit.org/}}. The tests cover
+some special parts parts of the system where unexpected results would
+otherwise be very hard to debug. All tests are located in the folder
+\textit{src/test/java/} and are compiled to \textit{bin/test/java/}.
 
 \section{System description}\label{sec:system}
 % Beskriv översiktligt hur programmet är uppbyggt och hur det löser
