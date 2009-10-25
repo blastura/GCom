@@ -111,9 +111,10 @@ public class DebugView extends JFrame {
         panel1.add(button1, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
         panel1.add(holdButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, 16, 0, new Insets(0, 0, 0, 0), 0, 0));
 
-        JButton button2 = new JButton();
-        button2.setText("Loose message");
-        panel1.add(button2, new GridBagConstraints(6, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
+        JButton buttonReleaseMessages = new JButton();
+        buttonReleaseMessages.setText("Release messages");
+        buttonReleaseMessages.addActionListener(EventHandler.create(ActionListener.class, debugController, "releaseMessages"));
+        panel1.add(buttonReleaseMessages, new GridBagConstraints(6, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
 
         JButton button3 = new JButton();
         button3.setText("CrashClient");

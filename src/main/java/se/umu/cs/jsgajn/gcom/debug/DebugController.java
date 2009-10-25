@@ -165,8 +165,8 @@ public class DebugController implements DebugHandler {
     }
 
     public void releaseMessages() {
-        this.doHold = true;
-        for (Message m : holdList){
+        this.doHold = false;
+        for (Message m : holdList) {
             try {
                 logger.debug("Sending back message-with-text: {}", m.getMessage().toString());
                 receiver.receive(m);
