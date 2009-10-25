@@ -1,6 +1,6 @@
 % -*- coding: utf-8 -*-
-% \documentclass[journal]{IEEEtran}
-\documentclass[titlepage, twocolumn, a4paper, 10pt]{article}
+ \documentclass[journal]{IEEEtran}
+%\documentclass[titlepage, twocolumn, a4paper, 10pt]{article}
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{verbatim}
@@ -12,7 +12,7 @@
 \usepackage[pdfborder={0 0 0 0}]{hyperref}
 
 % Column spacing
-\setlength{\columnsep}{10mm}
+\setlength{\columnsep}{7mm}
 
 % Include pdf with multiple pages ex \includepdf[pages=-, nup=2x2]{filename.pdf}
 \usepackage[final]{pdfpages}
@@ -126,6 +126,11 @@ Four message-ordering types are implemented: \textit{Non-ordered},
 \textit{Casual-Total}, described in greater detail in section
 \ref{sec:message-ordering-module}.
 
+The system is implemented in the programming language
+\textit{Java}\footnote{\url{http://java.sun.com/}} and uses \textit{Java
+  RMI}\footnote{\url{http://java.sun.com/javase/technologies/core/basic/rmi/index.jsp}}
+for network communication.
+
 The original specification of this practical assignment can be found at:\\
 \begin{footnotesize}
   \url{http://www.cs.umu.se/kurser/5DV020/HT09/assignment.html}
@@ -159,11 +164,41 @@ important consequences of a distributed system:
   actions of \textit{GCom}.
 \end{itemize}
 
+The environment in which \textit{GCom} will execute will defined by
+a model for distributed system called \textit{asynchronous}-system
+defined by three assumptions \cite{book:dist-syst}:
+
+\begin{itemize}
+\item There is no guarantee of \textbf{execution speed}, a process may respond
+  to a request immediately or after several years.
+\item In a similar manner there can be \textbf{transmission delays} in the
+  network were messages are passed. A message can take arbitrary long
+  time to arrive at its destination.
+\item As stated before, there is \textbf{no global clock}. One process can make
+  no assumptions about the clock in another process.
+\end{itemize}
 
 \subsection{Group partitioning}\label{sec:group-partitioning}
+When considering the previous characteristics of the environment for
+\textit{GCom}, a group of processes can at any time be divided in two
+groups without any means for communication between them. It would be
+impossible for the groups to determine whether the group members of
+the other group still executes and behaves normally. Therefore a
+partition of a group is treated as a crash of all the members cut off.
+This means that merging such a group when communication can be
+achieved again is done by a new join for all the members in one off
+the groups.
+
+% TODO: both groups will get new leaders, GNS should handle this and
+% make the group without leader rejoin the previous group.
 
 \subsection{Member failures}\label{sec:member-failures}
-
+A member of a group is considered to have failed only when throws a
+\textit{RemoteExceptioin}\footnote{\url{http://java.sun.com/javase/6/docs/api/java/rmi/RemoteException.html}}
+as defined by \textit{Java RMI}. This means that \textit{GCom} makes
+no guarantee about the time it takes to send a message to a group.
+This guarantee could be achieved simply by changing the definition of
+a member failure to include a time-limit for message delivery.
 
 \section{Usage}\label{sec:usage}
 % Förklara var programmet och källkoden ligger samt hur man kompilerar,
@@ -192,38 +227,6 @@ This catalog contains the following sub directories:
   needed by \textit{GCom}, se section \ref{sec:required-libraries}.
 \item The directory \verb!doc! contains the Javadoc API for \textit{GCom}.
 \end{itemize}
-
-\subsection{Configuration}\label{sec:configuration}
-The compiled system uses two configuration-files to define its
-standard behaviour, these files are located in the directory
-\textit{src/main/resources/}.
-
-\subsubsection{application.properties}\label{sec:application.properties}
-The file \textit{application.properties} defines the standard
-multicast and ordering types to use when communication with a group.
-Notice though that these settings are only used for the creator of a
-group that did not exist from before. When connection to an existing
-group, the settings from that group will suppress the settings in
-\textit{application.properties}. CodeSnippet \ref{code:app-prop}
-shows the content of an example configuration that uses
-
-\begin{code}
-  \begin{footnotesize}
-\begin{verbatim}
-# Used by GNS
-gcom.gns.port=1078
-
-# FIFO, TOTAL_ORDER, NO_ORDERING,
-# CASUAL_ORDERING, CASUALTOTAL_ORDERING
-gcom.ordering=FIFO
-
-# BASIC_MULTICAST, RELIABLE_MULTICAST
-gcom.multicast=RELIABLE_MULTICAST
-\end{verbatim}
-  \end{footnotesize}
-  \caption{applications.properties}\label{code:app-prop}
-\end{code}
-
 
 \section{Compilation}\label{sec:compilation}
 The following commands will require the software tool \textit{Apache
@@ -255,6 +258,37 @@ running:\\
 \begin{footnotesize}
   \verb!salt:./GCom> java -jar GCom.jar!
 \end{footnotesize}
+
+\subsection{Configuration}\label{sec:configuration}
+The compiled system uses two configuration-files to define its
+standard behaviour, these files are located in the directory
+\textit{src/main/resources/}.
+
+\subsubsection{application.properties}\label{sec:application.properties}
+The file \textit{application.properties} defines the standard
+multicast and ordering types to use when communication with a group.
+Notice though that these settings are only used for the creator of a
+group that did not exist from before. When connection to an existing
+group, the settings from that group will suppress the settings in
+\textit{application.properties}. CodeSnippet \ref{code:app-prop}
+shows the content of an example configuration that uses
+
+\begin{code}
+  \begin{footnotesize}
+\begin{verbatim}
+# Used by GNS
+gcom.gns.port=1078
+
+# FIFO, TOTAL_ORDER, NO_ORDERING,
+# CASUAL_ORDERING, CASUALTOTAL_ORDERING
+gcom.ordering=FIFO
+
+# BASIC_MULTICAST, RELIABLE_MULTICAST
+gcom.multicast=RELIABLE_MULTICAST
+\end{verbatim}
+  \end{footnotesize}
+  \caption{applications.properties}\label{code:app-prop}
+\end{code}
 
 \subsection{Required libraries}\label{sec:required-libraries}
 Internally \textit{GCom} uses some third party software located in the
