@@ -20,6 +20,10 @@ public class Debugger implements DebugHandler {
 
     private Debugger() {} // Prevent init
 
+    public static Debugger getDebugger() {
+        return INSTANCE;
+    }
+
     public static void setDebugHandler(DebugHandler d) {
         debugger = d;
     }
@@ -62,18 +66,6 @@ public class Debugger implements DebugHandler {
         debugger.groupChange(g);
     }
 
-    public static Debugger getDebugger() {
-        return INSTANCE;
-    }
-
-    
-    public boolean doHold() {
-        if (debugger == null) {
-            return false;
-        }
-        return debugger.doHold();
-    }
-
     public boolean holdMessage(Message m, Receiver r) {
         if (debugger == null) {
             return false;
@@ -81,26 +73,26 @@ public class Debugger implements DebugHandler {
         return debugger.holdMessage(m, r);
     }
 
-	public boolean isModelInitialized(int hack) {
-		return debugger.isModelInitialized(1);
-	}
-	
-	public void waitForModel() {
-		if(!debugger.isModelInitialized(1)) {
-        	while(debugger.isModelInitialized(1) == false){
-        		try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					System.out.println("Thread in debugger couldn't sleep.");
-				}
-        	}
-        }
-	}
+    public boolean isModelInitialized(int hack) {
+        return debugger.isModelInitialized(1);
+    }
 
-	public void updateVectorClock(VectorClock<UUID> vc) {
+    public void waitForModel() {
+        if(!debugger.isModelInitialized(1)) {
+            while(debugger.isModelInitialized(1) == false){
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    System.err.println("Thread in debugger couldn't sleep.");
+                }
+            }
+        }
+    }
+
+    public void updateVectorClock(VectorClock<UUID> vc) {
         if (debugger == null) {
             return;
         }
         debugger.updateVectorClock(vc);
-	}
+    }
 }

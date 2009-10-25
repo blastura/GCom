@@ -1,7 +1,6 @@
 package se.umu.cs.jsgajn.gcom.debug;
 
 import java.util.UUID;
-import java.util.Queue;
 
 import se.umu.cs.jsgajn.gcom.Message;
 import se.umu.cs.jsgajn.gcom.communication.Receiver;
@@ -16,6 +15,5 @@ public interface DebugHandler {
     public void block();
     public void updateVectorClock(VectorClock<UUID> vc);
     public boolean holdMessage(Message m, Receiver r);
-    public boolean doHold();
-	public boolean isModelInitialized(int hack);
+    public boolean isModelInitialized(int hack);
 }

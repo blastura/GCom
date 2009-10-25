@@ -2,23 +2,14 @@ package se.umu.cs.jsgajn.gcom.debug;
 
 import java.beans.PropertyChangeSupport;
 import java.util.UUID;
-import java.util.ArrayList;
-import java.util.HashSet;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
-
-import se.umu.cs.jsgajn.gcom.Message;
-import se.umu.cs.jsgajn.gcom.communication.Receiver;
-import se.umu.cs.jsgajn.gcom.management.ManagementModule;
-import se.umu.cs.jsgajn.gcom.ordering.VectorClock;
 
 public class ContactModel {
 

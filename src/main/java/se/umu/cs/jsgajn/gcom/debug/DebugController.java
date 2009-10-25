@@ -1,5 +1,8 @@
 package se.umu.cs.jsgajn.gcom.debug;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.UnsupportedEncodingException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -41,16 +44,28 @@ public class DebugController implements DebugHandler {
 
 
     public DebugController() {
-
     }
+
     public DebugController(ContactModel model) {
         currentContact = model;
+
     }
 
-    public void init() {
+    public void init(final DebugView view) {
+        view.addReleaseMessageListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) { // Doubleclick
+                    int index = view.getIndexOfMessageToRelease();
+                    if (index < 0) {return;}
+                    UUID id = (UUID) currentContact.getHoldTable().getValueAt(index, 1);
+                    logger.debug("Clicked index {} which has UUID {}", index, id);
+                    releaseMessage(id);
+                    currentContact.getHoldTable().removeRow(index);
+                }
+            }
+        });
     }
-
-
 
     public ContactModel getCurrentContact() {
         return currentContact;
@@ -60,7 +75,6 @@ public class DebugController implements DebugHandler {
         System.exit(0);
     }
 
-    
     public void block() {
         // TODO: implement
         boolean blocking = true;
@@ -74,7 +88,7 @@ public class DebugController implements DebugHandler {
     }
 
     /**
-     * Adds a message to the crash-table in the GUI. Thou we don't
+     * Adds a message to the crash-table in the GUI. Though we don't
      * use it.
      */
     public void crashMessage() {
@@ -88,7 +102,7 @@ public class DebugController implements DebugHandler {
      * @param m
      * @return
      */
-    public boolean allreadyFoundCheck(Message m) {
+    private boolean allreadyFoundCheck(Message m) {
         DefaultTableModel receivedTable = currentContact.getReceivedTable();
         for(int i = 0; i < receivedTable.getRowCount(); i++) {
             if(receivedTable.getValueAt(i, 2).equals(getShorterUIDForMessage(m.getUID()))) {
@@ -100,24 +114,9 @@ public class DebugController implements DebugHandler {
         }
         return false;
     }
-    
-    /**
-     * Checks if the message is already in the holdQueue TODO: doesent work
-     * @param m
-     * @return
-     */
-    public boolean allreadyHoldCheck(Message m) {
-        DefaultTableModel holdTable = currentContact.getHoldTable();
-        for(int i = 0; i < holdTable.getRowCount(); i++) {
-            if(holdTable.getValueAt(i, 1).equals(getShorterUIDForMessage(m.getUID()))) {
-                return true;
-            }
-        }
-        return false;
-    }	
 
     /**
-     * Adds a messate to the received-list, IF it hasn't been received already
+     * Adds a message to the received-list, IF it hasn't been received already
      */
     public void messageReceived(Message m) {
         boolean found = false;
@@ -132,7 +131,7 @@ public class DebugController implements DebugHandler {
                             getUserNameForUID(m.getOriginUID())});
         }
     }
-    
+
     /**
      * Adds a message to the delivered-list
      */
@@ -157,51 +156,40 @@ public class DebugController implements DebugHandler {
     }
 
     /**
-     * If on hold. Stop hold and return all messages.
-     * If not, start holdning messages.
+     * Toggle boolean state of doHold.
      */
     public void hold()	{
-        if(doHold) {
-            doHold = false;
-
-            //while (!holdList.isEmpty()) {
-            for(Message m : holdList){
-                try {
-                    logger.debug("Sending back message-with-text: {}", m.getMessage().toString());
-                    receiver.receive(m);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                    System.err.println("Debugger: Error while receiving.");
-                }
-            }
-            holdList.clear();
-            currentContact.clearHoldTable();
-        } else {
-            doHold = true;
-        }
+        logger.debug("doHold {}", this.doHold);
+        this.doHold = this.doHold ? false : true; 
+        logger.debug("doHold {}", this.doHold);
     }
 
-
-    /**
-     * Shall the debugger hold incomming messages?
-     */
-    public boolean doHold() {
-        return doHold;
+    public void releaseMessages() {
+        this.doHold = true;
+        for (Message m : holdList){
+            try {
+                logger.debug("Sending back message-with-text: {}", m.getMessage().toString());
+                receiver.receive(m);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+                System.err.println("Debugger: Error while receiving.");
+            }
+        }
+        holdList.clear();
+        currentContact.clearHoldTable();
     }
 
     // TODO: implement
     public boolean holdMessage(Message m, Receiver r) {
         // Add to some queue, must be quick this method will be invoked from
         // messageHandler thread in CommunicationsModuleImpl
-        if (doHold) {
+        if (this.doHold) {
             logger.debug("Holding message {}", m);
             receiver = r; 
             holdList.add(m);
             currentContact.addHold(new Object[]{m.getMessage(), m.getUID()});
-            return doHold;
-        } else {
-            return doHold;
         }
+        return this.doHold;
     }
 
     /**
@@ -306,7 +294,7 @@ public class DebugController implements DebugHandler {
     public boolean isModelInitialized(int hack) {
         return currentContact.isModelIsInit();
     }
-    
+
     /**
      * Releases one message from the holdList.
      * Is called when you click on a message in the GUI-list
@@ -324,6 +312,7 @@ public class DebugController implements DebugHandler {
         System.out.println("Mess: " + mSave.getMessage() +"UUID: " + id);
         if (mSave != null) {
             try {
+                this.doHold = false;
                 receiver.receive(mSave);
                 holdList.remove(mSave);
             } catch (RemoteException e) {
@@ -331,7 +320,5 @@ public class DebugController implements DebugHandler {
                 e.printStackTrace();
             }
         }
-
     }
-
 }

@@ -14,6 +14,9 @@ import java.awt.event.MouseListener;
 import java.beans.EventHandler;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -30,15 +33,14 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 
-public class DebugView extends JFrame{
-
+public class DebugView extends JFrame {
+    private static final Logger logger = LoggerFactory.getLogger(DebugView.class);
     ContactModel currentContact;
     DebugController debugController;
-    private JTable table1;
+    private JTable tableHoldMsg;
 
     public DebugView(DebugController debugController,
             ContactModel currentContact) {
-        debugController.init();
 
         this.currentContact = currentContact;
         this.debugController = debugController;
@@ -78,10 +80,10 @@ public class DebugView extends JFrame{
         panel0.setPreferredSize(new Dimension(100, 100));
         currentContact.setGroupViewPanel(panel0);
 
-        JToggleButton toggleButton0 = new JToggleButton();
-        toggleButton0.setText("Hold messages");
-        toggleButton0.addActionListener(EventHandler.create(ActionListener.class, debugController, "hold"));
-        currentContact.setHoldButton(toggleButton0);
+        JToggleButton holdButton = new JToggleButton();
+        holdButton.setText("Hold messages");
+        holdButton.addActionListener(EventHandler.create(ActionListener.class, debugController, "hold"));
+        currentContact.setHoldButton(holdButton);
 
         DefaultTableModel defaultTableModel3 = new DefaultTableModel();
         defaultTableModel3.setColumnCount(3);
@@ -107,7 +109,7 @@ public class DebugView extends JFrame{
         button1.setText("Shuffle holdqueue");
         button1.addActionListener(EventHandler.create(ActionListener.class, debugController, "shuffleHoldMessages"));
         panel1.add(button1, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
-        panel1.add(toggleButton0, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, 16, 0, new Insets(0, 0, 0, 0), 0, 0));
+        panel1.add(holdButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, 16, 0, new Insets(0, 0, 0, 0), 0, 0));
 
         JButton button2 = new JButton();
         button2.setText("Loose message");
@@ -156,18 +158,20 @@ public class DebugView extends JFrame{
         gridBagLayout4.rowWeights = new double[]{1};
         holdQueuePanel.setLayout(gridBagLayout4);
 
-        this.table1 = new JTable();
-
-        
-        table1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table1.getSelectionModel().addListSelectionListener(new HoldQueueSelectionListener());
-
-
+        // Table to hold holdmessages, listener are added from controller
+        this.tableHoldMsg = new JTable() {
+            public boolean isCellEditable(int rowIndex, int vColIndex) {
+                return false;
+            }
+        }; 
+        tableHoldMsg.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        //tableHoldMsg.removeEditor();
+        //table1.getSelectionModel().addListSelectionListener(new HoldQueueSelectionListener());
         //table1.setSelectionModel(newModel );
-        table1.setModel(defaultTableModel3);
-        table1.getTableHeader().setSize(new Dimension(225, 16));
+        tableHoldMsg.setModel(defaultTableModel3);
+        tableHoldMsg.getTableHeader().setSize(new Dimension(225, 16));
 
-        JScrollPane scrollPane1 = new JScrollPane(table1);
+        JScrollPane scrollPane1 = new JScrollPane(tableHoldMsg);
         scrollPane1.setPreferredSize(new Dimension(23, 27));
         holdQueuePanel.add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, 10, 1, new Insets(0, 0, 0, 0), 0, 0));
         holdQueuePanel.setBorder(new TitledBorder("Hold queue"));
@@ -339,25 +343,34 @@ public class DebugView extends JFrame{
         currentContact.setTabs(tabbedPane0);
         currentContact.setVectorclock(defaultTableModel4);
         currentContact.init();
-
+    
+        debugController.init(this);
     }
 
-    private class HoldQueueSelectionListener implements ListSelectionListener {
+    public int getIndexOfMessageToRelease() {
+        return tableHoldMsg.getSelectedRow();
+    }
+    
+    public void addReleaseMessageListener(MouseListener ml) {
+        tableHoldMsg.addMouseListener(ml);
+    }
 
-        public void valueChanged(ListSelectionEvent e) {
-            if (e.getValueIsAdjusting() == false) {
-                int index = e.getFirstIndex();
-                table1.getSelectionModel().removeListSelectionListener(this);
+    //     private class HoldQueueSelectionListener implements ListSelectionListener {
+
+    //         public void valueChanged(ListSelectionEvent e) {
+    //             if (e.getValueIsAdjusting() == false) {
+    //                 int index = e.getFirstIndex();
+    //                 table1.getSelectionModel().removeListSelectionListener(this);
                 
-                UUID id = (UUID) currentContact.getHoldTable().getValueAt(index, 1);
+    //                 UUID id = (UUID) currentContact.getHoldTable().getValueAt(index, 1);
                     
-                System.out.println("Du klickade på index: " + index + ", där är UUID " + id);
-                ((DebugController) debugController).releaseMessage(id);
-                currentContact.getHoldTable().removeRow(index);
+    //                 System.out.println("Du klickade på index: " + index + ", där är UUID " + id);
+    //                 ((DebugController) debugController).releaseMessage(id);
+    //                 currentContact.getHoldTable().removeRow(index);
                 
-                table1.getSelectionModel().addListSelectionListener(new HoldQueueSelectionListener());
-            }
-        }
+    //                 table1.getSelectionModel().addListSelectionListener(new HoldQueueSelectionListener());
+    //             }
+    //         }
 
-    }
+    //     }
 }

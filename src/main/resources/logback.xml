@@ -22,6 +22,10 @@
       <level value="${logback.root.level:-DEBUG}" />
    </logger>
 
+   <logger name="se.umu.cs.jsgajn.gcom.debug">
+      <level value="${logback.root.level:-DEBUG}" />
+   </logger>
+
    <!-- if system property logback.root.level is set use that otherwise use supplied -->
    
    <root>
