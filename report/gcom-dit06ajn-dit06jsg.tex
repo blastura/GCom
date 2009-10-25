@@ -1,6 +1,6 @@
 % -*- coding: utf-8 -*-
- \documentclass[journal]{IEEEtran}
-%\documentclass[titlepage, twocolumn, a4paper, 10pt]{article}
+% \documentclass[journal]{IEEEtran}
+\documentclass[titlepage, twocolumn, a4paper, 10pt]{article}
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{verbatim}
@@ -200,6 +200,15 @@ no guarantee about the time it takes to send a message to a group.
 This guarantee could be achieved simply by changing the definition of
 a member failure to include a time-limit for message delivery.
 
+\subsubsection{Group discovery}\label{sec:group-discovery}
+When a process wants to communicate with other processes using
+\textit{GCom} there must be a way to find groups and group members
+already existing. That starting point is defined by a global address
+known by all \textit{GCom} members. This starting point will contain a
+service for group discovery.
+
+% TODO: Discuss single point of failure?
+
 \section{Usage}\label{sec:usage}
 % Förklara var programmet och källkoden ligger samt hur man kompilerar,
 % startar och använder det. Förklara även översiktligt vad som händer
@@ -291,12 +300,22 @@ gcom.multicast=RELIABLE_MULTICAST
 \end{code}
 
 \subsection{Required libraries}\label{sec:required-libraries}
-Internally \textit{GCom} uses some third party software located in the
-\textit{lib} directory and described in the following sections.
+Basic functionality of \textit{GCom} requires no extra libraries other
+than the standard edition \textit{Java 6} platform. However for some
+extra functionality \textit{GCom} internally uses some third party
+software located in the \textit{lib} directory and described in the
+following sections.
 
-\subsection{SLF4J and Logback}\label{sec:logback}
+\subsubsection{SLF4J and Logback}\label{sec:logback}
+For logging capacities \textit{GCom} uses \textit{Simple Logging
+  Facade for Java (SLF4J)}\footnote{\url{http://www.slf4j.org/}} which
+provides a facade for different implementations of logging frameworks.
+The logging back-end used by default is
+\textit{Logger}\footnote{http://logback.qos.ch/}. This combination
+provides logging capabilities to get information about \textit{GCom}s
+status at run-time.
 
-\subsection{JUnit}\label{sec:junit}
+\subsubsection{JUnit}\label{sec:junit}
 For testing the individual parts of \textit{GCom}, tests are written
 using the \textit{JUnit testing
   framework}\footnote{http://www.junit.org/}.
