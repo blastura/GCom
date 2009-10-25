@@ -164,7 +164,7 @@ This catalog contains the following sub directories:
   contain all the compiled sources as well as configuration files used
   by this middleware.
 \item The directory \verb!lib! contains all requires third-party libraries
-  needed by \textit{GCom}.
+  needed by \textit{GCom}, se section \ref{sec:required-libraries}.
 \item The directory \verb!doc! contains the Javadoc API for \textit{GCom}.
 \end{itemize}
 
@@ -200,50 +200,47 @@ gcom.multicast=RELIABLE_MULTICAST
 \end{code}
 
 
-\section{Compile}\label{sec:compile}
+\section{Compilation}\label{sec:compilation}
 The following commands will require the software tool \textit{Apache
-  Ant}\footnote{http://ant.apache.org/}.
+  Ant}\footnote{http://ant.apache.org/}. More details about what
+happens using \textit{ant} in this project is found in the file
+\textit{build.xml}\footnote{http://ant.apache.org/manual/using.html}.
 
 To compile \textit{GCom} issue the following command:\\
 \begin{footnotesize}
-  \verb!salt:~/edu/apjava/lab4> ant!
-\end{footnotesize}
+  \verb!salt:./GCom> ant!
+\end{footnotesize}\\
+This will create a directory \verb!bin! if it does not already exists
+and compile/move source-code and configuration files to that
+directory.
 
-Det som händer vid anrop av kommandot ovan är att \textit{Ant} läser
-av filen \textit{build.xml} och letar efter standardkommandona att
-köra. I det här fallet är det operationerna som är definierade i
-XML-elementet \verb!<target />! med attributet
-\verb!name="compile"!. Oftast har taggarna i \textit{build.xml}
-relativt självförklarande namn, de motsvarar i många fall direkta
-kommandon som går att köra i en terminal. Nu ska programmet vara
-kompilerat och ligga i katalogen \verb!bin/main!.
+The root-directory for class-files when using \textit{GCom} is
+compiled to \textit{bin/main/java}, while the root-directory for
+test-code is compile to \textit{bin/test/java}.
 
-Spelet startas med kommandot:\\
+To create \textit{jar}-file of the compiled sources issue the
+following command:\\
 \begin{footnotesize}
-  \verb!salt:~/edu/apjava/lab4> ant run!
-\end{footnotesize}
-
-En banredigerare kan startas med kommandot:\\
+  \verb!salt:./GCom> ant jar!
+\end{footnotesize}\\
+This will create \textit{GCom.jar} which can be used when developing
+in third party software or directly as a \textit{GNS}-server (see
+section \ref{sec:group-naming-system}) by
+running:\\
 \begin{footnotesize}
-  \verb!salt:~/edu/apjava/lab4> ant run-editor!
+  \verb!salt:./GCom> java -jar GCom.jar!
 \end{footnotesize}
 
-Spelet kan även kompileras till en jar-fil som kan köras utan att
-\textit{Ant} är installerat, detta görs med kommandot:\\
-\begin{footnotesize}
-  \verb!salt:~/edu/apjava/lab4> ant jar!
-\end{footnotesize}
+\subsection{Required libraries}\label{sec:required-libraries}
+Internally \textit{GCom} uses some third party software located in the
+\textit{lib} directory and described in the following sections.
 
-Efter ovan kommando kommer det att skapas en fil \verb!AntiTD.jar! i
-samma katalog. För att starta spelet kan denna jar-fil köras med
-kommandot:\\
-\begin{footnotesize}
-  \verb!salt:~/edu/apjava/lab4> java -jar AntiTD.jar!
-\end{footnotesize}
+\subsection{SLF4J and Logback}\label{sec:logback}
 
-För att jar-filen ska kunna köras måste de bibliotek som behövs för
-körning finnas i en katalog \verb!lib! på samma sökväg som körningen
-görs från.
+\subsection{JUnit}\label{sec:junit}
+For testing the individual parts of \textit{GCom}, tests are written
+using the \textit{JUnit testing
+  framework}\footnote{http://www.junit.org/}.
 
 \section{System description}\label{sec:system}
 % Beskriv översiktligt hur programmet är uppbyggt och hur det löser
@@ -271,13 +268,6 @@ görs från.
   \label{fig:images/Stack}
 \end{figure*}
 
-You are free to use any tools you want for this project, in fact, selection of appropriate tools is considered part of the assignment. You will however have to motivate your choice of tools with respect to, and in terms of, what you expect to learn from this course and project. If you find a tool (there exists quite a few) that solves the assignment with little or no effort from your side, you are naturally not allowed to use it. (One such tool is for example JGroup) You are of course allowed to use documentation and research papers from existing solutions when designing GCom. As middleware-development is part of the course focus, you are not allowed to implement GCom using TCP/IP sockets.
-
-More specifically:
-
-* You may implement GCom in any programming language and middleware of your choice (as long as the rule about non-trivial solutions is not broken), however, the teachers cannot provide help for other systems than Java using Java RMI.
-* Make use of any IDE and/or plugins you feel makes the job easier. You will write a quite substantial amount of code (in Java, approximately between 2000 to 7000 lines including the GUI). Use tools that facilitate this.
-* Since your test and debug application(s) must feature graphical user interface(s), use a suitable tool for interface construction. There are IDE plugins for this task, and you will likely save at least half a day if not more by using these tools correctly.
 
 
 \subsection{Group management module}\label{sec:group-management-module}
@@ -369,10 +359,8 @@ More specifically:
 \newpage
 \appendix
 \pagenumbering{roman}
-\section{Bilagor}\label{sec:kallkod}
+\section{Appendix}\label{sec:kallkod}
 % Källkoden ska finnas tillgänglig i er hemkatalog
 % ~/edu/apjava/lab1/. Bifoga även utskriven källkod.
-Härefter följer utskrifter från källkoden och andra filer som hör till
-denna laboration
 
 \end{document}
