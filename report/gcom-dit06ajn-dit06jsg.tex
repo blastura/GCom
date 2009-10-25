@@ -253,7 +253,7 @@ When a process wants to communicate with other processes using
 already existing. That starting point is defined by a global address
 known by all \textit{GCom} members. This starting point will contain a
 service for group discovery, described in more detail in section
-\ref{sec:group-naming-system}.
+\ref{sec:group-name-system}.
 
 % TODO: Discuss single point of failure?
 
@@ -310,7 +310,7 @@ following command:\\
 \end{footnotesize}\\
 This will create \textit{GCom.jar} which can be used when developing
 in third party software or directly as a \textit{GNS}-server (see
-section \ref{sec:group-naming-system}) by
+section \ref{sec:group-name-system}) by
 running:\\
 \begin{footnotesize}
   \verb!salt:./GCom> java -jar GCom.jar!
@@ -406,6 +406,14 @@ some special parts parts of the system where unexpected results would
 otherwise be very hard to debug. All tests are located in the folder
 \textit{src/test/java/} and are compiled to \textit{bin/test/java/}.
 
+To run all tests issue the following command:\\
+\begin{footnotesize}
+  \verb!salt:./GCom> ant test!
+\end{footnotesize}\\
+Note hoverer that some tests require that some ports are note bound on
+\textit{localhost} by other processes, and therefore the tests can
+fail because of bind exceptions.
+
 \section{System description}\label{sec:system}
 % Beskriv översiktligt hur programmet är uppbyggt och hur det löser
 % problemet.
@@ -442,14 +450,49 @@ discussed in more detail in the following sections.
   \label{fig:images/Stack}
 \end{figure*}
 
-
-
-\subsection{Group management module}\label{sec:group-management-module}
-
-\subsubsection{Group Naming System}\label{sec:group-naming-system}
+\subsection{Group Name System}\label{sec:group-name-system}
 % To resolve group names: When a process sends a message to the group,
 % the group management module resolves the group name into a list of
 % group members.
+To act as an entry point for group members in a \textit{GCom} system
+there must be an instance of \textit{se.umu.cs.jsgajn.gcom.GNS}
+running on a machine with a known address. The \textit{GNS} acts as a
+Group Name System service which means that it resolves a group name
+consisting of string to an instance of the remote interface of the
+group leader.
+
+The \textit{GNS} is \textit{GCom} only critical point of failure. If
+the \textit{GNS} crashes no new group members can join groups without
+an instance of any group members remote interface.
+
+If the \textit{GNS} where to crash it can be started once again with
+a serialized object of the groups it contained before the crash. This
+is done with the following command:\\
+\begin{footnotesize}
+  \verb!salt:./GCom> java -jar GCom.jar GroupSettingMap.ser!
+\end{footnotesize}\\
+The previous command provides the \textit{GNS} with a file
+\textit{GroupSettingMap.ser} which is saved by the last instance of a
+running \textit{GNS}.
+
+\subsection{Group management module}\label{sec:group-management-module}
+The \textit{group management module} is the top one in the application
+stack, see figure \ref{fig:images/Stack}. Software using the
+\textit{GCom} middleware will should handle all communication through
+this module by creating an instance of it and passing an instance of
+\textit{se.umu.cs.jsgajn.gcom.Client} to the constructor of the
+\textit{Group management module}.
+
+A newly created \textit{group management module} will initialize all
+other modules needed for a fully functional \textit{GCom} application
+stack.
+
+The default implementation of the \textit{group management module} is
+implemented in the class
+\textit{s.u.c.j.g.management.ManagementModuleImpl}. This
+implementation will contain one thread to send messages and one thread
+to receive messages.
+
 
 \subsubsection{Group leaders}\label{sec:group-leaders}
 % To provide an interface for group management: The group management
