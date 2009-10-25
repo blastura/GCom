@@ -418,6 +418,16 @@ otherwise be very hard to debug. All tests are located in the folder
 % properly in order for your system to be able to ensure correct
 % message delivery semantics.
 
+The \textit{GCom} middleware is separated in three different modules
+to separate different behaviours, see figure \ref{fig:images/Stack}.
+The first module which will have the closest connection to
+implementing software is the \textit{management module}. This module
+handles group membership changes and actions. The second module
+\textit{ordering module}, handles message ordering. The third module
+\textit{communications module} is the one that actually sends and
+receives messages to and from the group. These modules will be
+discussed in more detail in the following sections.
+
 % \begin{figure}[!t]
 %   \centering
 %   \includegraphics[width=2.5in]{images/Stack.pdf}
@@ -426,7 +436,7 @@ otherwise be very hard to debug. All tests are located in the folder
 %   \label{fig:images/Stack}
 % \end{figure}
 
-\begin{figure*}[!t]
+\begin{figure*}[!thb]
   \centerline{\includegraphics[width=110mm]{images/Stack.pdf}}
   \caption{GCom stack}
   \label{fig:images/Stack}
