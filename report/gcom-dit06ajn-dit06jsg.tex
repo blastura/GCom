@@ -491,8 +491,13 @@ The default implementation of the \textit{group management module} is
 implemented in the class
 \textit{s.u.c.j.g.management.ManagementModuleImpl}. This
 implementation will contain one thread to send messages and one thread
-to receive messages.
-
+to receive messages. All messages to be sent are first paced in a
+priority queue where all messages are ordered according to the
+\textit{first in first out} principle, except some system messages
+that are prioritized before client messages. The system are those sent
+when a process wants to join a group, the message sent when a
+group constellation has changed and when a member has detected that
+another member has crashed.
 
 \subsubsection{Group leaders}\label{sec:group-leaders}
 % To provide an interface for group management: The group management
