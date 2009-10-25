@@ -285,7 +285,7 @@ This catalog contains the following sub directories:
 \item The directory \verb!doc! contains the Javadoc API for \textit{GCom}.
 \end{itemize}
 
-\section{Compilation}\label{sec:compilation}
+\subsection{Compilation}\label{sec:compilation}
 The following commands will require the software tool \textit{Apache
   Ant}\footnote{http://ant.apache.org/}. More details about what
 happens using \textit{ant} in this project is found in the file
@@ -347,9 +347,40 @@ gcom.multicast=RELIABLE_MULTICAST
   \caption{applications.properties}\label{code:app-prop}
 \end{code}
 
-\subsection{logback.xml}\label{sec:logback.xml}
+\subsubsection{logback.xml}\label{sec:logback.xml}
 The file \textit{logback.xml} defines the behaviours of logging when
-using \textit{GCom}.
+using \textit{GCom} and \textit{Logback}, see section
+\ref{sec:logback}. The settings in this file is ignored by default if
+a system property \textit{logback.root.level} is set to a specified
+logging level, e.g. \textit{\textit{logback.root.level=OFF}} turns all
+logging off.
+
+Every class has a separate logger-name consisting of its fully
+qualified class-name. This means that logging can be configured per
+class or package. For example to only print debug information from the
+\textit{se.umu.cs.jsgajn.gcom.management} package you could use the
+configuration shown in CodeSnippet \ref{code:logback}. For more
+information configuring logback check their
+manual\footnote{\url{http://logback.qos.ch/manual/configuration.html}}.
+
+\begin{code}
+  \begin{footnotesize}
+\begin{verbatim}
+<configuration>
+   <!-- ... -->
+   <logger name="se.umu.cs.jsgajn.gcom.management">
+      <level value="${logback.root.level:-DEBUG}" />
+   </logger>
+   
+   <root>
+      <level value="${logback.root.level:-OFF}"/>
+      <appender-ref ref="STDOUT" />
+   </root>
+</configuration>
+\end{verbatim}
+  \end{footnotesize}
+  \caption{logback.xml}\label{code:logback}
+\end{code}
 
 \subsection{Required libraries}\label{sec:required-libraries}
 Basic functionality of \textit{GCom} requires no extra libraries other
