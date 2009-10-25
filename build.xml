@@ -131,7 +131,7 @@
          <!-- define MANIFEST.MF -->
          <manifest>
             <attribute name="Built-By" value="${user.name}" />
-            <attribute name="Main-Class" value="se.umu.cs.dit06ajnajs.AntiTD"/>
+            <attribute name="Main-Class" value="se.umu.cs.jsgajn.gcom.GNSImpl"/>
 
             <!-- finally, use the magically generated libs path -->
             <attribute name="Class-Path" value="${libs.project}" />

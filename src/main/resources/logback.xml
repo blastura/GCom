@@ -9,7 +9,6 @@
       </layout>
    </appender>
    
-   
    <logger name="se.umu.cs.jsgajn.gcom.ordering">
       <level value="${logback.root.level:-DEBUG}" />
    </logger>
