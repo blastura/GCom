@@ -579,11 +579,19 @@ about the members that have crashed.
 \subsection{Message ordering module}\label{sec:message-ordering-module}
 The \textit{Message ordering module} is responsible for message
 ordering. That is it will for different orderings guarante that all
-messages delivered from this module up to the group management module
-is order according to the current ordering. The group module will send
-all outgoing messages to this module, which will prepare the message
-with necessary information such as vectorclocks and pass the message
-along to the communications module.
+messages delivered from this module up to the group \textit{management
+  module} is order according to the current ordering. The
+\textit{management module} will send all outgoing messages to this
+module, which will prepare the message with necessary information such
+as vector-clocks and pass the message along to the
+\textit{communications module}. The \textit{communications module}
+will in turn deliver received messages from other group members
+through the \textit{ordering module}. When messages are delivered here
+they are immediately put in the current ordering implementation. All
+ordering implementations describe in the following sections act as
+\textit{BlockingQueue}\footnote{\url{http://java.sun.com/j2se/1.5.0/docs/api/java/util/concurrent/BlockingQueue.html}}.
+When taking messages from them they block until they can release a
+message which confirms to their message ordering guarantee.
 
 \begin{figure}[!thb]
   \centering
@@ -593,10 +601,25 @@ along to the communications module.
 \end{figure}
 
 \subsubsection{Non-ordered}\label{sec:-non-ordered}
-\subsubsection{FIFO}\label{sec:fifo}
-\subsubsection{Causal}\label{sec:causal}
-\subsubsection{Total}\label{sec:total}
-\subsubsection{Causal-Total}\label{sec:causal-total}
+The \textit{non-ordered} ordering does not make any guarantee about
+the ordering of messages. It do however release messages it receives
+in the exact same order as it gets them.
+
+\subsubsection{FIFO ordering}\label{sec:fifo}
+The \textit{FIFO} ordering will release messages received from a
+correct process in the same order as they are sent from that process.
+This is done by keeping a counter of how many messages it has
+delivered for each group member. When preparing an outgoing message
+\textit{FIFO} will piggyback onto that message the total number of
+messages it has prepared and sent. When receiving a message
+\textit{FIFO} compares the counter in the message with its own receive
+counter for the sending message. If the message is not the next in
+order for that sender, the message will be put in a hold-back queue
+until it is.
+
+\subsubsection{Causal ordering}\label{sec:causal}
+\subsubsection{Total ordering}\label{sec:total}
+\subsubsection{Causal-Total ordering}\label{sec:causal-total}
 % (messages are first sorted according to causal ordering, then according to total ordering)
 
 \subsection{Communications module}\label{sec:communications-module}
