@@ -600,6 +600,13 @@ message which confirms to their message ordering guarantee.
   \label{fig:images/ordering}
 \end{figure}
 
+Because \textit{GCom} is implemented to allow members to join already
+existing groups the different type of orderings handle their first
+ever message from a group member as a starting point for ordering
+subsequent messages. This means that if a message is received after
+the first message that should have been received before the first
+message, it is discarded.
+
 \subsubsection{Non-ordered}\label{sec:-non-ordered}
 The \textit{non-ordered} ordering does not make any guarantee about
 the ordering of messages. It do however release messages it receives
@@ -642,12 +649,40 @@ sending member, and it has delivered all messages that the sending
 member had delivered when sending that message.
 
 \subsubsection{Total ordering}\label{sec:total}
+
 \subsubsection{Causal-Total ordering}\label{sec:causal-total}
-% (messages are first sorted according to causal ordering, then according to total ordering)
+% (messages are first sorted according to causal ordering, then
+% according to total ordering)
 
 \subsection{Communications module}\label{sec:communications-module}
+The \textit{communications module} is responsible for the actual
+sending and receiving of messages for a group member. All
+communication is done through \textit{Java RMI} by calling methods on
+remote objects.
+
+A \textit{communications module} will use an instance of a
+\textit{Multicast} interface to multicast messages to a group. Two
+multicast methods are implemented, \textit{Basic multicast} and
+\textit{Reliable multicast}, see figure \ref{fig:images/commodule}.
+
+\begin{figure}[!thb]
+  \centering
+  \includegraphics[width=2.5in]{images/ComModule.pdf}
+  \caption{Communications module}
+  \label{fig:images/commodule}
+\end{figure}
+
 \subsubsection{Basic multicast}\label{sec:basic-multicast}
+The multicast method \textit{Basic multicast} makes no guarantee that
+all members of a group will receive a message sent. Sending messages
+is done with \textit{one-to-one} communication with every member of
+the group. If for example the process where to fail when halfway
+through sending messages to the group, then the reminding half of the
+group will never receive that message. This is handled by
+\textit{Reliable multicast}.
+
 \subsubsection{Reliable multicast}\label{sec:reliable-multicast}
+The multicast method \textit{Reliable multicast} guarantee that 
 
 \subsection{Debugger}\label{sec:debugger}
 % That messages are delivered according to the specified ordering
@@ -664,7 +699,6 @@ member had delivered when sending that message.
 % count the number of messages (including control messages) required
 % to perform an operation (send one message with certain ordering and
 % certain multicast).
-
 
 \section{Limitations}\label{sec:limitations}
 % Vilka problem och begränsningar har din lösning av uppgiften? Hur
