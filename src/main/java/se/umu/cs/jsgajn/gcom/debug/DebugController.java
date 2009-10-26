@@ -53,77 +53,114 @@ public class DebugController implements DebugHandler {
 
     public void init(final DebugView view) {
         view.addReleaseMessageListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if (e.getClickCount() == 2) { // Doubleclick
-                        int index = view.getIndexOfMessageToRelease(1);
-                        if (index < 0) {return;}
-                        UUID id = (UUID) currentContact.getHoldTable().getValueAt(index, 1);
-                        logger.debug("Clicked index {} which has UUID {}", index, id);
-                        releaseMessage(id);
-                        currentContact.getHoldTable().removeRow(index);
-                    }
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) { // Doubleclick
+                    int index = view.getIndexOfMessageToRelease(1);
+                    if (index < 0) {return;}
+                    UUID id = (UUID) currentContact.getHoldTable().getValueAt(index, 1);
+                    logger.debug("Clicked index {} which has UUID {}", index, id);
+                    releaseMessage(id);
+                    currentContact.getHoldTable().removeRow(index);
                 }
-            });
-
+            }
+        });
 
         view.addShowReceivedMessageListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if (e.getClickCount() == 2) { // Doubleclick
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) { // Doubleclick
 
-                        int index = view.getIndexOfMessageToRelease(2);
+                    int index = view.getIndexOfMessageToRelease(2);
 
 
-                        if (index < 0) {return;}
+                    if (index < 0) {return;}
 
-                        Message m = (Message) currentContact.getReceivedTable().getValueAt(index, 5);
+                    Message m = (Message) currentContact.getReceivedTable().getValueAt(index, 5);
 
-                        MessageInfo messageInfo = new MessageInfo(m, DebugController.this);
-                        messageInfo.setLocationRelativeTo(null);
-                        messageInfo.setVisible(true);
-                        messageInfo.setPreferredSize(new Dimension(600, 300));
-                        messageInfo.pack();
+                    MessageInfo messageInfo = new MessageInfo(m, DebugController.this);
+                    messageInfo.setLocationRelativeTo(null);
+                    messageInfo.setVisible(true);
+                    messageInfo.setPreferredSize(new Dimension(600, 300));
+                    messageInfo.pack();
 
-                    }
                 }
-            });
+            }
+        });
 
         view.addShowDeliveredMessageListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if (e.getClickCount() == 2) { // Doubleclick
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) { // Doubleclick
 
-                        int index = view.getIndexOfMessageToRelease(3);
+                    int index = view.getIndexOfMessageToRelease(3);
 
 
-                        if (index < 0) {return;}
+                    if (index < 0) {return;}
 
-                        Message m = (Message) currentContact.getDeliveredTable().getValueAt(index, 4);
+                    Message m = (Message) currentContact.getDeliveredTable().getValueAt(index, 4);
 
-                        MessageInfo messageInfo = new MessageInfo(m, DebugController.this);
-                        messageInfo.setLocationRelativeTo(null);
-                        messageInfo.setVisible(true);
-                        messageInfo.setPreferredSize(new Dimension(600, 300));
-                        messageInfo.pack();
+                    MessageInfo messageInfo = new MessageInfo(m, DebugController.this);
+                    messageInfo.setLocationRelativeTo(null);
+                    messageInfo.setVisible(true);
+                    messageInfo.setPreferredSize(new Dimension(600, 300));
+                    messageInfo.pack();
 
-                    }
                 }
-            });
+            }
+        });
+    }
+    
+    public void init2(final SequencerHoldFrame view) {
+        view.addSequencerMessageListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) { // Doubleclick
+                    int index = view.getIndexOfMessageToRelease();
+                    if (index < 0) {return;}
+                    Message m = (Message) currentContact.getSequencerTable().getValueAt(index, 4);
+                    logger.debug("Clicked index {} which has Message {}", index, m);
+                    seqBlockMsgMap.put(m, false);
+                    currentContact.getSequencerTable().removeRow(index);
+                }
+            }
+        });
+    }
+
+    public void showSequencerOptions() {
+        logger.debug("kooooor");
+        SequencerHoldFrame sequencerHoldFrame = new SequencerHoldFrame(DebugController.this, currentContact);
+        sequencerHoldFrame.setLocationRelativeTo(null);
+        sequencerHoldFrame.setVisible(true);
+        sequencerHoldFrame.setPreferredSize(new Dimension(600, 300));
+        sequencerHoldFrame.pack();
     }
 
     public ContactModel getCurrentContact() {
         return currentContact;
     }
 
+    public void blockSequencer() {
+        logger.debug("block plix");
+        blockSequencer = true;
+    }
+    
     Map<Message, Boolean> seqBlockMsgMap = new HashMap<Message, Boolean>();
     boolean blockSequencer = false;
     /** Block message if active */
     public void sequencerHoldMessage(Message m) {
         logger.debug("Block sequence requests");
         if (!blockSequencer) { return; }
-        
+
         seqBlockMsgMap.put(m, true);
+        currentContact.addSequencerMessage(
+                new Object[]{
+                        getShortUIDForMessage(m.getUID()),
+                        getShorterUIDForMessage(m.getUID()),
+                        m.getMessage(),
+                        getUserNameForUID(m.getOriginUID()),
+                        m}
+        );
         while (seqBlockMsgMap.get(m)) {
             try {
                 Thread.sleep(1000);
@@ -186,13 +223,13 @@ public class DebugController implements DebugHandler {
         found = allreadyFoundCheck(m);
         if(found == false) {
             currentContact.addReceived(
-                                       new Object[]{
-                                           1,
-                                           getShortUIDForMessage(m.getUID()),
-                                           getShorterUIDForMessage(m.getUID()),
-                                           m.getMessage(),
-                                           getUserNameForUID(m.getOriginUID()),
-                                           m});
+                    new Object[]{
+                            1,
+                            getShortUIDForMessage(m.getUID()),
+                            getShorterUIDForMessage(m.getUID()),
+                            m.getMessage(),
+                            getUserNameForUID(m.getOriginUID()),
+                            m});
         }
     }
 
@@ -201,12 +238,12 @@ public class DebugController implements DebugHandler {
      */
     public void messageDelivered(Message m) {
         currentContact.addDelivered(
-                                    new Object[]{
-                                        getShortUIDForMessage(m.getUID()),
-                                        getShorterUIDForMessage(m.getUID()),
-                                        m.getMessage(),
-                                        getUserNameForUID(m.getOriginUID()),
-                                        m});
+                new Object[]{
+                        getShortUIDForMessage(m.getUID()),
+                        getShorterUIDForMessage(m.getUID()),
+                        m.getMessage(),
+                        getUserNameForUID(m.getOriginUID()),
+                        m});
     }
 
     /**
@@ -219,7 +256,7 @@ public class DebugController implements DebugHandler {
             currentContact.addToClock(new String[]{
                     getUserNameForUID(vcid).toString(),
                     Integer.toString(vc.get(vcid))
-                });
+            });
         }
     }
 
@@ -346,9 +383,9 @@ public class DebugController implements DebugHandler {
      */
     public void groupChange(GroupView group) {
         currentContact.updateGroupViewPanelTitle(
-                                                 getUserNameForUID(group.getGroupLeaderGroupMember().getPID()));
+                getUserNameForUID(group.getGroupLeaderGroupMember().getPID()));
         currentContact.updateMainFrameTitle(
-                                            "Debugger - " + getUserNameForUID(ManagementModule.PID));
+                "Debugger - " + getUserNameForUID(ManagementModule.PID));
         currentContact.clearGroup();
         for(GroupMember gm : group) {
             currentContact.addGroupMember(new Object[]{getUserNameForUID(gm.getPID())});

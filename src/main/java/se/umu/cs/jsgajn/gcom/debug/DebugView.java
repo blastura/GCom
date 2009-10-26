@@ -125,9 +125,10 @@ public class DebugView extends JFrame {
         panel1.add(button3, new GridBagConstraints(8, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
 
 
-        JButton button4 = new JButton();
-        button4.setText("Let one hold message go");
-        panel1.add(button4, new GridBagConstraints(9, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
+        JButton showSequncerFrame = new JButton();
+        showSequncerFrame.setText("Show Sequencer Options");
+        showSequncerFrame.addActionListener(EventHandler.create(ActionListener.class, debugController, "showSequencerOptions"));
+        panel1.add(showSequncerFrame, new GridBagConstraints(9, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
 
 
         JTabbedPane tabbedPane0 = new JTabbedPane();

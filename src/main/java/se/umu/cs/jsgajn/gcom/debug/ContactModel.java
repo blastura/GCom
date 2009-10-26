@@ -24,6 +24,7 @@ public class ContactModel {
     private DefaultTableModel crashedTable;
     private DefaultTableModel clientInfo;
     private DefaultTableModel groupMembers;
+    private DefaultTableModel sequencerTable;
 
     private JToggleButton holdButton;
     private JToggleButton releaseAndResortButton;
@@ -126,6 +127,10 @@ public class ContactModel {
     public void addGroupMember(Object[] rowData) {
         System.out.println("add: " + rowData[0]);
         groupMembers.insertRow(0, rowData);
+    }
+
+    public void addSequencerMessage(Object[] obj) {
+        sequencerTable.insertRow(0, obj);
     }
 
 
@@ -266,5 +271,13 @@ public class ContactModel {
 
     public void setOrderingHoldTable(DefaultTableModel orderingHoldTable) {
         this.orderingHoldTable = orderingHoldTable;
+    }
+
+    public void setSequencerTable(DefaultTableModel sequencerTable) {
+        this.sequencerTable = sequencerTable;
+    }
+
+    public DefaultTableModel getSequencerTable() {
+        return sequencerTable;
     }
 }
