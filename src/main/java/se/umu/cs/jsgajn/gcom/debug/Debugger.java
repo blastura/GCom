@@ -103,4 +103,11 @@ public class Debugger implements DebugHandler {
         debugger.updateOrderingHoldList(holdList);
         
     }
+
+    public void sequencerHoldMessage(Message m) {
+        if (debugger == null) {
+            return;
+        }
+        debugger.sequencerHoldMessage(m);
+    }
 }

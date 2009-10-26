@@ -3,7 +3,6 @@ package se.umu.cs.jsgajn.gcom.debug;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.UnsupportedEncodingException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ import java.util.Stack;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 import org.slf4j.Logger;
@@ -28,7 +26,6 @@ import se.umu.cs.jsgajn.gcom.management.GroupMember;
 import se.umu.cs.jsgajn.gcom.management.GroupView;
 import se.umu.cs.jsgajn.gcom.management.ManagementModule;
 import se.umu.cs.jsgajn.gcom.ordering.VectorClock;
-import se.umu.cs.jsgajn.gcom.testapp.ConnectDialog;
 
 public class DebugController implements DebugHandler {
     private static final Logger logger = LoggerFactory.getLogger(DebugController.class);
@@ -56,67 +53,85 @@ public class DebugController implements DebugHandler {
 
     public void init(final DebugView view) {
         view.addReleaseMessageListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) { // Doubleclick
-                    int index = view.getIndexOfMessageToRelease(1);
-                    if (index < 0) {return;}
-                    UUID id = (UUID) currentContact.getHoldTable().getValueAt(index, 1);
-                    logger.debug("Clicked index {} which has UUID {}", index, id);
-                    releaseMessage(id);
-                    currentContact.getHoldTable().removeRow(index);
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getClickCount() == 2) { // Doubleclick
+                        int index = view.getIndexOfMessageToRelease(1);
+                        if (index < 0) {return;}
+                        UUID id = (UUID) currentContact.getHoldTable().getValueAt(index, 1);
+                        logger.debug("Clicked index {} which has UUID {}", index, id);
+                        releaseMessage(id);
+                        currentContact.getHoldTable().removeRow(index);
+                    }
                 }
-            }
-        });
-        
+            });
+
 
         view.addShowReceivedMessageListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) { // Doubleclick
-                    
-                    int index = view.getIndexOfMessageToRelease(2);
-                    
-                    
-                    if (index < 0) {return;}
-                    
-                    Message m = (Message) currentContact.getReceivedTable().getValueAt(index, 5);
-                    
-                    MessageInfo messageInfo = new MessageInfo(m, DebugController.this);
-                    messageInfo.setLocationRelativeTo(null);
-                    messageInfo.setVisible(true);
-                    messageInfo.setPreferredSize(new Dimension(600, 300));
-                    messageInfo.pack();
-                    
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getClickCount() == 2) { // Doubleclick
+
+                        int index = view.getIndexOfMessageToRelease(2);
+
+
+                        if (index < 0) {return;}
+
+                        Message m = (Message) currentContact.getReceivedTable().getValueAt(index, 5);
+
+                        MessageInfo messageInfo = new MessageInfo(m, DebugController.this);
+                        messageInfo.setLocationRelativeTo(null);
+                        messageInfo.setVisible(true);
+                        messageInfo.setPreferredSize(new Dimension(600, 300));
+                        messageInfo.pack();
+
+                    }
                 }
-            }
-        });
-        
+            });
+
         view.addShowDeliveredMessageListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) { // Doubleclick
-                    
-                    int index = view.getIndexOfMessageToRelease(3);
-                    
-                    
-                    if (index < 0) {return;}
-                    
-                    Message m = (Message) currentContact.getDeliveredTable().getValueAt(index, 4);
-                    
-                    MessageInfo messageInfo = new MessageInfo(m, DebugController.this);
-                    messageInfo.setLocationRelativeTo(null);
-                    messageInfo.setVisible(true);
-                    messageInfo.setPreferredSize(new Dimension(600, 300));
-                    messageInfo.pack();
-                    
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getClickCount() == 2) { // Doubleclick
+
+                        int index = view.getIndexOfMessageToRelease(3);
+
+
+                        if (index < 0) {return;}
+
+                        Message m = (Message) currentContact.getDeliveredTable().getValueAt(index, 4);
+
+                        MessageInfo messageInfo = new MessageInfo(m, DebugController.this);
+                        messageInfo.setLocationRelativeTo(null);
+                        messageInfo.setVisible(true);
+                        messageInfo.setPreferredSize(new Dimension(600, 300));
+                        messageInfo.pack();
+
+                    }
                 }
-            }
-        });
+            });
     }
 
     public ContactModel getCurrentContact() {
         return currentContact;
+    }
+
+    Map<Message, Boolean> seqBlockMsgMap = new HashMap<Message, Boolean>();
+    boolean blockSequencer = false;
+    /** Block message if active */
+    public void sequencerHoldMessage(Message m) {
+        logger.debug("Block sequence requests");
+        if (!blockSequencer) { return; }
+        
+        seqBlockMsgMap.put(m, true);
+        while (seqBlockMsgMap.get(m)) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        seqBlockMsgMap.remove(m);
     }
 
     public void crash() {
@@ -146,7 +161,7 @@ public class DebugController implements DebugHandler {
     /**
      * Checks if the message already is in the received-table. If so, returns
      * false. If it isn't in the table, return true.
-     * 
+     *
      * @param m
      * @return
      */
@@ -171,13 +186,13 @@ public class DebugController implements DebugHandler {
         found = allreadyFoundCheck(m);
         if(found == false) {
             currentContact.addReceived(
-                    new Object[]{
-                            1,
-                            getShortUIDForMessage(m.getUID()),
-                            getShorterUIDForMessage(m.getUID()), 
-                            m.getMessage(), 
-                            getUserNameForUID(m.getOriginUID()),
-                            m});
+                                       new Object[]{
+                                           1,
+                                           getShortUIDForMessage(m.getUID()),
+                                           getShorterUIDForMessage(m.getUID()),
+                                           m.getMessage(),
+                                           getUserNameForUID(m.getOriginUID()),
+                                           m});
         }
     }
 
@@ -186,12 +201,12 @@ public class DebugController implements DebugHandler {
      */
     public void messageDelivered(Message m) {
         currentContact.addDelivered(
-                new Object[]{
-                        getShortUIDForMessage(m.getUID()),
-                        getShorterUIDForMessage(m.getUID()), 
-                        m.getMessage(), 
-                        getUserNameForUID(m.getOriginUID()),
-                        m});
+                                    new Object[]{
+                                        getShortUIDForMessage(m.getUID()),
+                                        getShorterUIDForMessage(m.getUID()),
+                                        m.getMessage(),
+                                        getUserNameForUID(m.getOriginUID()),
+                                        m});
     }
 
     /**
@@ -204,16 +219,16 @@ public class DebugController implements DebugHandler {
             currentContact.addToClock(new String[]{
                     getUserNameForUID(vcid).toString(),
                     Integer.toString(vc.get(vcid))
-            });
+                });
         }
     }
 
     /**
      * Toggle boolean state of doHold.
      */
-    public void hold()	{
+    public void hold()  {
         logger.debug("doHold {}", this.doHold);
-        this.doHold = this.doHold ? false : true; 
+        this.doHold = this.doHold ? false : true;
         logger.debug("doHold {}", this.doHold);
     }
 
@@ -238,7 +253,7 @@ public class DebugController implements DebugHandler {
         // messageHandler thread in CommunicationsModuleImpl
         if (this.doHold) {
             logger.debug("Holding message {}", m);
-            receiver = r; 
+            receiver = r;
             holdList.add(m);
             currentContact.addHold(new Object[]{m.getMessage(), m.getUID()});
         }
@@ -275,7 +290,7 @@ public class DebugController implements DebugHandler {
 
     /**
      * Converts UUID to a immature nickname
-     * 
+     *
      * @param uid
      * @return
      */
@@ -301,7 +316,7 @@ public class DebugController implements DebugHandler {
 
     /**
      * Converts an UUID to an int instead. For easier reading.
-     * 
+     *
      * @param uid
      * @return
      */
@@ -314,7 +329,7 @@ public class DebugController implements DebugHandler {
 
     /**
      * Ugly method for substring UUID to 12 letters.
-     * 
+     *
      * @param uid
      * @return
      */
@@ -331,9 +346,9 @@ public class DebugController implements DebugHandler {
      */
     public void groupChange(GroupView group) {
         currentContact.updateGroupViewPanelTitle(
-                getUserNameForUID(group.getGroupLeaderGroupMember().getPID()));
+                                                 getUserNameForUID(group.getGroupLeaderGroupMember().getPID()));
         currentContact.updateMainFrameTitle(
-                "Debugger - " + getUserNameForUID(ManagementModule.PID));
+                                            "Debugger - " + getUserNameForUID(ManagementModule.PID));
         currentContact.clearGroup();
         for(GroupMember gm : group) {
             currentContact.addGroupMember(new Object[]{getUserNameForUID(gm.getPID())});
@@ -351,14 +366,14 @@ public class DebugController implements DebugHandler {
     /**
      * Releases one message from the holdList.
      * Is called when you click on a message in the GUI-list
-     * 
+     *
      * @param id
      */
     public void releaseMessage(UUID id) {
         Message mSave = null;
         for (Message m : holdList) {
             if (m.getUID().equals(id)){
-                mSave = m; 
+                mSave = m;
                 break;
             }
         }
@@ -379,7 +394,7 @@ public class DebugController implements DebugHandler {
         DefaultTableModel dtm = currentContact.getOrderingHoldTable();
         dtm.setRowCount(0);
         for (Message m : holdList) {
-           dtm.addRow(new Object[]{m.getMessage(), m.getUID()}); 
+            dtm.addRow(new Object[]{m.getMessage(), m.getUID()});
         }
     }
 }

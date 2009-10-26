@@ -18,4 +18,7 @@ public interface DebugHandler {
     public boolean holdMessage(Message m, Receiver r);
     public boolean isModelInitialized(int hack);
     public void updateOrderingHoldList(ArrayList<Message> holdList);
+    
+    /** Will block until debugger want's to release it */
+    public void sequencerHoldMessage(Message m);
 }

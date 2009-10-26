@@ -10,14 +10,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import se.umu.cs.jsgajn.gcom.Message;
 import se.umu.cs.jsgajn.gcom.ordering.CasualTotalOrdering;
+import se.umu.cs.jsgajn.gcom.debug.Debugger;
 
 public class ReceiverImpl implements Receiver, Serializable {
+    private static final Debugger debugger = Debugger.getDebugger();
     private static final long serialVersionUID = 1L;
     // This will not be sent when object is serialized
     private transient BlockingQueue<Message> q;
     private final UUID PID;
-    private AtomicInteger sequenceNumber;
-    private CasualTotalOrdering ordering;
+    private transient AtomicInteger sequenceNumber;
+    private transient CasualTotalOrdering ordering;
 
     public ReceiverImpl(BlockingQueue<Message> q, final UUID processID)
         throws RemoteException, AlreadyBoundException, NotBoundException,IllegalArgumentException {
@@ -42,7 +44,10 @@ public class ReceiverImpl implements Receiver, Serializable {
         return this.PID;
     }
 
-    public int getSequenceNumber(Message m) {
+    public int getSequenceNumber(Message m) throws RemoteException {
+        // Will block if active
+        debugger.sequencerHoldMessage(m);
+            
         if (ordering != null) {
             ordering.askForSequenceNumber(m);
             ordering.getSequenceNumber(m);
@@ -50,11 +55,11 @@ public class ReceiverImpl implements Receiver, Serializable {
         return sequenceNumber.incrementAndGet();
     }
 
-    public void createOrdering() {
+    public void createOrdering() throws RemoteException {
         this.ordering = new CasualTotalOrdering();
     }
 
-    public boolean orderingExist() {
+    public boolean orderingExist() throws RemoteException {
         return ordering != null;
     }
 }

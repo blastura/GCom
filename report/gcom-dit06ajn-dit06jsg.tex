@@ -672,6 +672,47 @@ until it is.
 % make it impossible to implement - consider for example the Internet.
 % Read pages 498 and 508 in [DS].
 
+
+\subsection{Test protocol}\label{sec:test-protocol}
+
+% BEGIN RECEIVE ORGTBL salesfigures
+\begin{tabular}{lrl}
+p1 & p2 & p3 (hold all messages) \\
+\hline
+ett &  &  \\
+ & 2 &  \\
+tre &  &  \\
+ & 4 &  \\
+\hline
+ &  & (Release messages in reverse order) \\
+\hline
+ &  & 2 \\
+ &  & 4 \\
+ &  & ett \\
+ &  & tre \\
+\end{tabular}
+% END RECEIVE ORGTBL salesfigures
+\begin{comment}
+  #+ORGTBL: SEND salesfigures orgtbl-to-latex
+  | p1  | p2 | p3 (hold all messages)              |
+  |-----+----+-------------------------------------|
+  | ett |    |                                     |
+  |     |  2 |                                     |
+  | tre |    |                                     |
+  |     |  4 |                                     |
+  |-----+----+-------------------------------------|
+  |     |    | (Release messages in reverse order) |
+  |-----+----+-------------------------------------|
+  |     |    | 2                                   |
+  |     |    | 4                                   |
+  |     |    | ett                                 |
+  |     |    | tre                                 |
+\end{comment}
+
+
+
+
+
 %%%%%%%%%%%%%%%% END APPENDIX AND STUFF %%%%%%%%%%%%%%%%
 \bibliographystyle{alpha}
 \bibliography{books.bib}
