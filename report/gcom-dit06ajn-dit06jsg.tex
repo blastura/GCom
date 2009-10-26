@@ -483,6 +483,21 @@ handles group membership changes and actions. The second module
 receives messages to and from the group. These modules will be
 discussed in more detail in the following sections.
 
+\subsection{Overview}\label{sec:overview}
+The \textit{GCom} middleware
+In the center of \textit{GComs} distributed network is the
+\textit{Group Name System} (GNS). All processes that want to
+join the distributed network connects to it.  
+The three modules constructs one group member and each group member 
+belongs to a group view.   
+
+\begin{figure}[!thb]
+  \centering
+  \includegraphics[width=3.3in]{images/Ordering.pdf}
+  \caption{Ordering module}
+  \label{fig:images/ordering}
+\end{figure}
+
 % \begin{figure}[!t]
 %   \centering
 %   \includegraphics[width=2.5in]{images/Stack.pdf}
@@ -649,6 +664,12 @@ sending member, and it has delivered all messages that the sending
 member had delivered when sending that message.
 
 \subsubsection{Total ordering}\label{sec:total}
+Total order makes all the processes in the system to deliver all messages
+in the same order. This doesn't mean it's the right order, but it is the same.
+This is possible by letting the group leader become sequencer. This means 
+that all messages in the system have to ask the leader for a sequence number 
+before they can multicast their messages. Then all processes have to order
+incomming messages after this sequence numbers.
 
 \subsubsection{Causal-Total ordering}\label{sec:causal-total}
 % (messages are first sorted according to causal ordering, then
@@ -702,6 +723,52 @@ processes.
 % to perform an operation (send one message with certain ordering and
 % certain multicast).
 
+The debugger is a singelton and works as an entirely independent application.
+It can be activated in all classes of GCOM and it has a lot of useful functions.
+The debugger is uniq for the group member that starts it, that means it montors only the
+things which that group member.
+
+\subsubsection{Debugger functions}\label{sec:debuggerfunctions}
+Here is a list of all the functions in the debugger.
+\begin{itemize}
+\item Table with all received messages including this info
+    \begin{itemize}
+        \item Number of times the message been received
+        \item Short id (all message receives a debugger-id 1,2,3++)
+        \item UUID
+        \item Message content
+        \item Original sender UUID
+        \item The message-object
+        \item Doubleclick : Path message has taken, is it a systemmessage, its sequencenumber
+    \end{itemize}
+\item List all delivered messages including this info
+    \begin{itemize}
+        \item Short id (all message receives a debugger-id 1,2,3++)
+        \item UUID
+        \item Message content
+        \item Original sender UUID
+        \item The message-object
+        \item Doubleclick : Path message has taken, is it a systemmessage, its sequencenumber
+    \end{itemize}
+\item Information internal vector clock
+\item List of the members in the current group view
+\item Hold/unhold  messages from being delivered to the client
+\item Shuffle or revers the hold queue
+\item Release one or all messages from the holdqueue
+\item Table with all de helded messages
+    \begin{itemize}
+        \item Message content
+        \item UUID
+    \end{itemize}
+\item Table with the messages that is currently held in the ordering-class (except for the CasualTotal-ordering)
+    \begin{itemize}
+        \item Message content
+        \item UUID
+    \end{itemize}
+\item Possibility to let two messages when using the CasualTotal-ordering change order before goring to the sequencer.
+\end{itemize}
+
+
 \section{Limitations}\label{sec:limitations}
 % Vilka problem och begränsningar har din lösning av uppgiften? Hur
 % skulle de kunna rättas till?
@@ -735,15 +802,16 @@ processes.
 \subsection{Test protocol}\label{sec:test-protocol}
 
 % BEGIN RECEIVE ORGTBL salesfigures
-\begin{tabular}{lrl}
-p1 & p2 & p3 (hold all messages) \\
+\begin{tabular}{| l | r | l |}
+p1 & p2 & p3 \\
+ \multicolumn{3}{|c|}{ hold all messages } \\
 \hline
 ett &  &  \\
  & 2 &  \\
 tre &  &  \\
  & 4 &  \\
 \hline
- &  & (Release messages in reverse order) \\
+ \multicolumn{3}{|c|}{Release messages in reverse order}\\
 \hline
  &  & 2 \\
  &  & 4 \\
