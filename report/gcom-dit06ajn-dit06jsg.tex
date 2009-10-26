@@ -801,44 +801,208 @@ Here is a list of all the functions in the debugger.
 
 \subsection{Test protocol}\label{sec:test-protocol}
 
-% BEGIN RECEIVE ORGTBL salesfigures
-\begin{tabular}{| l | r | l |}
-p1 & p2 & p3 \\
- \multicolumn{3}{|c|}{ hold all messages } \\
+
+\subsection{FIFO ordering tests}\label{sec:fifo-tests}
+
+\begin{table}[H]
+  \centering
+  \begin{footnotesize}
+\begin{tabular} {c | c | c}
+% BEGIN RECEIVE ORGTBL fifo
+p1 & p2 & p3 (hold all messages) \\
 \hline
-ett &  &  \\
+one &  &  \\
  & 2 &  \\
-tre &  &  \\
+three &  &  \\
  & 4 &  \\
 \hline
- \multicolumn{3}{|c|}{Release messages in reverse order}\\
+ &  & (Release messages in reverse order) \\
 \hline
- &  & 2 \\
- &  & 4 \\
- &  & ett \\
- &  & tre \\
+one & one & 2 \\
+2 & 2 & 4 \\
+three & three & one \\
+4 & 4 & three \\
+% END RECEIVE ORGTBL fifo
 \end{tabular}
-% END RECEIVE ORGTBL salesfigures
+\end{footnotesize}
+\caption{Fifo ordering tests}
+\end{table}
 \begin{comment}
-  #+ORGTBL: SEND salesfigures orgtbl-to-latex
-  | p1  | p2 | p3 (hold all messages)              |
-  |-----+----+-------------------------------------|
-  | ett |    |                                     |
-  |     |  2 |                                     |
-  | tre |    |                                     |
-  |     |  4 |                                     |
-  |-----+----+-------------------------------------|
-  |     |    | (Release messages in reverse order) |
-  |-----+----+-------------------------------------|
-  |     |    | 2                                   |
-  |     |    | 4                                   |
-  |     |    | ett                                 |
-  |     |    | tre                                 |
+ #+ORGTBL: SEND fifo orgtbl-to-latex :splice t 
+| p1    |    p2 | p3 (hold all messages)              |
+|-------+-------+-------------------------------------|
+| one   |       |                                     |
+|       |     2 |                                     |
+| three |       |                                     |
+|       |     4 |                                     |
+|-------+-------+-------------------------------------|
+|       |       | (Release messages in reverse order) |
+|-------+-------+-------------------------------------|
+| one   |   one | 2                                   |
+| 2     |     2 | 4                                   |
+| three | three | one                                 |
+| 4     |     4 | three                               |
 \end{comment}
 
 
 
+\subsection{Casual ordering tests}\label{sec:casual-ordering-tests}
+\begin{table}[H]
+  \centering
+  \begin{footnotesize}
+    \begin{tabular} {c | c | c}
+      % BEGIN RECEIVE ORGTBL casual
+      p1 & p2 & p3 (hold all messages) \\
+      \hline
+      one &  &  \\
+      & 2 &  \\
+      three &  &  \\
+      & 4 &  \\
+      &  & V \\
+      \hline
+      &  & (Release messages in reverse order) \\
+      \hline
+      one & one & V \\
+      2 & 2 & one \\
+      three & three & 2 \\
+      4 & 4 & three \\
+      V & V & 4 \\
+      % END RECEIVE ORGTBL casual
+    \end{tabular}
+  \end{footnotesize}
+\caption{Casual ordering tests}
+\end{table}
+\begin{comment}
+  #+ORGTBL: SEND casual orgtbl-to-latex :splice t 
+  | p1    |    p2 | p3 (hold all messages)              |
+  |-------+-------+-------------------------------------|
+  | one   |       |                                     |
+  |       |     2 |                                     |
+  | three |       |                                     |
+  |       |     4 |                                     |
+  |       |       | V                                   |
+  |-------+-------+-------------------------------------|
+  |       |       | (Release messages in reverse order) |
+  |-------+-------+-------------------------------------|
+  | one   |   one | V                                   |
+  | 2     |     2 | one                                 |
+  | three | three | 2                                   |
+  | 4     |     4 | three                               |
+  | V     |     V | 4                                   |
+\end{comment}
 
+
+\subsection{Total ordering tests}\label{sec:total-ordering-tests}
+
+\begin{table}[H]
+  \centering
+  \begin{footnotesize}
+    \begin{tabular} {c | c | c}
+      % BEGIN RECEIVE ORGTBL total
+      p1 & p2 & p3 (hold all messages) \\
+      \hline
+      one &  &  \\
+      & 2 &  \\
+      three &  &  \\
+      & 4 &  \\
+      &  & V \\
+      \hline
+      &  & (Release messages in reverse order) \\
+      \hline
+      one & one & one \\
+      2 & 2 & 2 \\
+      three & three & three \\
+      4 & 4 & 4 \\
+      V & V & V \\
+      % END RECEIVE ORGTBL total
+    \end{tabular}
+  \end{footnotesize}
+  \caption{Total ordering tests}
+\end{table}
+\begin{comment}
+  #+ORGTBL: SEND total orgtbl-to-latex :splice t 
+  | p1    |    p2 | p3 (hold all messages)              |
+  |-------+-------+-------------------------------------|
+  | one   |       |                                     |
+  |       |     2 |                                     |
+  | three |       |                                     |
+  |       |     4 |                                     |
+  |       |       | V                                   |
+  |-------+-------+-------------------------------------|
+  |       |       | (Release messages in reverse order) |
+  |-------+-------+-------------------------------------|
+  | one   |   one | one                                 |
+  | 2     |     2 | 2                                   |
+  | three | three | three                               |
+  | 4     |     4 | 4                                   |
+  | V     |     V | V                                   |
+\end{comment}
+
+\begin{table}[H]
+  \centering
+  \begin{footnotesize}
+    \begin{tabular} {c | c | c}
+      % BEGIN RECEIVE ORGTBL totalB
+      p1 & p2 & Sequencer (hold all messages) \\
+      \hline
+      one &  &  \\
+      two &  &  \\
+      \hline
+      &  & (Release messages in reverse order) \\
+      \hline
+      two & two & two \\
+      one & one & one \\
+      % END RECEIVE ORGTBL totalB
+    \end{tabular}
+  \end{footnotesize}
+  \caption{Total ordering tests}
+\end{table}
+\begin{comment}
+  #+ORGTBL: SEND totalB orgtbl-to-latex :splice t 
+  | p1  | p2  | Sequencer (hold all messages)       |
+  |-----+-----+-------------------------------------|
+  | one |     |                                     |
+  | two |     |                                     |
+  |-----+-----+-------------------------------------|
+  |     |     | (Release messages in reverse order) |
+  |-----+-----+-------------------------------------|
+  | two | two | two                                 |
+  | one | one | one                                 |
+\end{comment}
+
+\subsection{Casual-Total ordering tests}\label{sec:casual-total-ordering-tests}
+
+\begin{table}[H]
+  \centering
+  \begin{footnotesize}
+    \begin{tabular} {c | c | c}
+      % BEGIN RECEIVE ORGTBL casualtotal
+      p1 & p2 & Sequencer (hold all messages) \\
+      \hline
+      one &  &  \\
+      two &  &  \\
+      \hline
+      &  & (Release messages in reverse order) \\
+      \hline
+      one & one & one \\
+      two & two & two \\
+      % END RECEIVE ORGTBL casualtotal
+    \end{tabular}
+  \end{footnotesize}
+  \caption{Casual-Total ordering tests}
+\end{table}
+\begin{comment}
+  #+ORGTBL: SEND casualtotal orgtbl-to-latex :splice t 
+  | p1  | p2  | Sequencer (hold all messages)       |
+  |-----+-----+-------------------------------------|
+  | one |     |                                     |
+  | two |     |                                     |
+  |-----+-----+-------------------------------------|
+  |     |     | (Release messages in reverse order) |
+  |-----+-----+-------------------------------------|
+  | one | one | one                                 |
+  | two | two | two                                 |
+\end{comment}
 
 %%%%%%%%%%%%%%%% END APPENDIX AND STUFF %%%%%%%%%%%%%%%%
 \bibliographystyle{alpha}
