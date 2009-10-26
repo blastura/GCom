@@ -473,6 +473,22 @@ public class App implements Client {
 % properly in order for your system to be able to ensure correct
 % message delivery semantics.
 
+The \textit{GCom} middlewares distributed network consist of one 
+\textit{Group Name System} (GNS), \textit{group views} and 
+\textit{group members}. Each \textit{group views} contains 
+one or more \textit{group members} and one of these 
+\textit{group members} servers as \textit{group leader}. 
+The \textit{GNS} has no other knowledge of the \textit{group views}
+except for a referens to the \textit{group leader}.
+
+\subsection{Remote Method Invocation}\label{sec:rmi}
+To keep track of the groups, the \textit{GNS} has a referens to a 
+remote object that represent each groups leader.
+
+Each group member has a referens to a remote object for each
+other group member.
+
+
 The \textit{GCom} middleware is separated in three different modules
 to separate different behaviours, see figure \vref{fig:images/Stack}.
 The first module which will have the closest connection to
@@ -482,14 +498,6 @@ handles group membership changes and actions. The second module
 \textit{communications module} is the one that actually sends and
 receives messages to and from the group. These modules will be
 discussed in more detail in the following sections.
-
-\subsection{Overview}\label{sec:overview}
-The \textit{GCom} middleware
-In the center of \textit{GComs} distributed network is the
-\textit{Group Name System} (GNS). All processes that want to
-join the distributed network connects to it.  
-The three modules constructs one group member and each group member 
-belongs to a group view.   
 
 \begin{figure}[!thb]
   \centering
@@ -520,8 +528,13 @@ To act as an entry point for group members in a \textit{GCom} system
 there must be an instance of \textit{se.umu.cs.jsgajn.gcom.GNS}
 running on a machine with a known address. The \textit{GNS} acts as a
 Group Name System service which means that it resolves a group name
-consisting of string to an instance of the remote interface of the
+consisting of string, to an instance of the remote interface of the
 group leader.
+
+When a process wants to connect it provides a groupname and if 
+the group exists, the \textit{GNS} returns the instance of the group
+leaders remote interface. If the group doesn't exist a new group is
+created and the connecting process is assigned as group leader. 
 
 The \textit{GNS} is \textit{GCom} only critical point of failure. If
 the \textit{GNS} crashes no new group members can join groups without
