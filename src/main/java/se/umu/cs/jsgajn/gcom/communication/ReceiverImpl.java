@@ -19,14 +19,14 @@ public class ReceiverImpl implements Receiver, Serializable {
     private transient BlockingQueue<Message> q;
     private final UUID PID;
     private transient AtomicInteger sequenceNumber;
-    private transient CasualTotalOrdering ordering;
+    private transient CasualTotalOrdering casualTotal;
 
     public ReceiverImpl(BlockingQueue<Message> q, final UUID processID)
         throws RemoteException, AlreadyBoundException, NotBoundException,IllegalArgumentException {
         this.q = q;
         this.PID = processID;
         this.sequenceNumber = new AtomicInteger(0);
-        this.ordering = null;
+        this.casualTotal = null;
     }
 
     public void receive(Message m) throws RemoteException {
@@ -44,22 +44,23 @@ public class ReceiverImpl implements Receiver, Serializable {
         return this.PID;
     }
 
-    public int getSequenceNumber(Message m) throws RemoteException {
+    public Message prepWithSequenceNumber(Message m) throws RemoteException {
         // Will block if active
         debugger.sequencerHoldMessage(m);
             
-        if (ordering != null) {
-            ordering.askForSequenceNumber(m);
-            ordering.getSequenceNumber(m);
+        if (casualTotal != null) {
+            //casualTotal.askForSequenceNumber(m);
+            return casualTotal.setSequenceNumber(m);
         }
-        return sequenceNumber.incrementAndGet();
+        m.setSequnceNumber(sequenceNumber.incrementAndGet());
+        return m;
     }
 
     public void createOrdering() throws RemoteException {
-        this.ordering = new CasualTotalOrdering();
+        this.casualTotal = new CasualTotalOrdering();
     }
 
     public boolean orderingExist() throws RemoteException {
-        return ordering != null;
+        return casualTotal != null;
     }
 }

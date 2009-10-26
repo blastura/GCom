@@ -8,11 +8,7 @@
          <!--<Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern> -->
       </layout>
    </appender>
-   
-   <logger name="se.umu.cs.jsgajn.gcom.ordering">
-      <level value="${logback.root.level:-OFF}" />
-   </logger>
-   
+
    <logger name="se.umu.cs.jsgajn.gcom.GNSImpl">
       <level value="${logback.root.level:-DEBUG}" />
    </logger>
@@ -20,7 +16,11 @@
    <logger name="se.umu.cs.jsgajn.gcom.management">
       <level value="${logback.root.level:-OFF}" />
    </logger>
-
+   
+   <logger name="se.umu.cs.jsgajn.gcom.ordering">
+      <level value="${logback.root.level:-DEBUG}" />
+   </logger>
+   
    <logger name="se.umu.cs.jsgajn.gcom.debug">
       <level value="${logback.root.level:-DEBUG}" />
    </logger>

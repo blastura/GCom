@@ -46,19 +46,22 @@ public class TotalOrdering implements Ordering {
         int sequenceNumber;
         UUID sequencerUID;
         try {
-            sequenceNumber =
-                g.getGroupLeaderGroupMember().getReceiver().getSequenceNumber(m);
+            // Remote prep at sequencer
+            Message mPrep =
+                g.getGroupLeaderGroupMember().getReceiver().prepWithSequenceNumber(m);
+            
             sequencerUID = g.getGroupLeaderGroupMember().getReceiver().getPID();
-
-            m.setSequncerUID(sequencerUID);
-            m.setSequnceNumber(sequenceNumber);
-            logger.debug("OUT: Prepared outgoing message: " + m);
+            
+            mPrep.setSequncerUID(sequencerUID);
+            
+            logger.debug("OUT: Prepared outgoing seqnr: {}, message: {}",
+                         mPrep.getSequnceNumber(), mPrep);
+            return mPrep;
         } catch (RemoteException e) {
             logger.debug("Error, problem with getSequenceNumber in prepOutMess.");
             crashed =  new CrashListImpl(g.getGroupLeaderGroupMember());
             throw new MessageCouldNotBeSentException(crashed);
         }
-        return m;
     }
 
     public void put(Message m) {
@@ -71,14 +74,14 @@ public class TotalOrdering implements Ordering {
 
             // Om det är en ny ledare
             if (!this.leaderUUID.equals(m.getSequncerUID())) {
-                this.latestReceivedSequenceNumber = (m.getSequnceNumber()-1);
+                this.latestReceivedSequenceNumber = (m.getSequnceNumber() - 1);
                 this.leaderUUID = m.getSequncerUID();
                 logger.debug("We got new sequencer, m.getSequcen() = " + latestReceivedSequenceNumber);
             }
             
             // Om detta är första meddelandet den får
-            if(this.latestReceivedSequenceNumber == 0) {
-                this.latestReceivedSequenceNumber = (m.getSequnceNumber()-1);
+            if (this.latestReceivedSequenceNumber == 0) {
+                this.latestReceivedSequenceNumber = (m.getSequnceNumber() - 1);
                 logger.debug("No sequencenumber, got " + latestReceivedSequenceNumber);
             }
 

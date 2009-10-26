@@ -10,11 +10,11 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.umu.cs.jsgajn.gcom.MemberCrashException;
 import se.umu.cs.jsgajn.gcom.Message;
 import se.umu.cs.jsgajn.gcom.MessageCouldNotBeSentException;
 import se.umu.cs.jsgajn.gcom.debug.Debugger;
@@ -24,7 +24,7 @@ import se.umu.cs.jsgajn.gcom.management.GroupView;
 
 public class CasualTotalOrdering implements Ordering {
     private static final long serialVersionUID = 1L;
-    private static final Logger logger = LoggerFactory.getLogger(TotalOrdering.class);
+    private static final Logger logger = LoggerFactory.getLogger(CasualTotalOrdering.class);
     private static final Debugger debugger = Debugger.getDebugger();
 
     private BlockingQueue<Message> receiveQueue;
@@ -34,7 +34,7 @@ public class CasualTotalOrdering implements Ordering {
     private int latestReceivedSequenceNumber = 0;
 
     private Ordering total;
-    private Ordering casual;
+    private Ordering fifo;
     private transient HashMap<UUID, Queue<Message>> holdQueues;
 
     public CasualTotalOrdering() {
@@ -43,7 +43,7 @@ public class CasualTotalOrdering implements Ordering {
         this.running = true;
 
         this.total = new TotalOrdering();
-        this.casual = new CasualOrdering();
+        this.fifo = new FIFOOrdering();
         this.holdQueues = new HashMap<UUID, Queue<Message>>();
         new Thread(new MessageHandler(), "Message sorter thread").start();
         new Thread(new MessageSorter(), "Message sorter thread").start();
@@ -53,7 +53,7 @@ public class CasualTotalOrdering implements Ordering {
         // Check if CT-ordering is set in receiver for group leader
         // if not. Set.
         try {
-            if(!g.getGroupLeaderGroupMember().getReceiver().orderingExist()) {
+            if (!g.getGroupLeaderGroupMember().getReceiver().orderingExist()) {
                 g.getGroupLeaderGroupMember().getReceiver().createOrdering();
             }
         } catch (RemoteException e) {
@@ -61,19 +61,19 @@ public class CasualTotalOrdering implements Ordering {
             cl.add(g.getGroupLeaderGroupMember());
             throw new MessageCouldNotBeSentException(cl);
         }
-        this.casual.prepareOutgoingMessage(m, g);
-        this.total.prepareOutgoingMessage(m, g);
-        return m;
+        this.fifo.prepareOutgoingMessage(m, g);
+        Message mPrep = this.total.prepareOutgoingMessage(m, g);
+        return mPrep;
     }
 
     public void put(Message m) {
         try {
             int sequenceNumber = m.getSequnceNumber();
-            if(this.latestReceivedSequenceNumber == 0) {
-                this.latestReceivedSequenceNumber = (sequenceNumber-1);
-                logger.debug("No sequencenumber, got " + latestReceivedSequenceNumber);
+            if (this.latestReceivedSequenceNumber == 0) {
+                this.latestReceivedSequenceNumber = (sequenceNumber - 1);
+                logger.debug("No sequencenumber: it is now: " + latestReceivedSequenceNumber);
             }
-            logger.debug("Send to queue: {} {}", m.getSequnceNumber(), m.getMessage());
+            logger.debug("Send to queue seqNr: {}, message: {}", m.getSequnceNumber(), m.getMessage());
             receiveQueue.put(m);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -85,7 +85,7 @@ public class CasualTotalOrdering implements Ordering {
             return deliverQueue.take();
         } catch (InterruptedException e) {
             e.printStackTrace();
-            return null;
+            throw new Error("Couldn't wait for queue");
         }
     }
 
@@ -107,7 +107,7 @@ public class CasualTotalOrdering implements Ordering {
 
                         // Check every message in holdBackSortedSet and deliver if
                         // possible
-                        //for (Message holdMessage : holdBackSortedSet) {
+                        // for (Message holdMessage : holdBackSortedSet) {
                         for (Iterator<Message> i = holdBackSortedSet.iterator(); i.hasNext();) {
                             Message holdMessage = i.next();
                             logger.debug("Looping holdback m.getSeq: {}", holdMessage.getSequnceNumber());
@@ -137,7 +137,7 @@ public class CasualTotalOrdering implements Ordering {
         private boolean deliverCheck(final Message m) {
             int sequenceNumber = m.getSequnceNumber();
             logger.debug("Delivercheck: Message got " + sequenceNumber + " compare with " + (latestReceivedSequenceNumber+1));
-            if(sequenceNumber == (CasualTotalOrdering.this.latestReceivedSequenceNumber + 1)) {
+            if (sequenceNumber == (CasualTotalOrdering.this.latestReceivedSequenceNumber + 1)) {
                 CasualTotalOrdering.this.latestReceivedSequenceNumber++;
                 return true;
             } else {
@@ -146,39 +146,41 @@ public class CasualTotalOrdering implements Ordering {
         }
     }
 
-    public void askForSequenceNumber(Message m) {
+
+    /***** Sequencer stuff ****************************************************/
+    private void putInOrdering(Message m) {
         // If its the first time a client asks for a sequence number
-        if(!holdQueues.containsKey(m.getOriginUID())) {
+        if (!holdQueues.containsKey(m.getOriginUID())) {
             holdQueues.put(m.getOriginUID(), new LinkedBlockingQueue<Message>());
         }
-        casual.put(m);
-
+        fifo.put(m);
     }
-    public Message getSequenceNumber(Message m) {
+
+    public Message setSequenceNumber(Message m) {
+        putInOrdering(m);
         LinkedBlockingQueue<Message> queue =
             (LinkedBlockingQueue<Message>) holdQueues.get(m.getOriginUID());
 
         try {
-            Message m2 = queue.take();
+            return queue.take();
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            throw new Error("Couldn't wait for queue.");
         }
-        return null;
     }
 
     /**
      * Sorts the messages into diffrent queues depending on with origin is has
      * @author Jonny
-     *
      */
     private class MessageSorter implements Runnable {
-
+        final AtomicInteger sequenceNumber = new AtomicInteger(0);
         public void run() {
             while (running) {
                 try {
-                    Message m = casual.take();
-
+                    Message m = fifo.take();
+                    m.setSequnceNumber(sequenceNumber.incrementAndGet());
                     LinkedBlockingQueue<Message> queue =
                         (LinkedBlockingQueue<Message>) holdQueues.get(m.getOriginUID());
 

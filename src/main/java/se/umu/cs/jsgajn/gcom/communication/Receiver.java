@@ -34,7 +34,7 @@ public interface Receiver extends Remote {
      * 
      * @return
      */
-    public int getSequenceNumber(Message m) throws RemoteException;
+    public Message prepWithSequenceNumber(Message m) throws RemoteException;
     
     /**
      * Sets orderingmodule. Is used in Casual-Total ordering.
