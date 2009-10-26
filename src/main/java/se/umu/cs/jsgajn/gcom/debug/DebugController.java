@@ -142,7 +142,7 @@ public class DebugController implements DebugHandler {
 
     public void blockSequencer() {
         logger.debug("block plix");
-        blockSequencer = true;
+        blockSequencer = blockSequencer ? false : true;
     }
     
     Map<Message, Boolean> seqBlockMsgMap = new HashMap<Message, Boolean>();

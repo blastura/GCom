@@ -618,6 +618,29 @@ order for that sender, the message will be put in a hold-back queue
 until it is.
 
 \subsubsection{Causal ordering}\label{sec:causal}
+The \textit{Casual} ordering guarantees that messages will be ordered
+by a cause and event ordering. That is if one message is sent as a
+reply to another message all members will deliver those messages in
+the correct order. More formally from \cite{book:dist-syst}:
+\textit{''If multicast(g, m) $\rightarrow$ multicast(g, m'), where
+  $\rightarrow$ is the happened-before relation induced only by
+  messages sent between the members of g, then any correct process
+  that delivers m' will deliver m before m'''}.
+
+This is done by letting each group member keep track of the number of
+messages it has delivered from each other group member as well as
+keeping a counter for the number of messages it has sent to the group.
+This record of message counters is called a \textit{vector-clock}, see
+page 447 \cite{book:dist-syst}.
+
+When preparing a message for sending every process piggybacks its
+vector clock on the outgoing message.
+
+When receiving a message \textit{Casual} ordering places the message
+in a hold back queue until it the next to be delivered from the
+sending member, and it has delivered all messages that the sending
+member had delivered when sending that message.
+
 \subsubsection{Total ordering}\label{sec:total}
 \subsubsection{Causal-Total ordering}\label{sec:causal-total}
 % (messages are first sorted according to causal ordering, then according to total ordering)

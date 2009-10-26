@@ -30,6 +30,8 @@ import se.umu.cs.jsgajn.gcom.ordering.OrderingModule;
 import se.umu.cs.jsgajn.gcom.ordering.OrderingModuleImpl;
 import se.umu.cs.jsgajn.gcom.ordering.OrderingType;
 import se.umu.cs.jsgajn.gcom.ordering.Orderings;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * author dit06ajn, dit06jsg
@@ -56,7 +58,7 @@ public class ManagementModuleImpl implements ManagementModule {
     private PriorityBlockingQueue<FIFOEntry<Message>> sendQueue;
 
     private Thread messageReceiverThread;
-    private Thread messageSenderThread;
+    private List<Thread> messageSenderThreads;
     private boolean running;
 
     public ManagementModuleImpl(Client client, String gnsHost, int gnsPort, String groupName)
@@ -124,7 +126,13 @@ public class ManagementModuleImpl implements ManagementModule {
         }
 
         this.messageReceiverThread = new Thread(new MessageReceiver(), "GroupModule Receive-Thread");
-        this.messageSenderThread = new Thread(new MessageSender(), "GroupModule Send-Thread");
+        
+        int nrSendThreads = 2;
+        this.messageSenderThreads = new ArrayList<Thread>(nrSendThreads);
+        for (int i = 0; i < nrSendThreads; i++) {
+            this.messageSenderThreads.add(new Thread(new MessageSender(), "GroupModule Send-Thread " + i));
+        }
+        //this.messageSenderThread = new Thread(new MessageSender(), "GroupModule Send-Thread");
 
         start();
     }
@@ -134,7 +142,9 @@ public class ManagementModuleImpl implements ManagementModule {
         //Module is started in constructor
         this.running = true;
         this.messageReceiverThread.start();
-        this.messageSenderThread.start();
+        for (Thread t : this.messageSenderThreads) {
+            t.start();
+        }
     }
 
     public void stop() {
