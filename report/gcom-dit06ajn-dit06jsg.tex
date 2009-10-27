@@ -476,6 +476,23 @@ public class App implements Client {
 \end{code}
 
 
+\subsubsection{Example application}\label{sec:exapp}
+In Here is an example of an GUI-application using the GCOM 
+middleware. To test the applications use this line of code:
+\\
+\begin{footnotesize}
+  \verb!salt:./GCom> ./start-gui
+\end{footnotesize}\\
+
+\begin{figure}[!thb]
+  \centering
+  \includegraphics[width=3.3in]{images/TestProgram.png}
+  \caption{GUI-application example }
+  \label{fig:images/guiapp}
+\end{figure}
+
+
+
 \section{System description}\label{sec:system}
 % Beskriv översiktligt hur programmet är uppbyggt och hur det löser
 % problemet.
@@ -987,6 +1004,9 @@ lot of useful functions. The debugger is uniq for the group member
 that starts it, that means it montors only the things which that group
 member.
 
+The debugger can be used to reproduce the ordering examples in the tables
+\ref{tbl:fifo}-\ref{tbl:castot}
+
 \subsubsection{Debugger functions}\label{sec:debuggerfunctions}
 Here is a list of all the functions in the debugger.
 \begin{itemize}
@@ -1031,6 +1051,19 @@ Here is a list of all the functions in the debugger.
   CasualTotal-ordering change order before goring to the sequencer.
 \end{itemize}
 
+\begin{figure*}[!thb]
+  \centerline{\includegraphics[width=110mm]{images/Debuggerstart.png}}
+  \caption{Debugger start screen with popups}
+  \label{fig:images/Debuggerstart}
+\end{figure*}
+
+\begin{figure}[!thb]
+  \centering
+  \includegraphics[width=3.3in]{images/Holdqueues.png}
+  \caption{Debugger hold queues}
+  \label{fig:images/commodule}
+\end{figure}
+
 
 \section{Discussion}\label{sec:discussion}
 % Vilka problem och begränsningar har din lösning av uppgiften? Hur
@@ -1071,10 +1104,18 @@ behind a firewall.
 % % liknande) så kan det även vara intressant att nämna det, samt motivera
 % % ert val av miljö.
 
+\subsection{No automatic failure detection}\label{sec:no-automatic-failure-detection}
+We have no automatic "ping-function" in our system. That means that if for example
+a group member crashed, no one will realize this before they tries to send a message. This also
+implies that if the leader crashes and no messages is sent, there will be no way to connect to the group.
 
+\subsection{Security}\label{sec:security}
+Here there are great opportunities for development. For instance, teoreticly anyone could send I 
+GroupChange-message and noone will know it the sender is the leader or not. It is the same way 
+with all other messages types.
 
 \section{Scenarios}\label{sec:scenarios}
-This section shows diffent scenarios that explains how the system
+This section shows different scenarios that explains how the system
 works.
 
 \subsection{Create new group}
