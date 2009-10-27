@@ -41,7 +41,7 @@ public class ChatMember implements Client {
     }
 
     public void deliver(Object m) {
-        System.out.println(m.toString());
+        System.out.println("=> " + m.toString());
     }
 
     private static void usage() {
