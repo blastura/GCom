@@ -1,17 +1,21 @@
 package se.umu.cs.jsgajn.gcom.testapp;
 
-import se.umu.cs.jsgajn.gcom.Message;
-import se.umu.cs.jsgajn.gcom.MessageType;
+import java.io.Serializable;
 
-public class ChatMessage {
+public class ChatMessage implements Serializable{
     private static final long serialVersionUID = 1L;
     private String msg;
-
-    public ChatMessage(String msg) {
+    private String name;
+    
+    public ChatMessage(String msg, String name) {
         this.msg = msg;
+        this.name = name;
     }
 
     public String getMessage() {
         return this.msg;
+    }
+    public String getName() {
+        return this.name;
     }
 }
