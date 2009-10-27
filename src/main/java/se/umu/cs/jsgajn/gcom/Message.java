@@ -6,6 +6,14 @@ import java.util.List;
 
 import se.umu.cs.jsgajn.gcom.ordering.VectorClock;
 
+/**
+ * Interface to represent messages sent by GCom, all client messages will be 
+ * packed in an instance of this interface, the constructor should be used for
+ * this object insertion. The client message can then be retrieved with the method
+ * {@link #getMessage()}.
+ * 
+ * @author dit06ajn, dit06jsg
+  */
 public interface Message extends Serializable, Comparable<Message> {
     public MessageType getMessageType();
     public UUID getOriginUID();
@@ -70,5 +78,12 @@ public interface Message extends Serializable, Comparable<Message> {
      * Returns who set the message sequence number
      */
     public UUID getSequncerUID();
+    
+    
+    /**
+     * Sets the UUID of the sequencer for this message.
+     * 
+     * @param sequencerUID The UUID this message got its sequence number from.
+     */
     public void setSequncerUID(UUID sequencerUID);
 }

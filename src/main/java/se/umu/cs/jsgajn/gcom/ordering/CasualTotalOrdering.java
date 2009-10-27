@@ -171,8 +171,7 @@ public class CasualTotalOrdering implements Ordering {
     }
 
     /**
-     * Sorts the messages into diffrent queues depending on with origin is has
-     * @author Jonny
+     * Sorts the messages into different queues depending on with origin is has
      */
     private class MessageSorter implements Runnable {
         final AtomicInteger sequenceNumber = new AtomicInteger(0);

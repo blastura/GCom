@@ -1,6 +1,11 @@
 package se.umu.cs.jsgajn.gcom.ordering;
 
 
+/**
+ * Singleton factory class to create instances of orderings.
+ * 
+ * @author dit06ajn, dit06jsg
+  */
 public class Orderings {
     private Orderings() {}; // Prevent instantiation
 
@@ -10,6 +15,12 @@ public class Orderings {
         return newInstance(DEFAULT_ORDERING);
     }
 
+    /**
+     * Create and return a new instance of the specified type.
+     * 
+     * @param type The type of the ordering to create.
+     * @return The newly created instance of the specified ordering.
+     */
     public static Ordering newInstance(OrderingType type) {
         switch (type) {
         case FIFO:

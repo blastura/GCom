@@ -39,6 +39,12 @@ public class ReliableMulticast implements Multicast {
         bMulticast.multicast(m, g);
     }
 
+    /** 
+     * If a message is not received before and is not sent by own member, this
+     * message will be multicasted to all members of the specified GroupView.
+     * 
+     * @see se.umu.cs.jsgajn.gcom.communication.Multicast#deliverCheck(se.umu.cs.jsgajn.gcom.Message, se.umu.cs.jsgajn.gcom.management.GroupView)
+     */
     public boolean deliverCheck(Message m, GroupView g) {
         //System.out.println(m.getUID() + " \n " + m.getOriginUID() + " \n " + m.toString() + "\n" +  m.getMessage().toString() +"\n\n");
         if (!received.contains(m)) {

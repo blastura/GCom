@@ -9,6 +9,11 @@ import se.umu.cs.jsgajn.gcom.ordering.CasualTotalOrdering;
 import se.umu.cs.jsgajn.gcom.ordering.Ordering;
 
 
+/**
+ * Remote interface for receivers of a group member.
+ * 
+ * @author dit06ajn, dit06jsg
+ */
 public interface Receiver extends Remote {
     public static final String STUB_NAME = "snoppen";
     /**

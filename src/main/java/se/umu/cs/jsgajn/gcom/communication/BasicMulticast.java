@@ -59,6 +59,11 @@ public class BasicMulticast implements Multicast {
         }
     }
 
+    /**
+     * Will always return true.
+     * 
+     * @see se.umu.cs.jsgajn.gcom.communication.Multicast#deliverCheck(se.umu.cs.jsgajn.gcom.Message, se.umu.cs.jsgajn.gcom.management.GroupView)
+     */
     public boolean deliverCheck(Message m, GroupView g) {
         return true;
     }

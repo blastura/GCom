@@ -4,7 +4,7 @@ import java.util.UUID;
 import se.umu.cs.jsgajn.gcom.Module;
 
 /**
- * Interface do define behaviour of the management module used for
+ * Interface do define behavior of the management module used for
  * clients to communicate with the group.
  *
  * TODO: Hide or differentiate methods used by other Modules and
@@ -14,6 +14,7 @@ import se.umu.cs.jsgajn.gcom.Module;
  * @version 1.0
  */
 public interface ManagementModule extends Module {
+    
     /**
      * The stubname to bind in registry.
      *
@@ -26,7 +27,7 @@ public interface ManagementModule extends Module {
      * Unique identifier for every groupmember/process. This i
      * generated on first call and is consistent after that.
      *
-     * @return The globaly unique identifier for this current process.
+     * @return The globally unique identifier for this current process.
      */
     public static final UUID PID = UUID.randomUUID();
     

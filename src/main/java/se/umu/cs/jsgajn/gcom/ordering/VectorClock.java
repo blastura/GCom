@@ -8,6 +8,14 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A class to represent vector clocks. Which is a map identifiers T mapped to 
+ * counters.
+ * 
+ * @author dit06ajn, dit06jsg
+ *
+ * @param <T>
+ */
 public class VectorClock<T extends Serializable> implements Comparable<VectorClock<T>>, Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(VectorClock.class);
@@ -20,16 +28,31 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
         this.map = new HashMap<T, Integer>(v.getMap());
     }
 
+    /**
+     * Create a vector clock with specified id. The counter for that id will be
+     * 0.
+     * 
+     * @param id The id of this vector clock.
+     */
     public VectorClock(T id) {
         this(id, 0);
     }
 
+    /**
+     * Create a new vector clock with a specified start value for id.
+     * 
+     * @param id The id of this vector clock.
+     * @param startValue The start value of the id.
+     */
     public VectorClock(T id, int startValue) {
         this.id = id;
         map = new HashMap<T, Integer>();
         map.put(id, startValue);
     }
 
+    /**
+     * @param newId Add a new process to this vector clock with counter 0.
+     */
     public void newProcess(T newId) {
         newProcess(newId, 0);
     }
@@ -57,15 +80,6 @@ public class VectorClock<T extends Serializable> implements Comparable<VectorClo
         }
         map.put(id, (map.get(id) + 1));
     }
-
-    //     /**
-    //      * Set own process counter to new value;
-    //      * @param counter The new value.
-    //      * @return The old value.
-    //      */
-    //     public int put(int counter) {
-    //         return map.put(id, counter);
-    //     }
 
     /**
      * Merge this vector clock with supplied v-clock. For every process in both

@@ -3,6 +3,9 @@ package se.umu.cs.jsgajn.gcom;
 import se.umu.cs.jsgajn.gcom.management.GroupView;
 
 /**
+ * Used by the different modules in the GCom stack. Provides message passing
+ * methods.
+ * 
  * @author dit06ajn, dit06jsg
  */
 public interface Module {
@@ -25,12 +28,12 @@ public interface Module {
     public void deliver(Message m);
     
     /**
-     * Starts moudle. Ex: start message handling threads.
+     * Starts module. Ex: start message handling threads.
      */
     public void start();
     
     /**
-     * Shutdown moudle. Ex: kill threads, unregister created registries.
+     * Shutdown module. Ex: kill threads, unregister created registers.
      */
     public void stop();
 }
