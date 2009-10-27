@@ -697,7 +697,7 @@ the same order for all processes.
       & three & three & one \\
       & 4 & 4 & three \\
       % END RECEIVE ORGTBL fifo
-    \end{tabular}
+      x    \end{tabular}
   \end{footnotesize}
   \caption{Fifo ordering tests}
   \label{tbl:fifo}
@@ -744,7 +744,7 @@ in a hold back queue until it the next to be delivered from the
 sending member, and it has delivered all messages that the sending
 member had delivered when sending that message.
 
-Table \ref{}
+Table \ref{tbl:casual} shows a scenario where process \textit{p3} receives all messages in the reverese order from which they are sent. This results in a \textit{casual} order where all messages are ordered according to the messages delivered by the sending processes at send time. All messages are in order for process \textit{p3} except message \textit{V} since no process had delivered that message when sending the other messages.
 
 \begin{table}[H]
   \centering
@@ -799,6 +799,14 @@ that all messages in the system have to ask the leader for a sequence number
 before they can multicast their messages. Then all processes have to order
 incoming messages after this sequence numbers.
 
+Table \ref{tbl:total} show a scenario where process \textit{p3}
+receives all messages in the reverse order from which they are sent.
+This does not effect the outcome at all, messages are delivered at all
+processes in the same order.
+
+Table \ref{tbl:totalseq} show a scenario where the sequencer deliveres
+sequence numbers in the reverese order for which they are received.
+This results in a reverse order for all processes.
 \begin{table}[H]
   \centering
   \begin{footnotesize}
@@ -823,6 +831,7 @@ incoming messages after this sequence numbers.
     \end{tabular}
   \end{footnotesize}
   \caption{Total ordering tests}
+  \label{tbl:total}
 \end{table}
 \begin{comment}
   #+ORGTBL: SEND total orgtbl-to-latex :splice t
@@ -848,7 +857,7 @@ incoming messages after this sequence numbers.
   \begin{footnotesize}
     \begin{tabular} {c | c | c | c}
       % BEGIN RECEIVE ORGTBL totalB
-      & p1 & p2 & Sequencer (hold all messages) \\
+      & p1 & p2 & p3 - Sequencer (hold all messages) \\
       \hline
       Send order & one &  &  \\
       & two &  &  \\
@@ -861,10 +870,11 @@ incoming messages after this sequence numbers.
     \end{tabular}
   \end{footnotesize}
   \caption{Total ordering tests}
+  \label{tbl:totalseq}
 \end{table}
 \begin{comment}
   #+ORGTBL: SEND totalB orgtbl-to-latex :splice t
-  |               | p1  | p2  | Sequencer (hold all messages)       |
+  |               | p1  | p2  | p3 - Sequencer (hold all messages)  |
   |---------------+-----+-----+-------------------------------------|
   | Send order    | one |     |                                     |
   |               | two |     |                                     |
@@ -887,12 +897,14 @@ group are both casualy and totaly ordered. For a discussion about the
 reasoning behind using a \textit{FIFO} instead of a \textit{Casual}
 ordering in the sequencer, see section \ref{sec:disc-casual-total}.
 
+Table \ref{tbl:castot} shows a scenario where the sequencer receives messages in reverse order. This does not affect the sequence numberse released from the sequencer since they are first \textit{FIFO} ordered.
+
 \begin{table}[H]
   \centering
   \begin{footnotesize}
     \begin{tabular} {c | c | c | c}
       % BEGIN RECEIVE ORGTBL casualtotal
-      & p1 & p2 & Sequencer (hold all messages) \\
+      & p1 & p2 & p3 - Sequencer (hold all messages) \\
       \hline
       Send order & one &  &  \\
       & two &  &  \\
@@ -905,10 +917,11 @@ ordering in the sequencer, see section \ref{sec:disc-casual-total}.
     \end{tabular}
   \end{footnotesize}
   \caption{Casual-Total ordering tests}
+  \label{tbl:castot}
 \end{table}
 \begin{comment}
   #+ORGTBL: SEND casualtotal orgtbl-to-latex :splice t
-  |               | p1  | p2  | Sequencer (hold all messages)       |
+  |               | p1  | p2  | p3 - Sequencer (hold all messages)  |
   |---------------+-----+-----+-------------------------------------|
   | Send order    | one |     |                                     |
   |               | two |     |                                     |
