@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import se.umu.cs.jsgajn.gcom.MemberCrashException;
 import se.umu.cs.jsgajn.gcom.Message;
+import se.umu.cs.jsgajn.gcom.debug.Debugger;
 import se.umu.cs.jsgajn.gcom.management.CrashList;
 import se.umu.cs.jsgajn.gcom.management.CrashListImpl;
 import se.umu.cs.jsgajn.gcom.management.GroupMember;
@@ -17,6 +18,7 @@ import se.umu.cs.jsgajn.gcom.management.GroupView;
 
 public class BasicMulticast implements Multicast {
     private static final Logger logger = LoggerFactory.getLogger(BasicMulticast.class);
+    private static final Debugger debugger = Debugger.getDebugger();
     //private static final Debugger debugger = Debugger.getDebugger();
 
     private CrashList crashed;
@@ -34,6 +36,12 @@ public class BasicMulticast implements Multicast {
             try {
                 member.getReceiver().receive(m);
                 logger.debug("Sent message to: " + member);
+                
+                // For debugging, if message is sent to one process other than 
+                // ourself, it is possible for the debugger to exit this process.
+                if (!member.getPID().equals(ManagementModule.PID)) { 
+                    debugger.crash(); // Will exit system if debugger decides to
+                }
             } catch (RemoteException re) {
                 if (!(re.getCause() instanceof java.net.ConnectException)) {
                     logger.error("RemoteException not ConnectException");

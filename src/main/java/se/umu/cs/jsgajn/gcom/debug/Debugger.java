@@ -49,6 +49,7 @@ public class Debugger implements DebugHandler {
         if (debugger == null) {
             return;
         }
+        debugger.crash();
     }
 
     public void block() {

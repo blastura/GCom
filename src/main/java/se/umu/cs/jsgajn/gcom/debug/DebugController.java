@@ -171,10 +171,18 @@ public class DebugController implements DebugHandler {
         seqBlockMsgMap.remove(m);
     }
 
+    boolean crash = false;
     public void crash() {
-        System.exit(0);
+        if (this.crash) {
+            System.exit(0);
+        }
     }
 
+    public void turnOnCrash() {
+        logger.debug("will crash next loop");
+        this.crash = true;
+    }
+    
     public void block() {
         // TODO: implement
         boolean blocking = true;

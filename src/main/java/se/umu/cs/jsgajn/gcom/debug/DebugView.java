@@ -118,11 +118,11 @@ public class DebugView extends JFrame {
         buttonReleaseMessages.addActionListener(EventHandler.create(ActionListener.class, debugController, "releaseMessages"));
         panel1.add(buttonReleaseMessages, new GridBagConstraints(6, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
 
-        JButton button3 = new JButton();
-        button3.setText("CrashClient");
-        button3.addActionListener(EventHandler.create(ActionListener.class, debugController, "crashMessage"));
-        button3.addActionListener(EventHandler.create(ActionListener.class, debugController, "crash"));
-        panel1.add(button3, new GridBagConstraints(8, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
+        JButton crashButton = new JButton();
+        crashButton.setText("CrashClient");
+        crashButton.addActionListener(EventHandler.create(ActionListener.class, debugController, "crashMessage"));
+        crashButton.addActionListener(EventHandler.create(ActionListener.class, debugController, "turnOnCrash"));
+        panel1.add(crashButton, new GridBagConstraints(8, 1, 1, 1, 0.0, 0.0, 15, 0, new Insets(0, 0, 0, 0), 0, 0));
 
 
         JButton showSequncerFrame = new JButton();

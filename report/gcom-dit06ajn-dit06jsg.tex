@@ -114,7 +114,10 @@
     \begin{large}
       \namn, \mail \\
       \namnTva, \mailTva\\
-      \texttt{\pathtocode}
+      %Code-path: \texttt{\pathtocode}\\
+      \vspace{10mm}
+      Start-server: \texttt{\pathtocode > ./start-server.sh}\\
+      Start-gui: \texttt{\pathtocode > ./start-gui.sh}
     \end{large}
     \vfill
     \large{\textbf{Supervisors}}\\
@@ -485,9 +488,19 @@ except for a referens to the \textit{group leader}.
 To keep track of the groups, the \textit{GNS} has a referens to a 
 remote object that represent each groups leader.
 
-Each group member has a referens to a remote object for each
-other group member.
+Each group member has a referens to a remote object representing the 
+GNS and one for each other group member. This means all group members 
+are connected to each other.
 
+\begin{figure}[!thb]
+  \centering
+  \includegraphics[width=3.3in]{images/Overview.pdf}
+  \caption{GCOM overview}
+  \label{fig:images/overview}
+\end{figure}
+
+
+\subsection{The modules}\label{sec:modules}
 
 The \textit{GCom} middleware is separated in three different modules
 to separate different behaviours, see figure \vref{fig:images/Stack}.
@@ -498,13 +511,6 @@ handles group membership changes and actions. The second module
 \textit{communications module} is the one that actually sends and
 receives messages to and from the group. These modules will be
 discussed in more detail in the following sections.
-
-\begin{figure}[!thb]
-  \centering
-  \includegraphics[width=3.3in]{images/Ordering.pdf}
-  \caption{Ordering module}
-  \label{fig:images/ordering}
-\end{figure}
 
 % \begin{figure}[!t]
 %   \centering
@@ -581,7 +587,7 @@ member has crashed.
 Since groups may contain large amounts of group members the
 \textit{GNS} only contains a reference to one of the group members.
 This member is called the group leader. A group leader is responsible
-for reciving and managing joining members. In the case of the total
+for receiving and managing joining members. In the case of the total
 ordering of messages the group leader will act as a sequencer for the
 group, see section \ref{sec:total}.
 
@@ -597,6 +603,8 @@ will result in a groupchange message multicasted to the group. A
 groupchange message contains information about the complete new group
 composition whereas a membercrash message only contains information
 about the members that have crashed.
+
+When the member that has crashed is the group leader the exact same procedure is used except that when processes receive membercrash messages they will check if they are the new group leader, and if they are they will send a groupchange message to the group. Group members test if they are the new group leader by checking if they have the maximum value of \textit{UUID}s in the current group. This is a variant of the \textit{Bully alghoritm}, see page 482 \cite{book:dist-syst}.
 
 % TODO: this section maybe should have contained info about normal leave 
 % messages, which we have not implemented.
@@ -679,14 +687,15 @@ member had delivered when sending that message.
 \subsubsection{Total ordering}\label{sec:total}
 Total order makes all the processes in the system to deliver all messages
 in the same order. This doesn't mean it's the right order, but it is the same.
-This is possible by letting the group leader become sequencer. This means 
+This is possible by letting the group leader become a sequencer. This means 
 that all messages in the system have to ask the leader for a sequence number 
 before they can multicast their messages. Then all processes have to order
-incomming messages after this sequence numbers.
+incoming messages after this sequence numbers.
 
 \subsubsection{Causal-Total ordering}\label{sec:causal-total}
 % (messages are first sorted according to causal ordering, then
 % according to total ordering)
+The \textit{Casual-total} ordering is almost identical to \textit{Total} ordering except that the sequencer will use an instance of the \textit{FIFO} ordering implementation to make sure that before sending out sequences number for requests, the requests should first be casualy ordered. This means that all messages delivered in the group are both casualy and totaly ordered. For a discussion about the reasoning behind using a \textit{FIFO} instead of a \textit{Casual} ordering in the sequencer, see section \ref{sec:disc-casual-total}.
 
 \subsection{Communications module}\label{sec:communications-module}
 The \textit{communications module} is responsible for the actual
@@ -782,10 +791,18 @@ Here is a list of all the functions in the debugger.
 \end{itemize}
 
 
-\section{Limitations}\label{sec:limitations}
+\section{Discussion}\label{sec:discussion}
 % Vilka problem och begränsningar har din lösning av uppgiften? Hur
 % skulle de kunna rättas till?
+The following sections will discuss some of the problems and solutions encountered while implementing \textit{GCom}.
 
+\subsection{Casual-Total ordering}\label{sec:disc-casual-total}
+The \textit{Total} ordering in our implementation of \textit{GCom} doesn't allow group members to multicast messages without first having piggybacked a correct sequence number to the message. This implies that because our first implementation only had one sending thread there would not exist any case where a message got an a sequence number which was not both total and casual.
+
+To make a different between the total order and the total-casual ordering as defined by the assignment specification we made it possible for the process to use multiple processes to simultaniously send messages. This way there can exist a case where a message on its way to the sequencer will be surpassed by a later message from the same process. That would in a totaly orderd system mean that the messages would be received in the reverse order, but our total-casual sequencer will FIFO order the messages back to their original order before giving them sequence numbers.
+
+\subsection{Passing remote objects}\label{sec:passing-remote-ojbects}
+Our implementation pass remote objects directly between different processes to enable group members to get a connection to other group members. This could become a problem on systems that are connected to internet behind a firewall. Since the lookup of the remote object only is done once different hosts might not have an open route to a process behind a firewall.
 % \section{Reflektioner}\label{Reflektioner}
 % % Reflektioner - Var det något som var speciellt krångligt? Vilka
 % % problem uppstod och hur löste ni dem? Vilka verktyg använde ni? Hur
@@ -793,6 +810,76 @@ Here is a list of all the functions in the debugger.
 % % problem på grund av olika miljöer (i termer av operativsystem och
 % % liknande) så kan det även vara intressant att nämna det, samt motivera
 % % ert val av miljö.
+
+
+
+\section{Scenarios}\label{sec:scenarios}
+This section shows diffent scenarios that explains  how the system works.
+
+\subsection{Create new group}
+P = The process that wants to create new group.
+\begin{enumerate}
+\item P: Create GroupSettings-object with information about name, leader (the process itself) orderingtype and multicasttype.
+\item P: Create a remote object of the GNS.
+\item P: Connect to the GNS with the GroupSettings-object.
+\item GNS: Saves the GroupSetting-object and then returns it to the process again (with a notice if its new or if the group already existed, in this scenario we presume the group didn’t existed).
+\item P: Creates a GroupLeaderImpl()-instance.
+\item P: Starts the receive- and senderthreads.
+\end{enumerate}
+
+\subsection{Join existing group}
+P = The process that wants to join new group. GL = GroupLeader
+\begin{enumerate}
+\item P: Create GroupSettings-object with information about name, leader (the process itself) orderingtype and multicasttype.
+\item P: Create a remote object of the GNS.
+\item P: Connect to the GNS with the GroupSettings-object.
+\item GNS: Discovers that I group with the given name already exist and then returns the already saved group.
+\item P: Create a join-message and inserting a remote object referring to itself as message content.
+\item P: Creates new GroupView with the leader from the GroupSettings-object.
+\item P: Sends the join-message to the OrderingModule where it skips the ordering because it counts as an system message.
+\item P: CommunicationModel receives the message from ordering module and then multicasts it.
+\item All members: Receives the message.
+\item GL: Adds new member to current GroupView-object.
+\item GL: Create a GroupChange with the updated GroupView-object as content.
+\item GL: Multicasts the message to all members (this message is also a system messages which makes it skip ordering)
+\item All members: Receives GroupChange-message and updates thier groups
+\end{enumerate}
+
+\subsection{Member crash (not leader)}
+P = The process that discovers crashed member. GL = GroupLeader
+\begin{enumerate}
+\item P: Tries to multicast message to process C and discovers I remote exception because C has crashed.
+\item P: Throws MemberCrashException which includes C.
+\item P: ManagementModule catches the Exception.
+\item P: Creates MemberCrash-messages with C as its content and multicasts it to the group view (this is I system message which means it skips ordering)
+\item All members: Receives message.
+\item GL: Removes C from it’s GroupView.
+\item GL: Create a GroupChange with the updated GroupView-object as content.
+\item GL: Multicasts the message to all members (this message is also a system messages which makes it skip ordering)
+\item All members: Receives GroupChange-message and updates their groups.
+\end{enumerate}
+Note: Some other member in the group will maybe also discovers that C has crashed so this reaction chain may be executed more times than one.
+
+\subsection{Leader crash}
+P = The process that discovers the crashed leader. GL = GroupLeader
+\begin{enumerate}
+\item P: Tries to multicast message to process C and discovers I remote exception because C has crashed.
+\item P: Throws MemberCrashException which includes C.
+\item P: ManagementModule catches the Exception.
+\item P: Creates MemberCrash-messages with C as its content and multicasts it to the group view (this is I system message which means it skips ordering)
+\item All members: Receives message.
+\item All members: Discovers that is the leader that is dead, then removes the leader from their group view.
+\item All members: Checks if their own MangagementModule has the highest UUID in the GroupView.
+\item Member with highest UUID: Notifys the GNS that the group has a new leader. 
+\item GNS: Updates it’s leaderreferens for the group
+\item GL (new): Creates a GroupLeaderImpl-instance.
+\item GL: Create a GroupChange with the updated GroupView-object as content.
+\item GL: Multicasts the message to all members (this message is also a system messages which makes it skip ordering)
+\item All members: Receives GroupChange-message and updates their groups
+\end{enumerate}
+Note: Some other member in the group will maybe also discovers that C has crashed so this reaction chain may be executed more times than one.
+
+
 
 \section{Tests}\label{sec:tests}
 % Noggranna testkörningar där man ser att programmet fungerar som det
@@ -812,10 +899,19 @@ Here is a list of all the functions in the debugger.
 % Read pages 498 and 508 in [DS].
 
 
-\subsection{Test protocol}\label{sec:test-protocol}
 
+%%%%%%%%%%%%%%%% END APPENDIX AND STUFF %%%%%%%%%%%%%%%%
+\bibliographystyle{alpha}
+\bibliography{books.bib}
 
-\subsection{FIFO ordering tests}\label{sec:fifo-tests}
+\newpage
+\appendix
+\pagenumbering{roman}
+\section{Appendix}\label{sec:kallkod}
+% Källkoden ska finnas tillgänglig i er hemkatalog
+% ~/edu/apjava/lab1/. Bifoga även utskriven källkod.
+\section{Test protocols}\label{sec:test-protocol}
+\subsubsection{FIFO ordering tests}\label{sec:fifo-tests}
 
 \begin{table}[H]
   \centering
@@ -859,7 +955,7 @@ three & three & one \\
 
 
 
-\subsection{Casual ordering tests}\label{sec:casual-ordering-tests}
+\subsubsection{Casual ordering tests}\label{sec:casual-ordering-tests}
 \begin{table}[H]
   \centering
   \begin{footnotesize}
@@ -905,7 +1001,7 @@ three & three & one \\
 \end{comment}
 
 
-\subsection{Total ordering tests}\label{sec:total-ordering-tests}
+\subsubsection{Total ordering tests}\label{sec:total-ordering-tests}
 
 \begin{table}[H]
   \centering
@@ -983,7 +1079,7 @@ three & three & one \\
   | one | one | one                                 |
 \end{comment}
 
-\subsection{Casual-Total ordering tests}\label{sec:casual-total-ordering-tests}
+\subsubsection{Casual-Total ordering tests}\label{sec:casual-total-ordering-tests}
 
 \begin{table}[H]
   \centering
@@ -1016,16 +1112,5 @@ three & three & one \\
   | one | one | one                                 |
   | two | two | two                                 |
 \end{comment}
-
-%%%%%%%%%%%%%%%% END APPENDIX AND STUFF %%%%%%%%%%%%%%%%
-\bibliographystyle{alpha}
-\bibliography{books.bib}
-
-\newpage
-\appendix
-\pagenumbering{roman}
-\section{Appendix}\label{sec:kallkod}
-% Källkoden ska finnas tillgänglig i er hemkatalog
-% ~/edu/apjava/lab1/. Bifoga även utskriven källkod.
 
 \end{document}
