@@ -440,8 +440,10 @@ CodeSnippet \ref{code:app-example}.
   \begin{footnotesize}
 \begin{verbatim}
 import se.umu.cs.jsgajn.gcom.Client;
-import se.umu.cs.jsgajn.gcom.management.ManagementModule;
-import se.umu.cs.jsgajn.gcom.management.ManagementModuleImpl;
+import se.umu.cs.jsgajn.gcom.management. /
+                             ManagementModule;
+import se.umu.cs.jsgajn.gcom.management. /
+                             ManagementModuleImpl;
 
 public class App implements Client {
     public App() {
@@ -474,11 +476,10 @@ public class App implements Client {
   \caption{GCom application}
   \label{code:app-example}
 \end{code}
-
-
+\newpage % TODO: warning
 \subsubsection{Example application}\label{sec:exapp}
 A GUI-application using GCOM is created for demostration purpos. 
-It can be viewed in \vref{fig:images/guiapp}. To test the 
+It can be viewed in figure \vref{fig:images/guiapp}. To test the 
 applications use this line of code:
 \\
 \begin{footnotesize}
@@ -599,11 +600,11 @@ other modules needed for a fully functional \textit{GCom} application
 stack.
 
 The default implementation of the \textit{group management module} is
-implemented in the class
-\textit{s.u.c.j.g.management.ManagementModuleImpl}. This
-implementation will contain one thread to send messages and one thread
-to receive messages. All messages to be sent are first paced in a
-priority queue where all messages are ordered according to the
+implemented in the class (package truncated):\\
+\textit{s.u.c.j.g.management.ManagementModuleImpl}.\\
+This implementation will contain one thread to send messages and one
+thread to receive messages. All messages to be sent are first paced in
+a priority queue where all messages are ordered according to the
 \textit{first in first out} principle, except some system messages
 that are prioritized before client messages. The system are those sent
 when a process wants to join a group, the message sent when a group
@@ -1005,9 +1006,10 @@ lot of useful functions. The debugger is uniq for the group member
 that starts it, that means it montors only the things which that group
 member.
 
-The debugger can be used to reproduce the ordering examples in the tables
-\ref{tbl:fifo}-\ref{tbl:castot}. The interface is shown in 
-\vref{fig:images/Debuggerstart} and \vref{fig:images/holdqueues}.
+The debugger can be used to reproduce the ordering examples in the
+tables \ref{tbl:fifo}-\ref{tbl:castot}. The interface is shown in
+figure \vref{fig:images/Debuggerstart} and figure
+\vref{fig:images/holdqueues}.
 
 \subsubsection{Debugger functions}\label{sec:debuggerfunctions}
 Here is a list of all the functions in the debugger.
@@ -1232,28 +1234,11 @@ one.
 \bibliographystyle{alpha}
 \bibliography{books.bib}
 
-\newpage
-\appendix
-\pagenumbering{roman}
-\section{Appendix}\label{sec:kallkod}
-% Källkoden ska finnas tillgänglig i er hemkatalog
-% ~/edu/apjava/lab1/. Bifoga även utskriven källkod.
-\section{Test protocols}\label{sec:test-protocol}
-\subsubsection{FIFO ordering tests}\label{sec:fifo-tests}
-
-
-
-
-\subsubsection{Casual ordering tests}\label{sec:casual-ordering-tests}
-
-
-
-\subsubsection{Total ordering tests}\label{sec:total-ordering-tests}
-
-
-
-\subsubsection{Casual-Total ordering tests}\label{sec:casual-total-ordering-tests}
-
-
+%\newpage
+%\appendix
+% \pagenumbering{roman}
+% \section{Appendix}\label{sec:kallkod}
+% % Källkoden ska finnas tillgänglig i er hemkatalog
+% % ~/edu/apjava/lab1/. Bifoga även utskriven källkod.
 
 \end{document}
