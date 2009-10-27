@@ -1,5 +1,5 @@
 % -*- coding: utf-8 -*-
-% \documentclass[journal]{IEEEtran}
+%\documentclass[journal]{IEEEtran}
 \documentclass[titlepage, twocolumn, a4paper, 10pt]{article}
 \usepackage{parskip}
 \usepackage[english]{babel}
@@ -13,6 +13,9 @@
 %%%%%%%%%%%%%%%%
 % Column spacing
 %\setlength{\columnsep}{7mm}
+\renewcommand{\sfdefault}{phv}
+\renewcommand{\rmdefault}{ptm}
+\renewcommand{\ttdefault}{pcr}
 
 \hyphenpenalty=750
 % If we didn't adjust the interword spacing, 2200 might be better.
@@ -440,8 +443,10 @@ public class App implements Client {
         int localPort = "33445"
         String group = "YourGroupName";
         try {
-            managementModule = new ManagementModuleImpl(
-                this, host, hostPort, group, localPort);
+            managementModule =
+                new ManagementModuleImpl(
+                    this, host, hostPort,
+                    group, localPort);
         } catch (RemoteException e) {
         } catch (IllegalArgumentException e) {
         } catch (AlreadyBoundException e) {
@@ -668,7 +673,7 @@ the correct order. More formally from \cite{book:dist-syst}:
 \textit{''If multicast(g, m) $\rightarrow$ multicast(g, m'), where
   $\rightarrow$ is the happened-before relation induced only by
   messages sent between the members of g, then any correct process
-  that delivers m' will deliver m before m'''}.
+  that delivers m' will deliver m before m' ''}.
 
 This is done by letting each group member keep track of the number of
 messages it has delivered from each other group member as well as
