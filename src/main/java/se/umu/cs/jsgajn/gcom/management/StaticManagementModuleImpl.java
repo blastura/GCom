@@ -60,10 +60,12 @@ public class StaticManagementModuleImpl implements ManagementModule {
     private Thread messageReceiverThread;
     private List<Thread> messageSenderThreads;
     private boolean running;
+    private List<String> memberNames;
 
-    public StaticManagementModuleImpl(Client client, String gnsHost, int gnsPort, String groupName)
+    public StaticManagementModuleImpl(Client client, String gnsHost, int gnsPort,
+            String groupName, List<String> memberNames)
         throws RemoteException, AlreadyBoundException, NotBoundException {
-        this(client, gnsHost, gnsPort, groupName, Registry.REGISTRY_PORT);
+        this(client, gnsHost, gnsPort, groupName, Registry.REGISTRY_PORT, memberNames);
     }
 
     /**
@@ -78,8 +80,9 @@ public class StaticManagementModuleImpl implements ManagementModule {
      * @throws AlreadyBoundException If it's not possible to bind this to own register.
      * @throws NotBoundException If GNS stub is not found in GNS register.
      */
-    public StaticManagementModuleImpl(final Client client, final String gnsHost, final int gnsPort,
-                                final String groupName, final int clientPort)
+    public StaticManagementModuleImpl(final Client client, final String gnsHost,
+            final int gnsPort, final String groupName, final int clientPort,
+            List<String> memberNames)
         throws RemoteException, AlreadyBoundException, NotBoundException, IllegalArgumentException {
         this.client = client;
         this.receiveQueue = new LinkedBlockingQueue<Message>();
@@ -90,7 +93,8 @@ public class StaticManagementModuleImpl implements ManagementModule {
         this.communicationModule.setOrderingModule(this.orderingModule);
         this.orderingModule.setCommunicationsModule(this.communicationModule);
 
-        this.groupMember = new GroupMember(communicationModule.getReceiver());
+        this.memberNames = memberNames;
+        this.groupMember = new GroupMember(communicationModule.getReceiver(), memberNames.get(0));
         // Temp groupview
         this.groupView =  new GroupViewImpl(groupName, this.groupMember);
         GroupSettings gs = initGroupSettings(groupMember, groupName);
