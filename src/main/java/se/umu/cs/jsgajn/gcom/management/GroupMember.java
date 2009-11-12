@@ -29,6 +29,10 @@ public class GroupMember implements Serializable, Comparable<GroupMember> {
         this(receiver);
         this.name = name;
     }
+    
+    public String getName() {
+        return name;
+    }
 
     public Receiver getReceiver() {
         return this.receiver;

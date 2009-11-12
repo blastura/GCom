@@ -40,6 +40,7 @@ public class StaticManagementModuleImpl implements ManagementModule {
     private static final Logger logger = LoggerFactory.getLogger(StaticManagementModuleImpl.class);
     private static final Debugger debugger = Debugger.getDebugger();
 
+    private boolean staticGroupInitialized = false;
     private Client client;
     private GNS gns;
     private GroupView groupView;
@@ -64,7 +65,7 @@ public class StaticManagementModuleImpl implements ManagementModule {
 
     public StaticManagementModuleImpl(Client client, String gnsHost, int gnsPort,
             String groupName, List<String> memberNames)
-        throws RemoteException, AlreadyBoundException, NotBoundException {
+    throws RemoteException, AlreadyBoundException, NotBoundException {
         this(client, gnsHost, gnsPort, groupName, Registry.REGISTRY_PORT, memberNames);
     }
 
@@ -83,7 +84,7 @@ public class StaticManagementModuleImpl implements ManagementModule {
     public StaticManagementModuleImpl(final Client client, final String gnsHost,
             final int gnsPort, final String groupName, final int clientPort,
             List<String> memberNames)
-        throws RemoteException, AlreadyBoundException, NotBoundException, IllegalArgumentException {
+    throws RemoteException, AlreadyBoundException, NotBoundException, IllegalArgumentException {
         this.client = client;
         this.receiveQueue = new LinkedBlockingQueue<Message>();
         this.sendQueue = new PriorityBlockingQueue<FIFOEntry<Message>>();
@@ -113,6 +114,10 @@ public class StaticManagementModuleImpl implements ManagementModule {
         this.communicationModule.start();
 
         if (gs.isNew()) { // Group is empty I am leader
+            if (memberNames.size() < 2) {
+                client.deliver("Static group with one member, why!");
+                System.exit(1); 
+            }
             logger.debug("Got new group from GNS, this member is leader");
             this.gl = new GroupLeaderImpl();
             debugger.groupChange(this.groupView);
@@ -120,9 +125,9 @@ public class StaticManagementModuleImpl implements ManagementModule {
             logger.debug("Got existing group from GNS, sending join message");
             MessageImpl joinMessage =
                 new MessageImpl(this.groupMember,
-                                MessageType.JOIN,
-                                PID,
-                                groupView.getID());
+                        MessageType.JOIN,
+                        PID,
+                        groupView.getID());
             this.groupView = new GroupViewImpl(groupName, gs.getLeader());
             this.groupView.add(this.groupMember);
             //.getReceiver().receive(joinMessage);
@@ -130,7 +135,7 @@ public class StaticManagementModuleImpl implements ManagementModule {
         }
 
         this.messageReceiverThread = new Thread(new MessageReceiver(), "GroupModule Receive-Thread");
-        
+
         int nrSendThreads = 2;
         this.messageSenderThreads = new ArrayList<Thread>(nrSendThreads);
         for (int i = 0; i < nrSendThreads; i++) {
@@ -200,7 +205,7 @@ public class StaticManagementModuleImpl implements ManagementModule {
      */
     public void send(Object clientMessage) {
         Message m = new MessageImpl(clientMessage,
-                                    MessageType.CLIENTMESSAGE, PID, groupView.getID());
+                MessageType.CLIENTMESSAGE, PID, groupView.getID());
         send(m, this.groupView);
     }
 
@@ -215,6 +220,11 @@ public class StaticManagementModuleImpl implements ManagementModule {
      * @param g The GroupView Message should be sent to.
      */
     public void send(Message m, GroupView g) {
+        if (m.getMessageType().equals(MessageType.CLIENTMESSAGE)
+                && !staticGroupInitialized) {
+            client.deliver("All members are not connected, please wait");
+            return;
+        }
         sendQueue.put(new FIFOEntry<Message>(m));
     }
 
@@ -234,16 +244,27 @@ public class StaticManagementModuleImpl implements ManagementModule {
             throw new Error("TODO: not implemented");
         }
 
+        public boolean isAllMembersConnected() {
+            return memberNames.size() == groupView.size();
+        }
+
         public void addMemberToGroup(GroupMember member) {
             // TODO: fix this
             GroupView groupViewCopy;
+
             synchronized (groupView) {
-                groupView.add(member);
+                // Only add members that are in memberNames
+                if (memberNames.contains(member.getName())) {
+                    groupView.add(member);
+                }
                 groupViewCopy = new GroupViewImpl(groupView);
-            }
+            } 
+
             // Multicast new groupView
-            send(new MessageImpl(groupViewCopy, MessageType.GROUPCHANGE, PID, groupViewCopy.getID()),
-                 groupView); // TODO: Important don't send with wrong send!!!!
+            if (isAllMembersConnected()) {
+                send(new MessageImpl(groupViewCopy, MessageType.GROUPCHANGE, PID, groupViewCopy.getID()),
+                        groupView); // TODO: Important don't send with wrong send!!!!
+            }
         }
     }
 
@@ -276,7 +297,7 @@ public class StaticManagementModuleImpl implements ManagementModule {
                         handleMemberCrashException(e);
                     } catch (MessageCouldNotBeSentException e) {
                         logger.debug("Caught MessageCouldNotBeSentException fifoEntry: {}",
-                                     fifoEntry);
+                                fifoEntry);
                         handleMemberCrashException(new MemberCrashException(e.getCrashedMembers()));
                         // Put message back in queue
                         sendQueue.put(fifoEntry);
@@ -293,8 +314,8 @@ public class StaticManagementModuleImpl implements ManagementModule {
 
             CrashList crashedMembers = e.getCrashedMembers();
             Message memberCrashMessage = new MessageImpl(crashedMembers,
-                                                         MessageType.MEMBERCRASH, ManagementModule.PID,
-                                                         groupView.getID());
+                    MessageType.MEMBERCRASH, ManagementModule.PID,
+                    groupView.getID());
             send(memberCrashMessage, groupView);
         }
     }
@@ -320,6 +341,7 @@ public class StaticManagementModuleImpl implements ManagementModule {
             switch (type) {
             case GROUPCHANGE:
                 logger.info("GROUPCHANGE");
+                staticGroupInitialized = true;
                 synchronized (groupView) {
                     groupView = (GroupView) m.getMessage();
                 }
@@ -364,9 +386,9 @@ public class StaticManagementModuleImpl implements ManagementModule {
                         newLeader = true;
                         try {
                             gns.setNewLeader(
-                                             ManagementModuleImpl.this.groupMember, groupView.getName());
-                            groupView.setNewLeader(ManagementModuleImpl.this.groupMember);
-                            ManagementModuleImpl.this.gl = new GroupLeaderImpl(); // TODO: Sync erros?
+                                    StaticManagementModuleImpl.this.groupMember, groupView.getName());
+                            groupView.setNewLeader(StaticManagementModuleImpl.this.groupMember);
+                            StaticManagementModuleImpl.this.gl = new GroupLeaderImpl(); // TODO: Sync erros?
                         } catch (RemoteException e1) {
                             logger.debug("Error, GNS cant change groupleader");
                             e1.printStackTrace();
@@ -382,8 +404,8 @@ public class StaticManagementModuleImpl implements ManagementModule {
                     }
                     Message groupChangeMessage =
                         new MessageImpl(groupView, MessageType.GROUPCHANGE,
-                                        ManagementModule.PID,
-                                        groupView.getID());
+                                ManagementModule.PID,
+                                groupView.getID());
                     send(groupChangeMessage, groupView);
                 }
             }
@@ -408,13 +430,13 @@ public class StaticManagementModuleImpl implements ManagementModule {
      * @throws NotBoundException If GNS stub can't be found.
      */
     private GNS getGNS(String host, int port) throws RemoteException,
-                                                     NotBoundException {
+    NotBoundException {
         Registry gnsReg = LocateRegistry.getRegistry(host, port);
         return (GNS) gnsReg.lookup(GNS.STUB_NAME);
     }
 
     protected static class FIFOEntry<E extends Comparable<? super E>>
-        implements Comparable<FIFOEntry<E>> {
+    implements Comparable<FIFOEntry<E>> {
         final static AtomicLong seq = new AtomicLong();
         final long seqNum;
         final E entry;
