@@ -10,6 +10,7 @@ public class GroupMember implements Serializable, Comparable<GroupMember> {
     private static final long serialVersionUID = 1L;
     private final Receiver receiver;
     private final UUID PID;
+    private String name;
 
     /**
      * Creates a new GroupMember to use for communication, will get PID from
@@ -22,6 +23,11 @@ public class GroupMember implements Serializable, Comparable<GroupMember> {
     public GroupMember(Receiver receiver) throws RemoteException {
         this.receiver = receiver;
         this.PID = receiver.getPID();
+    }
+    
+    public GroupMember(Receiver receiver, String name) throws RemoteException {
+        this(receiver);
+        this.name = name;
     }
 
     public Receiver getReceiver() {
