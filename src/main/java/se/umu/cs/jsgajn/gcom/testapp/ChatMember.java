@@ -3,6 +3,7 @@ package se.umu.cs.jsgajn.gcom.testapp;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import org.slf4j.Logger;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import se.umu.cs.jsgajn.gcom.Client;
 import se.umu.cs.jsgajn.gcom.management.ManagementModule;
 import se.umu.cs.jsgajn.gcom.management.ManagementModuleImpl;
+import se.umu.cs.jsgajn.gcom.management.StaticManagementModuleImpl;
 
 public class ChatMember implements Client {
     private static final Logger logger = LoggerFactory.getLogger(ChatMember.class);
@@ -18,15 +20,24 @@ public class ChatMember implements Client {
 
     public ChatMember(String gnsHost, int gnsPort, String groupName)
         throws RemoteException, AlreadyBoundException, NotBoundException {
-        this(gnsHost, gnsPort, groupName, -1); // TODO: FIx init clientPort
+        this(gnsHost, gnsPort, groupName, -1, null); // TODO: FIx init clientPort
     }
 
-    public ChatMember(String gnsHost, int gnsPort, String groupName, int clientPort)
+    public ChatMember(String gnsHost, int gnsPort, String groupName, 
+            int clientPort, ArrayList<String> members)
         throws RemoteException, AlreadyBoundException, NotBoundException {
+        
         if (clientPort < 1) {
-            this.groupMember = new ManagementModuleImpl(this, gnsHost, gnsPort, groupName);
+            this.groupMember = new ManagementModuleImpl(this, gnsHost, 
+                    gnsPort, groupName);
         } else {
-            this.groupMember = new ManagementModuleImpl(this, gnsHost, gnsPort, groupName, clientPort);
+            if (members != null) {
+                this.groupMember = new StaticManagementModuleImpl(this, gnsHost, 
+                        gnsPort, groupName, clientPort, members);
+            } else {
+                this.groupMember = new ManagementModuleImpl(this, gnsHost, 
+                        gnsPort, groupName, clientPort);
+            }
         }
 
         new Thread (new Runnable() {
@@ -51,8 +62,14 @@ public class ChatMember implements Client {
 
     public static void main(String[] args) {
         try {
-            if (args.length == 4) {
-                new ChatMember(args[0], Integer.parseInt(args[1]), args[2], Integer.parseInt(args[3]));
+            if (args.length > 4) {
+                ArrayList<String> members = new ArrayList<String>();
+                for(int i = 4; i < args.length; i++) {
+                    members.add(args[i]);
+                }
+                new ChatMember(args[0], Integer.parseInt(args[1]), args[2], Integer.parseInt(args[3]), members);
+            } else if (args.length == 4) {
+                new ChatMember(args[0], Integer.parseInt(args[1]), args[2], Integer.parseInt(args[3]), null);
             } else if (args.length == 3) {
                 new ChatMember(args[0], Integer.parseInt(args[1]), args[2]);
             } else if (args.length == 2) {
