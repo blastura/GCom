@@ -39,7 +39,7 @@ public class DebugMain {
                 DebugMain.this.chatmember = new ChatMember(args[0],
                                                            Integer.parseInt(args[1]),
                                                            args[2],
-                                                           Integer.parseInt(args[3]));
+                                                           Integer.parseInt(args[3]), null);
             
         } catch (NumberFormatException e) {
             e.printStackTrace();
