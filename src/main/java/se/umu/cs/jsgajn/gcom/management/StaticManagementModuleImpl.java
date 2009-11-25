@@ -114,6 +114,8 @@ public class StaticManagementModuleImpl implements ManagementModule {
         this.communicationModule.start();
 
         if (gs.isNew()) { // Group is empty I am leader
+            // Remove own name from membernames
+            memberNames.remove(memberNames.get(0));
             if (memberNames.size() < 2) {
                 client.deliver("Static group with one member, why!");
                 System.exit(1); 
@@ -245,7 +247,8 @@ public class StaticManagementModuleImpl implements ManagementModule {
         }
 
         public boolean isAllMembersConnected() {
-            return memberNames.size() == groupView.size();
+            logger.info("Members connected? Size {}", memberNames.size());
+            return memberNames.isEmpty();
         }
 
         public void addMemberToGroup(GroupMember member) {
@@ -255,6 +258,7 @@ public class StaticManagementModuleImpl implements ManagementModule {
             synchronized (groupView) {
                 // Only add members that are in memberNames
                 if (memberNames.contains(member.getName())) {
+                    memberNames.remove(member.getName());
                     groupView.add(member);
                 }
                 groupViewCopy = new GroupViewImpl(groupView);
