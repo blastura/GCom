@@ -33,7 +33,7 @@
       <pathelement location="${build.main.dir}" />
       <pathelement location="${build.test.dir}" />
       <fileset dir="${lib.dir}">
-         <include name="*.jar"/>
+         <include name="**/*.jar"/>
       </fileset>
    </path>
 
