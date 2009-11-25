@@ -32,11 +32,12 @@ public class CasualTotalOrdering implements Ordering {
 
     private boolean running = false;
     private int latestReceivedSequenceNumber = 0;
-
     private Ordering total;
     private Ordering fifo;
     private transient HashMap<UUID, Queue<Message>> holdQueues;
 
+    private UUID leaderUUID = null;
+    
     public CasualTotalOrdering() {
         this.receiveQueue = new LinkedBlockingQueue<Message>();
         this.deliverQueue = new LinkedBlockingQueue<Message>();
@@ -68,12 +69,25 @@ public class CasualTotalOrdering implements Ordering {
 
     public void put(Message m) {
         try {
-            int sequenceNumber = m.getSequnceNumber();
-            if (this.latestReceivedSequenceNumber == 0) {
-                this.latestReceivedSequenceNumber = (sequenceNumber - 1);
-                logger.debug("No sequencenumber: it is now: " + latestReceivedSequenceNumber);
+            // Körs första gången endast
+            if (this.leaderUUID == null) {
+                this.leaderUUID = m.getSequncerUID();
+                logger.debug("No leader UUID, set new! " + this.leaderUUID);
             }
-            logger.debug("Send to queue seqNr: {}, message: {}", m.getSequnceNumber(), m.getMessage());
+
+            // Om det är en ny ledare
+            if (!this.leaderUUID.equals(m.getSequncerUID())) {
+                this.latestReceivedSequenceNumber = (m.getSequnceNumber() - 1);
+                this.leaderUUID = m.getSequncerUID();
+                logger.debug("We got new sequencer, m.getSequcen() = " + latestReceivedSequenceNumber);
+            }
+
+            // Om detta är första meddelandet den får
+            if (this.latestReceivedSequenceNumber == 0) {
+                this.latestReceivedSequenceNumber = (m.getSequnceNumber() - 1);
+                logger.debug("No sequencenumber, got " + latestReceivedSequenceNumber);
+            }
+
             receiveQueue.put(m);
         } catch (InterruptedException e) {
             e.printStackTrace();

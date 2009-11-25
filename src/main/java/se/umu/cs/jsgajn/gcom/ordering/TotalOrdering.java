@@ -43,7 +43,6 @@ public class TotalOrdering implements Ordering {
     }
 
     public Message prepareOutgoingMessage(Message m, GroupView g) throws MessageCouldNotBeSentException {
-        int sequenceNumber;
         UUID sequencerUID;
         try {
             // Remote prep at sequencer
