@@ -57,7 +57,9 @@ public class ReceiverImpl implements Receiver, Serializable {
     }
 
     public void createOrdering() throws RemoteException {
-        this.casualTotal = new CasualTotalOrdering();
+        if (casualTotal != null) {
+            this.casualTotal = new CasualTotalOrdering();
+        }
     }
 
     public boolean orderingExist() throws RemoteException {
