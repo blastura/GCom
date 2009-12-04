@@ -397,6 +397,23 @@ public class StaticManagementModuleImpl implements ManagementModule {
                             logger.debug("Error, GNS cant change groupleader");
                             e1.printStackTrace();
                         }
+                    } else {
+                        GroupMember probableLeader = groupView.getMember(groupView.getHighestUUID());
+                        try {
+                            probableLeader.getReceiver().getPID();
+                        } catch (RemoteException e) {
+                            // TODO - fix error message
+                            logger.info("Next leader also crached");
+                            
+                            if (!groupView.remove(probableLeader)) {
+                                logger.warn("Next leader crached, but is not in my GroupView!");
+                            } else { // Leader was removed from my groupView
+                                Message memberCrashMessage = new MessageImpl(new CrashListImpl(probableLeader),
+                                                                             MessageType.MEMBERCRASH, ManagementModule.PID,
+                                                                             groupView.getID());
+                                send(memberCrashMessage, groupView);
+                            }
+                        }
                     }
                 }
 
