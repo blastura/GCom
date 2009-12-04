@@ -127,7 +127,7 @@ public class ManagementModuleImpl implements ManagementModule {
 
         this.messageReceiverThread = new Thread(new MessageReceiver(), "GroupModule Receive-Thread");
         
-        int nrSendThreads = 2;
+        int nrSendThreads = 1;
         this.messageSenderThreads = new ArrayList<Thread>(nrSendThreads);
         for (int i = 0; i < nrSendThreads; i++) {
             this.messageSenderThreads.add(new Thread(new MessageSender(), "GroupModule Send-Thread " + i));
@@ -347,6 +347,7 @@ public class ManagementModuleImpl implements ManagementModule {
         private void handleMemberCrash(CrashList crashedMembers) {
             // TODO: verify and test this!
             synchronized (groupView) {
+                
                 // Leader crash?
                 boolean newLeader = false;
                 if (crashedMembers.contains(groupView.getGroupLeaderGroupMember())) {
@@ -354,18 +355,35 @@ public class ManagementModuleImpl implements ManagementModule {
                     if (!groupView.removeAll(crashedMembers.getAll())) {
                         logger.warn("Someone crashed, but is not in my list!");
                     }
+                    
                     // Am I the new leader?
                     if (ManagementModule.PID.equals(groupView.getHighestUUID())) {
                         logger.info("I am new leader :)");
                         newLeader = true;
                         try {
-                            gns.setNewLeader(
-                                             ManagementModuleImpl.this.groupMember, groupView.getName());
+                            gns.setNewLeader(ManagementModuleImpl.this.groupMember, groupView.getName());
                             groupView.setNewLeader(ManagementModuleImpl.this.groupMember);
                             ManagementModuleImpl.this.gl = new GroupLeaderImpl(); // TODO: Sync erros?
                         } catch (RemoteException e1) {
                             logger.debug("Error, GNS cant change groupleader");
                             e1.printStackTrace();
+                        }
+                    } else {
+                        GroupMember probableLeader = groupView.getMember(groupView.getHighestUUID());
+                        try {
+                            probableLeader.getReceiver().getPID();
+                        } catch (RemoteException e) {
+                            // TODO - fix error message
+                            logger.info("Next leader also crached");
+                            
+                            if (!groupView.remove(probableLeader)) {
+                                logger.warn("Next leader crached, but is not in my GroupView!");
+                            } else { // Leader was removed from my groupView
+                                Message memberCrashMessage = new MessageImpl(new CrashListImpl(probableLeader),
+                                                                             MessageType.MEMBERCRASH, ManagementModule.PID,
+                                                                             groupView.getID());
+                                send(memberCrashMessage, groupView);
+                            }
                         }
                     }
                 }

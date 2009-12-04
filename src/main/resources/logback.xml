@@ -14,7 +14,7 @@
    </logger>
    
    <logger name="se.umu.cs.jsgajn.gcom.management">
-      <level value="${logback.root.level:-OFF}" />
+      <level value="${logback.root.level:-DEBUG}" />
    </logger>
    
    <logger name="se.umu.cs.jsgajn.gcom.ordering">

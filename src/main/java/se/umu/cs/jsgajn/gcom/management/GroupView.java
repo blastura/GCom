@@ -11,6 +11,9 @@ import java.util.List;
  * @author dit06ajn, dit06jsg
   */
 public interface GroupView extends Iterable<GroupMember>, Serializable {
+    
+    public GroupMember getMember(UUID id);
+    
     /**
      * @return The unique id of this GroupView.
      */

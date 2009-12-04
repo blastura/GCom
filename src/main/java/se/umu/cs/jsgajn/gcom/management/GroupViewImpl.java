@@ -36,6 +36,15 @@ public class GroupViewImpl implements GroupView {
         add(groupLeader);
     }
 
+    public GroupMember getMember(UUID id) {
+        for (GroupMember m : members) {
+            if (m.getPID().equals(id)) {
+                return m;
+            }
+        }
+        return null;
+    }
+    
     public String getName() {
         return name;
     }

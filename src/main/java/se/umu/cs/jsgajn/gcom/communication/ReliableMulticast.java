@@ -7,9 +7,7 @@ import se.umu.cs.jsgajn.gcom.MemberCrashException;
 import se.umu.cs.jsgajn.gcom.Message;
 import se.umu.cs.jsgajn.gcom.MessageType;
 import se.umu.cs.jsgajn.gcom.management.ManagementModule;
-import se.umu.cs.jsgajn.gcom.management.ManagementModuleImpl;
 import se.umu.cs.jsgajn.gcom.management.GroupView;
-import se.umu.cs.jsgajn.gcom.management.GroupViewImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

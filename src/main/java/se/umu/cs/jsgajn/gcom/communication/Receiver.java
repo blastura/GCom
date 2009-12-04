@@ -5,9 +5,6 @@ import java.rmi.RemoteException;
 import java.util.UUID;
 
 import se.umu.cs.jsgajn.gcom.Message;
-import se.umu.cs.jsgajn.gcom.ordering.CasualTotalOrdering;
-import se.umu.cs.jsgajn.gcom.ordering.Ordering;
-
 
 /**
  * Remote interface for receivers of a group member.
@@ -32,7 +29,6 @@ public interface Receiver extends Remote {
      * @throws RemoteException
      */
     public UUID getPID() throws RemoteException;
-    
     
     /**
      * Return the sequence number
